@@ -1,0 +1,48 @@
+"use client";
+
+import type { ReactNode } from "react";
+import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import SideBar from "../components/SideBar";
+import { ErpRouteGuard } from "../components/ErpRouteGuard";
+import { useAuth } from "../context/auth-context";
+
+type ErpLayoutProps = {
+  children: ReactNode;
+};
+
+export default function ErpLayout({ children }: ErpLayoutProps) {
+  const { isAuthenticated, isLoading } = useAuth();
+  const pathname = usePathname();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.replace(`/login?next=${encodeURIComponent(pathname)}`);
+    }
+  }, [isAuthenticated, isLoading, pathname, router]);
+
+  if (isLoading || !isAuthenticated) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#fafafa] text-[#53623b]">
+        Validando acceso al ERP...
+      </main>
+    );
+  }
+
+  return (
+    <div className="min-h-screen overflow-y-hidden bg-[#fafafa] ">
+      <div className="mx-auto flex max-h-screen w-full overflow-y-hidden">
+        <SideBar />
+
+        <main className="min-w-0 overflow-y-hidden flex-1 px-4 py-6 lg:pr-6">
+          <div className="min-h-[calc(100vh-3rem)] overflow-y-hidden rounded-4xl border border-[#eef1e6] bg-[radial-gradient(circle_at_top,#ffffff_0%,#fffefb_55%,#fbfcf8_100%)] p-4 shadow-lg md:p-6">
+            <div className="min-w-0 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-[34px]   p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur md:p-5">
+              <ErpRouteGuard>{children}</ErpRouteGuard>
+            </div>
+          </div>
+        </main>
+      </div>
+    </div>
+  );
+}
