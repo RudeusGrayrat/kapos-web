@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   AdminActionButton,
   ArrowLeftIcon,
@@ -12,9 +12,8 @@ import {
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
@@ -34,7 +33,7 @@ type UserForm = {
   password: string;
   firstName: string;
   lastName: string;
-  documentType: "DNI" | "CE" | "PASSPORT";
+  documentType: "DNI" | "RUC" | "CE" | "PASSPORT";
   documentNumber: string;
   phone: string;
   title: string;
@@ -110,8 +109,6 @@ export default function ConfigUsuariosPage() {
     setMembers(response.data);
     return { data: response.data, total: response.total };
   }
-
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId]);
 
   function toggleRole(target: "create" | "edit", scopeKey: string) {
     const updater = (current: UserForm) => ({
@@ -261,7 +258,7 @@ export default function ConfigUsuariosPage() {
         )}
         <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombres</span><input className={`w-full rounded-[20px] border border-[#e2e8d0] px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24] ${editingMembershipOnly ? "bg-[#f8faf2] text-[#6c755c]" : "bg-white"}`} value={values.firstName} onChange={(event) => setValues((current) => ({ ...current, firstName: event.target.value }))} disabled={editingMembershipOnly} /></label>
         <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Apellidos</span><input className={`w-full rounded-[20px] border border-[#e2e8d0] px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24] ${editingMembershipOnly ? "bg-[#f8faf2] text-[#6c755c]" : "bg-white"}`} value={values.lastName} onChange={(event) => setValues((current) => ({ ...current, lastName: event.target.value }))} disabled={editingMembershipOnly} /></label>
-        <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo documento</span><select className={`w-full rounded-[20px] border border-[#e2e8d0] px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24] ${editingMembershipOnly ? "bg-[#f8faf2] text-[#6c755c]" : "bg-white"}`} value={values.documentType} onChange={(event) => setValues((current) => ({ ...current, documentType: event.target.value as UserForm["documentType"] }))} disabled={editingMembershipOnly}><option value="DNI">DNI</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
+        <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo documento</span><select className={`w-full rounded-[20px] border border-[#e2e8d0] px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24] ${editingMembershipOnly ? "bg-[#f8faf2] text-[#6c755c]" : "bg-white"}`} value={values.documentType} onChange={(event) => setValues((current) => ({ ...current, documentType: event.target.value as UserForm["documentType"] }))} disabled={editingMembershipOnly}><option value="DNI">DNI</option><option value="RUC">RUC</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
         <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Documento</span><input className={`w-full rounded-[20px] border border-[#e2e8d0] px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24] ${editingMembershipOnly ? "bg-[#f8faf2] text-[#6c755c]" : "bg-white"}`} value={values.documentNumber} onChange={(event) => setValues((current) => ({ ...current, documentNumber: event.target.value }))} disabled={editingMembershipOnly} /></label>
         <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Telefono</span><input className={`w-full rounded-[20px] border border-[#e2e8d0] px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24] ${editingMembershipOnly ? "bg-[#f8faf2] text-[#6c755c]" : "bg-white"}`} value={values.phone} onChange={(event) => setValues((current) => ({ ...current, phone: event.target.value }))} disabled={editingMembershipOnly} /></label>
         <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Cargo</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="Cajero, supervisor..." value={values.title} onChange={(event) => setValues((current) => ({ ...current, title: event.target.value }))} /></label>
@@ -273,7 +270,7 @@ export default function ConfigUsuariosPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Configuracion"
         title="Usuarios internos"
         description="Invita o vincula usuarios a la organizacion activa, asigna roles y suspende accesos sin borrar historial."
@@ -287,12 +284,12 @@ export default function ConfigUsuariosPage() {
             <AdminActionButton tone="primary" active={mode === "create"} icon={<PlusIcon />} onClick={() => setMode("create")}>Crear usuario</AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Usuarios", value: String(members.length), hint: "Miembros cargados en tabla.", tone: "dark" },
+          { label: "Activos", value: String(members.filter((member) => member.status === "ACTIVE").length), hint: "Pueden operar.", tone: "accent" },
+          { label: "Roles disponibles", value: String(roles.length), hint: "Asignables en esta organizacion." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Usuarios" value={String(members.length)} hint="Miembros cargados en tabla." tone="dark" />
-        <StatCard label="Activos" value={String(members.filter((member) => member.status === "ACTIVE").length)} hint="Pueden operar." tone="accent" />
-        <StatCard label="Roles disponibles" value={String(roles.length)} hint="Asignables en esta organizacion." />
-      </div>
       {error ? <AdminMessage title="No pudimos completar la accion" description={error} tone="warn" /> : null}
 
       {mode === "create" ? (
@@ -313,7 +310,7 @@ export default function ConfigUsuariosPage() {
         <PanelCard title="Tabla de usuarios" description="Accesos internos de la organizacion activa.">
           <AdminDataTable
             fetchData={fetchUsers}
-            reloadKey={reloadKey}
+            reloadKey={`${activeOrganizationId ?? ""}-${reloadKey}`}
             rowKey={(row) => row.id}
             permissionKeys={effectivePermissionKeys}
             searchPlaceholder="Buscar usuario..."

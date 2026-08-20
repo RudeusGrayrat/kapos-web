@@ -10,9 +10,8 @@ import {
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
@@ -87,7 +86,7 @@ export default function PlatformUsersPage() {
     password: "",
     firstName: "",
     lastName: "",
-    documentType: "DNI" as "DNI" | "CE" | "PASSPORT",
+    documentType: "DNI" as "DNI" | "RUC" | "CE" | "PASSPORT",
     documentNumber: "",
     phone: "",
     status: "ACTIVE" as "ACTIVE" | "INVITED" | "SUSPENDED" | "DISABLED",
@@ -99,7 +98,7 @@ export default function PlatformUsersPage() {
     email: string;
     firstName: string;
     lastName: string;
-    documentType: "DNI" | "CE" | "PASSPORT";
+  documentType: "DNI" | "RUC" | "CE" | "PASSPORT";
     documentNumber: string;
     phone: string;
     status: "ACTIVE" | "INVITED" | "SUSPENDED" | "DISABLED";
@@ -585,7 +584,7 @@ export default function PlatformUsersPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Superadmin"
         title="Usuarios globales y owners"
         description="Desde aqui controlas la identidad compartida de Kapos: quien existe, a que empresa entra y si actua como platform admin, owner o manager."
@@ -610,13 +609,12 @@ export default function PlatformUsersPage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Usuarios globales", value: String(users.length), hint: "Identidades unicas reutilizables entre clientes y ERP." },
+          { label: "Owners activos", value: String(owners), hint: "Responsables que podran gobernar sus organizaciones.", tone: "accent" },
+          { label: "Roles base", value: String(roles.length), hint: "Roles disponibles para asignar accesos.", tone: "dark" },
+        ]}
       />
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Usuarios globales" value={String(users.length)} hint="Identidades unicas reutilizables entre clientes y ERP." />
-        <StatCard label="Owners activos" value={String(owners)} hint="Responsables que podran gobernar sus organizaciones." tone="accent" />
-        <StatCard label="Roles base" value={String(roles.length)} hint="Roles disponibles para asignar accesos." tone="dark" />
-      </div>
 
       {error ? <AdminMessage title="No pudimos cargar los usuarios globales" description={error} tone="warn" /> : null}
 
@@ -636,7 +634,7 @@ export default function PlatformUsersPage() {
                 <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Contrasena</span><input type="password" required className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} /></label>
                 <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombres</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.firstName} onChange={(event) => setForm((current) => ({ ...current, firstName: event.target.value }))} /></label>
                 <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Apellidos</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.lastName} onChange={(event) => setForm((current) => ({ ...current, lastName: event.target.value }))} /></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo documento</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.documentType} onChange={(event) => setForm((current) => ({ ...current, documentType: event.target.value as "DNI" | "CE" | "PASSPORT" }))}><option value="DNI">DNI</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo documento</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.documentType} onChange={(event) => setForm((current) => ({ ...current, documentType: event.target.value as "DNI" | "RUC" | "CE" | "PASSPORT" }))}><option value="DNI">DNI</option><option value="RUC">RUC</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
                 <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Numero documento</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.documentNumber} onChange={(event) => setForm((current) => ({ ...current, documentNumber: event.target.value }))} /></label>
                 <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Telefono</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} /></label>
                 <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as "ACTIVE" | "INVITED" | "SUSPENDED" | "DISABLED" }))}><option value="ACTIVE">Activo</option><option value="INVITED">Invitado</option><option value="SUSPENDED">Suspendido</option></select></label>
@@ -765,7 +763,7 @@ export default function PlatformUsersPage() {
               <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.status} onChange={(event) => setEditForm((current) => current ? { ...current, status: event.target.value as typeof editForm.status } : current)}><option value="ACTIVE">Activo</option><option value="INVITED">Invitado</option><option value="SUSPENDED">Suspendido</option><option value="DISABLED">Deshabilitado</option></select></label>
               <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombres</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.firstName} onChange={(event) => setEditForm((current) => current ? { ...current, firstName: event.target.value } : current)} /></label>
               <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Apellidos</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.lastName} onChange={(event) => setEditForm((current) => current ? { ...current, lastName: event.target.value } : current)} /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo documento</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.documentType} onChange={(event) => setEditForm((current) => current ? { ...current, documentType: event.target.value as typeof editForm.documentType } : current)}><option value="DNI">DNI</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo documento</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.documentType} onChange={(event) => setEditForm((current) => current ? { ...current, documentType: event.target.value as typeof editForm.documentType } : current)}><option value="DNI">DNI</option><option value="RUC">RUC</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
               <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Numero documento</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.documentNumber} onChange={(event) => setEditForm((current) => current ? { ...current, documentNumber: event.target.value } : current)} /></label>
               <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Telefono</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.phone} onChange={(event) => setEditForm((current) => current ? { ...current, phone: event.target.value } : current)} /></label>
               <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Rol de plataforma</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.platformRoleScopeKey} onChange={(event) => setEditForm((current) => current ? { ...current, platformRoleScopeKey: event.target.value } : current)}><option value="">Sin acceso de plataforma</option>{platformRoles.map((role) => (<option key={role.id} value={role.scopeKey}>{role.name}</option>))}</select></label>

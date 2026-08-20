@@ -46,23 +46,23 @@ export function AdminActionButton({
   const toneClass =
     tone === "primary"
       ? active
-        ? "border-[#1a1d14] bg-[#171717] text-white shadow-[0_20px_40px_rgba(17,17,17,0.28)]"
-        : "border-[#1d1f19] bg-[#111111] text-white shadow-[0_14px_28px_rgba(17,17,17,0.18)] hover:bg-[#1c1d1a]"
+        ? "border-[var(--kapos-charcoal)] bg-[var(--kapos-black)] text-white shadow-[0_20px_40px_rgba(12,13,15,0.28)]"
+        : "border-[var(--kapos-charcoal)] bg-[var(--kapos-black)] text-white shadow-[0_14px_28px_rgba(12,13,15,0.18)] hover:bg-[var(--kapos-charcoal)]"
       : tone === "accent"
         ? active
-          ? "border-[#9fcf1f] bg-[#c7ed4a] text-[#182007] shadow-[0_18px_34px_rgba(180,230,16,0.24)]"
-          : "border-[#d6ea95] bg-[#f7fddf] text-[#2c3812] shadow-[0_12px_24px_rgba(180,230,16,0.14)] hover:border-[#b8da4b] hover:bg-[#eef8c7]"
+          ? "border-[var(--kapos-lime)] bg-[var(--kapos-lime)] text-[var(--kapos-text)] shadow-[0_18px_34px_rgba(184,242,12,0.24)]"
+          : "border-[var(--kapos-border-strong)] bg-[var(--kapos-lime-wash)] text-[var(--kapos-text)] shadow-[0_12px_24px_rgba(184,242,12,0.14)] hover:border-[var(--kapos-lime)] hover:bg-[var(--kapos-lime-soft)]"
         : tone === "danger"
           ? active
-            ? "border-[#3b1717] bg-[#2a1616] text-white shadow-[0_18px_34px_rgba(58,21,21,0.24)]"
-            : "border-[#efd6d3] bg-[#fff7f6] text-[#7f2f28] shadow-[0_12px_22px_rgba(127,47,40,0.08)] hover:border-[#ddaaa4] hover:bg-[#fff0ee]"
+            ? "border-[var(--kapos-danger)] bg-[var(--kapos-danger)] text-white shadow-[0_18px_34px_rgba(211,95,72,0.24)]"
+            : "border-[color-mix(in_srgb,var(--kapos-danger)_34%,white)] bg-[color-mix(in_srgb,var(--kapos-danger)_7%,white)] text-[var(--kapos-danger)] shadow-[0_12px_22px_rgba(211,95,72,0.08)] hover:border-[var(--kapos-danger)] hover:bg-[color-mix(in_srgb,var(--kapos-danger)_11%,white)]"
           : tone === "ghost"
             ? active
-              ? "border-[#d7e3b7] bg-[#f5f9e6] text-[#21310f] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_24px_rgba(64,86,22,0.1)]"
-              : "border-transparent bg-transparent text-[#5b654a] hover:border-[#e3e9d3] hover:bg-white/85 hover:text-[#1f280f]"
+              ? "border-[var(--kapos-border-strong)] bg-[var(--kapos-lime-wash)] text-[var(--kapos-text)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_24px_rgba(32,36,21,0.1)]"
+              : "border-transparent bg-transparent text-[var(--kapos-text-soft)] hover:border-[var(--kapos-border)] hover:bg-white/85 hover:text-[var(--kapos-text)]"
             : active
-              ? "border-[#d3ddba] bg-[#f8fbef] text-[#1d280e] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_16px_28px_rgba(34,44,18,0.08)]"
-              : "border-[#e0e7cf] bg-white text-[#4c5935] shadow-[0_12px_24px_rgba(34,44,18,0.05)] hover:border-[#bfd481] hover:bg-[#fcfef7] hover:text-[#1f280f]";
+              ? "border-[var(--kapos-border-strong)] bg-[var(--kapos-card-alt)] text-[var(--kapos-text)] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_16px_28px_rgba(32,36,21,0.08)]"
+              : "border-[var(--kapos-border)] bg-[var(--kapos-card)] text-[var(--kapos-text-soft)] shadow-[0_12px_24px_rgba(32,36,21,0.05)] hover:border-[var(--kapos-border-strong)] hover:bg-[var(--kapos-lime-wash)] hover:text-[var(--kapos-text)]";
 
   const sizeClass =
     size === "sm"
@@ -76,7 +76,7 @@ export function AdminActionButton({
       type={type}
       className={joinClasses(
         "inline-flex items-center justify-center rounded-full border font-semibold tracking-[-0.01em] transition duration-200 ease-out",
-        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#b4e610] focus-visible:ring-offset-2 focus-visible:ring-offset-white",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--kapos-lime)] focus-visible:ring-offset-2 focus-visible:ring-offset-white",
         "disabled:cursor-not-allowed disabled:opacity-50",
         "active:translate-y-[1px]",
         sizeClass,

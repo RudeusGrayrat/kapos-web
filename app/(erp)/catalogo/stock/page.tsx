@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AdminActionButton, ArrowLeftIcon, PencilIcon, PlusIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable, createLocalAdminTableFetch } from "../../../components/admin/AdminDataTable";
-import { AdminMessage, AdminPageHeader, PanelCard, StatCard, Tag } from "../../../components/admin/AdminBlocks";
+import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { useAuth } from "../../../context/auth-context";
 import { useToast } from "../../../context/toast-context";
 import { getBranches, getProducts, getStock, upsertStock } from "../../../lib/erp-api";
@@ -15,7 +15,8 @@ export default function CatalogoStockPage() {
   const [stock, setStock] = useState<ProductStockSummary[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
   const [branches, setBranches] = useState<BranchSummary[]>([]);
-  const [reloadKey, setReloadKey] = useState(0);
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const reloadKey = `${activeOrganizationId ?? "none"}:${reloadVersion}`;
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "create">("table");
   const [form, setForm] = useState({ productId: "", branchId: "", quantity: "0", minQuantity: "0" });
@@ -41,8 +42,6 @@ export default function CatalogoStockPage() {
     })(input);
   }
 
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId]);
-
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const token = await resolveToken();
@@ -60,7 +59,7 @@ export default function CatalogoStockPage() {
         },
       });
       setForm({ productId: "", branchId: "", quantity: "0", minQuantity: "0" });
-      setReloadKey((current) => current + 1);
+      setReloadVersion((current) => current + 1);
       setViewMode("table");
       toast.showSuccess("El stock fue actualizado correctamente.", "Stock actualizado");
     } catch (submitError) {
@@ -82,10 +81,10 @@ export default function CatalogoStockPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Catalogo"
         title="Stock"
-        description="Existencias iniciales por sucursal. Luego agregaremos kardex y movimientos auditables."
+        description="Inventario por sucursal: existencia fisica menos unidades reservadas da el disponible para nuevas ventas."
         action={
           <div className="flex gap-3">
             {viewMode === "create" ? (
@@ -98,12 +97,12 @@ export default function CatalogoStockPage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Items con stock", value: String(stock.length), hint: "Producto por sucursal.", tone: "dark" },
+          { label: "Bajo stock", value: String(stock.filter((item) => item.status === "LOW").length), hint: "Alertas iniciales.", tone: "accent" },
+          { label: "Sin stock", value: String(stock.filter((item) => item.status === "OUT").length), hint: "No disponibles." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Items con stock" value={String(stock.length)} hint="Producto por sucursal." tone="dark" />
-        <StatCard label="Bajo stock" value={String(stock.filter((item) => item.status === "LOW").length)} hint="Alertas iniciales." tone="accent" />
-        <StatCard label="Sin stock" value={String(stock.filter((item) => item.status === "OUT").length)} hint="No disponibles." />
-      </div>
       {error ? <AdminMessage title="No pudimos actualizar stock" description={error} tone="warn" /> : null}
       {viewMode === "create" ? (
         <PanelCard title="Actualizar stock" description="Stock inicial manual para dejar listo el POS.">
@@ -128,7 +127,9 @@ export default function CatalogoStockPage() {
             columns={[
               { key: "product", label: "Producto", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.product?.name ?? "Producto"}</p><p className="text-xs text-[#7a845f]">{row.product?.sku ?? "sin sku"}</p></div> },
               { key: "branch", label: "Sucursal", render: (row) => row.branch?.name ?? "Sin sucursal" },
-              { key: "qty", label: "Cantidad", align: "right", render: (row) => row.quantity },
+              { key: "qty", label: "Existencia fisica", align: "right", render: (row) => row.quantity },
+              { key: "reserved", label: "Reservado en pedidos", align: "right", render: (row) => row.reservedQuantity },
+              { key: "available", label: "Disponible para venta", align: "right", render: (row) => row.availableQuantity },
               { key: "min", label: "Minimo", align: "right", render: (row) => row.minQuantity },
               { key: "status", label: "Estado", render: (row) => <Tag tone={row.status === "OK" ? "accent" : row.status === "LOW" ? "warn" : "dark"}>{row.status}</Tag> },
             ]}

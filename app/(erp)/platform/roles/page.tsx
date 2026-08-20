@@ -13,9 +13,8 @@ import {
 } from "../../../components/admin/AdminDataTable";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
@@ -282,17 +281,16 @@ export default function PlatformRolesPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Superadmin"
         title="Roles base de Kapos"
         description="Aqui editas roles reales del sistema: plataforma, owners, administradores y roles delegables a organizaciones."
+        stats={[
+          { label: "Roles base", value: String(roles.length), hint: "Roles activos dentro del sistema.", tone: "dark" },
+          { label: "Roles platform", value: String(roles.filter((role) => role.context === "PLATFORM").length), hint: "Gobierno maestro de Kapos.", tone: "accent" },
+          { label: "Roles organization", value: String(roles.filter((role) => role.context === "ORGANIZATION").length), hint: "Delegables a clientes y sus equipos." },
+        ]}
       />
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Roles base" value={String(roles.length)} hint="Roles activos dentro del sistema." tone="dark" />
-        <StatCard label="Roles platform" value={String(roles.filter((role) => role.context === "PLATFORM").length)} hint="Gobierno maestro de Kapos." tone="accent" />
-        <StatCard label="Roles organization" value={String(roles.filter((role) => role.context === "ORGANIZATION").length)} hint="Delegables a clientes y sus equipos." />
-      </div>
 
       {error ? (
         <AdminMessage title="No pudimos cargar los roles base" description={error} tone="warn" />

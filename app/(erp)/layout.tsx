@@ -24,20 +24,20 @@ export default function ErpLayout({ children }: ErpLayoutProps) {
 
   if (isLoading || !isAuthenticated) {
     return (
-      <main className="grid min-h-screen place-items-center bg-[#fafafa] text-[#53623b]">
+      <main className="grid min-h-screen place-items-center bg-[var(--kapos-background)] text-[var(--kapos-text-soft)]">
         Validando acceso al ERP...
       </main>
     );
   }
 
   return (
-    <div className="min-h-screen overflow-y-hidden bg-[#fafafa] ">
+    <div className="min-h-screen overflow-y-hidden bg-[var(--kapos-background)] ">
       <div className="mx-auto flex max-h-screen w-full overflow-y-hidden">
         <SideBar />
 
         <main className="min-w-0 overflow-y-hidden flex-1 px-4 py-6 lg:pr-6">
-          <div className="min-h-[calc(100vh-3rem)] overflow-y-hidden rounded-4xl border border-[#eef1e6] bg-[radial-gradient(circle_at_top,#ffffff_0%,#fffefb_55%,#fbfcf8_100%)] p-4 shadow-lg md:p-6">
-            <div className="min-w-0 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-[34px]   p-3 shadow-[inset_0_1px_0_rgba(255,255,255,0.95)] backdrop-blur md:p-5">
+          <div className="min-h-[calc(100vh-3rem)] overflow-y-hidden rounded-4xl border border-[var(--kapos-border)]  p-4 shadow-lg md:p-6">
+            <div className="min-w-0 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-[34px] p-3  md:p-5">
               <ErpRouteGuard>{children}</ErpRouteGuard>
             </div>
           </div>

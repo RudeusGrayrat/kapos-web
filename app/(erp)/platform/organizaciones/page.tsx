@@ -9,9 +9,8 @@ import {
 } from "../../../components/admin/AdminActionButton";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import {
@@ -389,7 +388,7 @@ export default function PlatformOrganizationsPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Superadmin"
         title="Organizaciones y clientes"
         description="Aqui nacen empresas como Basti, defines su owner inicial y eliges que modulos base podran usar antes de entrar a Kapos."
@@ -414,27 +413,12 @@ export default function PlatformOrganizationsPage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Empresas activas", value: String(activeOrganizations), hint: "Clientes que ya tienen estructura viva dentro del ERP.", tone: "dark" },
+          { label: "Empresas en prueba", value: String(trialOrganizations), hint: "Organizaciones aun en fase inicial o de implementacion.", tone: "accent" },
+          { label: "Modulos organization", value: String(organizationModules.length), hint: "Catalogo ERP listo para encenderse por cliente." },
+        ]}
       />
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard
-          label="Empresas activas"
-          value={String(activeOrganizations)}
-          hint="Clientes que ya tienen estructura viva dentro del ERP."
-          tone="dark"
-        />
-        <StatCard
-          label="Empresas en prueba"
-          value={String(trialOrganizations)}
-          hint="Organizaciones aun en fase inicial o de implementacion."
-          tone="accent"
-        />
-        <StatCard
-          label="Modulos organization"
-          value={String(organizationModules.length)}
-          hint="Catalogo ERP listo para encenderse por cliente."
-        />
-      </div>
 
       {error ? (
         <AdminMessage

@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AdminActionButton, ArrowLeftIcon, PencilIcon, PlusIcon, TrashIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable, createLocalAdminTableFetch } from "../../../components/admin/AdminDataTable";
-import { AdminMessage, AdminPageHeader, PanelCard, StatCard, Tag } from "../../../components/admin/AdminBlocks";
+import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import { useAuth } from "../../../context/auth-context";
 import { createBranch, getBranches, updateBranch } from "../../../lib/erp-api";
@@ -39,8 +39,6 @@ export default function ConfigSucursalesPage() {
       filterRow: (branch, search) => [branch.name, branch.code, branch.address, branch.phone, branch.status].filter(Boolean).some((value) => String(value).toLowerCase().includes(search)),
     })(input);
   }
-
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -106,7 +104,7 @@ export default function ConfigSucursalesPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Configuracion"
         title="Sucursales"
         description="Sedes donde operaran caja, stock, POS y reportes."
@@ -122,12 +120,12 @@ export default function ConfigSucursalesPage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Organizacion", value: activeOrganization?.organizationName ?? "...", hint: "Contexto activo.", tone: "dark" },
+          { label: "Sucursales", value: String(branches.length), hint: "Sedes configuradas.", tone: "accent" },
+          { label: "Activas", value: String(branches.filter((branch) => branch.status === "ACTIVE").length), hint: "Disponibles para operar." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Organizacion" value={activeOrganization?.organizationName ?? "..."} hint="Contexto activo." tone="dark" />
-        <StatCard label="Sucursales" value={String(branches.length)} hint="Sedes configuradas." tone="accent" />
-        <StatCard label="Activas" value={String(branches.filter((branch) => branch.status === "ACTIVE").length)} hint="Disponibles para operar." />
-      </div>
       {error ? <AdminMessage title="No pudimos crear la sucursal" description={error} tone="warn" /> : null}
       {viewMode === "create" ? (
         <PanelCard title="Crear sucursal" description="Alta rapida de sede para comenzar a operar caja y stock.">
@@ -152,7 +150,7 @@ export default function ConfigSucursalesPage() {
         <PanelCard title="Tabla de sucursales" description="Listado real de sedes de la organizacion activa.">
           <AdminDataTable
             fetchData={fetchBranches}
-            reloadKey={reloadKey}
+            reloadKey={`${activeOrganizationId ?? ""}-${reloadKey}`}
             rowKey={(row) => row.id}
             permissionKeys={effectivePermissionKeys}
             searchPlaceholder="Buscar sucursal..."

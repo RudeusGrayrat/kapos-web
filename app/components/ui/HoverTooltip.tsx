@@ -6,6 +6,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
   type ReactNode,
 } from "react";
 import { createPortal } from "react-dom";
@@ -24,6 +25,9 @@ type TooltipPosition = {
 };
 
 const TOOLTIP_MARGIN = 12;
+const subscribeToClient = () => () => undefined;
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
 
 export function HoverTooltip({
   label,
@@ -33,7 +37,11 @@ export function HoverTooltip({
 }: HoverTooltipProps) {
   const anchorRef = useRef<HTMLSpanElement>(null);
   const tooltipRef = useRef<HTMLDivElement>(null);
-  const [isMounted, setIsMounted] = useState(false);
+  const isMounted = useSyncExternalStore(
+    subscribeToClient,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
   const [isVisible, setIsVisible] = useState(false);
   const [position, setPosition] = useState<TooltipPosition>({
     left: 0,
@@ -84,10 +92,6 @@ export function HoverTooltip({
       transform: "translate(-50%, -100%)",
     });
   }, [getAnchorElement, side]);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   useEffect(() => {
     const anchorElement = getAnchorElement();

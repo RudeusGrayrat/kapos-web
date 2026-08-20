@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AdminActionButton, ArrowLeftIcon, PlusIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
-import { AdminMessage, AdminPageHeader, PanelCard, StatCard, Tag } from "../../../components/admin/AdminBlocks";
+import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { useAuth } from "../../../context/auth-context";
 import { closeCashSession, getCashSessions } from "../../../lib/erp-api";
 import type { CashSessionSummary } from "../../../types/erp";
@@ -65,8 +65,6 @@ export default function CajaCierrePage() {
     return { data: closedResponse.data, total: closedResponse.total };
   }
 
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId]);
-
   function handleSelectSession(sessionId: string) {
     const session = openSessions.find((item) => item.id === sessionId);
     setSelectedSessionId(sessionId);
@@ -107,7 +105,7 @@ export default function CajaCierrePage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Caja"
         title="Cierre"
         description="Cuenta el efectivo real, compara contra lo esperado y cierra la sesion de caja."
@@ -123,12 +121,12 @@ export default function CajaCierrePage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Abiertas", value: String(openSessions.length), hint: "Pendientes de cierre.", tone: "dark" },
+          { label: "Cerradas", value: String(closedSessions.length), hint: "Ultimas sesiones listadas.", tone: "accent" },
+          { label: "Diferencia actual", value: `S/ ${differenceAmount.toFixed(2)}`, hint: "Conteo menos esperado." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Abiertas" value={String(openSessions.length)} hint="Pendientes de cierre." tone="dark" />
-        <StatCard label="Cerradas" value={String(closedSessions.length)} hint="Ultimas sesiones listadas." tone="accent" />
-        <StatCard label="Diferencia actual" value={`S/ ${differenceAmount.toFixed(2)}`} hint="Conteo menos esperado." />
-      </div>
       {error ? <AdminMessage title="No pudimos cerrar la caja" description={error} tone="warn" /> : null}
       {viewMode === "close" ? (
         <PanelCard title="Cerrar caja" description="Este cierre bloquea nuevos movimientos en la sesion.">
@@ -159,7 +157,7 @@ export default function CajaCierrePage() {
         <PanelCard title="Historial de cierres" description="Sesiones cerradas con esperado, contado y diferencia.">
           <AdminDataTable
             fetchData={fetchClosedSessions}
-            reloadKey={reloadKey}
+            reloadKey={`${activeOrganizationId ?? ""}-${reloadKey}`}
             rowKey={(row) => row.id}
             permissionKeys={effectivePermissionKeys}
             searchPlaceholder="Buscar cierre..."

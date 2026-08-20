@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   AdminActionButton,
   ArrowLeftIcon,
@@ -9,9 +9,8 @@ import {
 } from "../../../components/admin/AdminActionButton";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import {
@@ -360,7 +359,7 @@ export default function PlatformModulesPage() {
     });
   }
 
-  function openSubmoduleEditor(row: (typeof submoduleRows)[number]) {
+  function openSubmoduleEditor(row: NonNullable<typeof selectedSubmodule>) {
     setSelectedSubmodule(row);
     setSubmoduleEditForm({
       name: row.name,
@@ -375,22 +374,9 @@ export default function PlatformModulesPage() {
     0,
   );
 
-  const submoduleRows = useMemo(
-    () =>
-      modules.flatMap((moduleItem) =>
-        moduleItem.submodules.map((submodule) => ({
-          moduleId: moduleItem.id,
-          moduleName: moduleItem.name,
-          audience: moduleItem.audience,
-          ...submodule,
-        })),
-      ),
-    [modules],
-  );
-
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Superadmin"
         title="Modulos y submodulos"
         description="Aqui defines la estructura alta del sistema. Kapos debe crecer agregando modulos, no rompiendo columnas ni rearmando la base."
@@ -426,36 +412,14 @@ export default function PlatformModulesPage() {
             </AdminActionButton>
           </div>
         }
+        statsColumnsClassName="md:grid-cols-4"
+        stats={[
+          { label: "Modulos base", value: String(modules.length), hint: "Bloques funcionales maestros que ordenan Kapos.", tone: "dark" },
+          { label: "Submodulos", value: String(totalSubmodules), hint: "Rutas hijas listas para crecer sin tocar la base central.", tone: "accent" },
+          { label: "Modulos platform", value: String(modules.filter((m) => m.audience === "PLATFORM").length), hint: "Solo visibles para superadmin." },
+          { label: "Modulos organization", value: String(modules.filter((m) => m.audience === "ORGANIZATION" || m.audience === "BOTH").length), hint: "Bloques ERP activables por cliente." },
+        ]}
       />
-
-      <div className="grid gap-4 md:grid-cols-4">
-        <StatCard
-          label="Modulos base"
-          value={String(modules.length)}
-          hint="Bloques funcionales maestros que ordenan Kapos."
-          tone="dark"
-        />
-        <StatCard
-          label="Submodulos"
-          value={String(totalSubmodules)}
-          hint="Rutas hijas listas para crecer sin tocar la base central."
-          tone="accent"
-        />
-        <StatCard
-          label="Modulos platform"
-          value={String(modules.filter((m) => m.audience === "PLATFORM").length)}
-          hint="Solo visibles para superadmin."
-        />
-        <StatCard
-          label="Modulos organization"
-          value={String(
-            modules.filter(
-              (m) => m.audience === "ORGANIZATION" || m.audience === "BOTH",
-            ).length,
-          )}
-          hint="Bloques ERP activables por cliente."
-        />
-      </div>
 
       {error ? (
         <AdminMessage title="No pudimos cargar los modulos" description={error} tone="warn" />

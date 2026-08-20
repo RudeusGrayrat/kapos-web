@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { AdminActionButton, PlusIcon } from "../../../components/admin/AdminActionButton";
-import { AdminMessage, AdminPageHeader, PanelCard, StatCard } from "../../../components/admin/AdminBlocks";
+import { AdminMessage, AdminModuleHeader, PanelCard } from "../../../components/admin/AdminBlocks";
 import { useAuth } from "../../../context/auth-context";
 import { getOrganizationProfile, updateOrganizationProfile } from "../../../lib/erp-api";
 import { isApiError } from "../../../lib/api";
@@ -103,13 +103,16 @@ export default function ConfigEmpresaPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader eyebrow="Configuracion" title="Datos de empresa" description="Identidad fiscal y preferencias base de la organizacion activa." />
-
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Organizacion" value={profile?.tradeName ?? profile?.legalName ?? "..."} hint="Cliente activo de Kapos." tone="dark" />
-        <StatCard label="Moneda" value={form.currencyCode} hint="Base para precios, caja y comprobantes." tone="accent" />
-        <StatCard label="IGV" value={`${form.taxRate || "0"}%`} hint="Tasa tributaria por defecto." />
-      </div>
+      <AdminModuleHeader
+        eyebrow="Configuracion"
+        title="Datos de empresa"
+        description="Identidad fiscal y preferencias base de la organizacion activa."
+        stats={[
+          { label: "Organizacion", value: profile?.tradeName ?? profile?.legalName ?? "...", hint: "Cliente activo de Kapos.", tone: "dark" },
+          { label: "Moneda", value: form.currencyCode, hint: "Base para precios, caja y comprobantes.", tone: "accent" },
+          { label: "IGV", value: `${form.taxRate || "0"}%`, hint: "Tasa tributaria por defecto." },
+        ]}
+      />
 
       {error ? <AdminMessage title="No pudimos guardar" description={error} tone="warn" /> : null}
       {message ? <AdminMessage title="Listo" description={message} tone="accent" /> : null}

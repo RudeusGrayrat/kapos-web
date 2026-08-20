@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   AdminActionButton,
   ArrowLeftIcon,
@@ -11,9 +11,8 @@ import {
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
@@ -87,8 +86,6 @@ export default function ConfigRolesPage() {
     setRoles(response.data);
     return { data: response.data, total: response.total };
   }
-
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId]);
 
   function togglePermission(target: "create" | "edit", permissionKey: string) {
     const updater = (current: RoleForm) => ({
@@ -192,7 +189,7 @@ export default function ConfigRolesPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Configuracion"
         title="Roles internos"
         description="Crea roles personalizados para la organizacion activa sin delegar permisos superiores a los tuyos."
@@ -206,12 +203,12 @@ export default function ConfigRolesPage() {
             <AdminActionButton tone="primary" active={mode === "create"} icon={<PlusIcon />} onClick={() => setMode("create")}>Crear rol</AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Roles visibles", value: String(roles.length), hint: "Sistema y personalizados.", tone: "dark" },
+          { label: "Personalizados", value: String(roles.filter((role) => !role.isSystem).length), hint: "Creados por la organizacion.", tone: "accent" },
+          { label: "Permisos delegables", value: String(permissions.length), hint: "Limite real del owner/admin." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Roles visibles" value={String(roles.length)} hint="Sistema y personalizados." tone="dark" />
-        <StatCard label="Personalizados" value={String(roles.filter((role) => !role.isSystem).length)} hint="Creados por la organizacion." tone="accent" />
-        <StatCard label="Permisos delegables" value={String(permissions.length)} hint="Limite real del owner/admin." />
-      </div>
       {error ? <AdminMessage title="No pudimos completar la accion" description={error} tone="warn" /> : null}
 
       {mode === "create" ? (
@@ -233,7 +230,7 @@ export default function ConfigRolesPage() {
         <PanelCard title="Tabla de roles" description="Los roles de sistema se usan como base; solo los personalizados se editan o archivan aqui.">
           <AdminDataTable
             fetchData={fetchRoles}
-            reloadKey={reloadKey}
+            reloadKey={`${activeOrganizationId ?? ""}-${reloadKey}`}
             rowKey={(row) => row.id}
             permissionKeys={effectivePermissionKeys}
             searchPlaceholder="Buscar rol..."

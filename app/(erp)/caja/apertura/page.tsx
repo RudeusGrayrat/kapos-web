@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   AdminActionButton,
   ArrowLeftIcon,
@@ -14,9 +14,8 @@ import {
 } from "../../../components/admin/AdminDataTable";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
@@ -104,8 +103,6 @@ export default function CajaAperturaPage() {
           .some((value) => String(value).toLowerCase().includes(search)),
     })(input);
   }
-
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId]);
 
   async function handleCreateRegister(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -222,7 +219,7 @@ export default function CajaAperturaPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Caja"
         title="Apertura"
         description="Crea cajas por sucursal y abre el turno antes de vender. Una caja solo puede tener una sesion abierta."
@@ -241,12 +238,12 @@ export default function CajaAperturaPage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Cajas", value: String(registers.length), hint: "Cajas configuradas.", tone: "dark" },
+          { label: "Abiertas", value: String(openSessions.length), hint: "Sesiones listas para operar.", tone: "accent" },
+          { label: "Sucursales", value: String(branches.length), hint: "Sedes activas." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Cajas" value={String(registers.length)} hint="Cajas configuradas." tone="dark" />
-        <StatCard label="Abiertas" value={String(openSessions.length)} hint="Sesiones listas para operar." tone="accent" />
-        <StatCard label="Sucursales" value={String(branches.length)} hint="Sedes activas." />
-      </div>
       {error ? <AdminMessage title="No pudimos completar la accion" description={error} tone="warn" /> : null}
       {viewMode === "create-register" ? (
           <PanelCard title="Crear caja" description="Caja fisica o logica dentro de una sucursal.">
@@ -290,7 +287,7 @@ export default function CajaAperturaPage() {
         <PanelCard title="Cajas registradas" description="Administra cajas sin eliminarlas fisicamente.">
           <AdminDataTable
             fetchData={fetchRegisters}
-            reloadKey={reloadKey}
+            reloadKey={`${activeOrganizationId ?? ""}-${reloadKey}`}
             rowKey={(row) => row.id}
             permissionKeys={effectivePermissionKeys}
             searchPlaceholder="Buscar caja o sucursal..."

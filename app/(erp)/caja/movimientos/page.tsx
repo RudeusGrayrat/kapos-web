@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AdminActionButton, ArrowLeftIcon, PlusIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable, createLocalAdminTableFetch } from "../../../components/admin/AdminDataTable";
-import { AdminMessage, AdminPageHeader, PanelCard, StatCard, Tag } from "../../../components/admin/AdminBlocks";
+import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { useAuth } from "../../../context/auth-context";
 import {
   createCashMovement,
@@ -92,8 +92,6 @@ export default function CajaMovimientosPage() {
     })(input);
   }
 
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId, selectedSessionId]);
-
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const token = await resolveToken();
@@ -136,7 +134,7 @@ export default function CajaMovimientosPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Caja"
         title="Movimientos"
         description="Registra ingresos, gastos, retiros y ajustes dentro de una caja abierta."
@@ -152,12 +150,12 @@ export default function CajaMovimientosPage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Sesiones abiertas", value: String(openSessions.length), hint: "Cajas operativas.", tone: "dark" },
+          { label: "Ingresos manuales", value: `S/ ${incomeTotal.toFixed(2)}`, hint: "Ingresos, depositos y ajustes.", tone: "accent" },
+          { label: "Salidas", value: `S/ ${expenseTotal.toFixed(2)}`, hint: "Gastos y retiros." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Sesiones abiertas" value={String(openSessions.length)} hint="Cajas operativas." tone="dark" />
-        <StatCard label="Ingresos manuales" value={`S/ ${incomeTotal.toFixed(2)}`} hint="Ingresos, depositos y ajustes." tone="accent" />
-        <StatCard label="Salidas" value={`S/ ${expenseTotal.toFixed(2)}`} hint="Gastos y retiros." />
-      </div>
       {error ? <AdminMessage title="No pudimos registrar el movimiento" description={error} tone="warn" /> : null}
       {viewMode === "create" ? (
         <PanelCard title="Nuevo movimiento" description="Todo movimiento queda ligado a la sesion abierta.">
@@ -192,7 +190,7 @@ export default function CajaMovimientosPage() {
         <PanelCard title="Movimientos de la caja" description="Historial manual de la sesion seleccionada.">
           <AdminDataTable
             fetchData={fetchMovements}
-            reloadKey={reloadKey}
+            reloadKey={`${activeOrganizationId ?? ""}-${selectedSessionId}-${reloadKey}`}
             rowKey={(row) => row.id}
             permissionKeys={effectivePermissionKeys}
             searchPlaceholder="Buscar movimiento..."

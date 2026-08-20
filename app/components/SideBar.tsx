@@ -115,7 +115,7 @@ const ICONS = {
   ),
 } satisfies Record<string, ReactNode>;
 
-const SURFACE_COLOR = "#fafafa";
+const SURFACE_COLOR = "var(--kapos-background)";
 
 const CATEGORIES: Category[] = [
   {
@@ -168,14 +168,29 @@ const CATEGORIES: Category[] = [
         description: "Comprobantes y control de emision.",
       },
       {
-        label: "Tesoreria",
-        path: "/finanzas/tesoreria",
-        description: "Caja, bancos y conciliaciones.",
+        label: "Series fiscales",
+        path: "/finanzas/series-fiscales",
+        description: "Series, correlativos y sedes emisoras.",
       },
       {
-        label: "Reportes",
-        path: "/finanzas/reportes",
-        description: "Indicadores y cortes financieros.",
+        label: "Proveedores fiscales",
+        path: "/finanzas/proveedores-fiscales",
+        description: "Integraciones, ambientes y credenciales.",
+      },
+      {
+        label: "Cuentas por cobrar",
+        path: "/finanzas/cuentas-por-cobrar",
+        description: "Saldos pendientes y ventas al credito.",
+      },
+      {
+        label: "Gastos",
+        path: "/finanzas/gastos",
+        description: "Egresos administrativos y operativos.",
+      },
+      {
+        label: "Bancos y conciliacion",
+        path: "/finanzas/bancos-conciliacion",
+        description: "Depositos, bancos y conciliaciones.",
       },
     ],
   },
@@ -242,6 +257,16 @@ const CATEGORIES: Category[] = [
         label: "Parametros",
         path: "/configuracion/parametros",
         description: "Ajustes globales del ERP.",
+      },
+      {
+        label: "Metodos de pago",
+        path: "/configuracion/metodos-pago",
+        description: "Efectivo, tarjetas, billeteras y transferencias.",
+      },
+      {
+        label: "Dispositivos e impresion",
+        path: "/configuracion/impresion",
+        description: "Impresoras, formatos y reglas por caja.",
       },
     ],
   },
@@ -444,9 +469,9 @@ export default function SideBar() {
       className="relative my-6 ml-6 hidden w-20 shrink-0 select-none overflow-visible lg:block"
       style={{ backgroundColor: SURFACE_COLOR }}
     >
-      <aside className="absolute left-0 top-0 z-30 flex h-full w-20 flex-col items-center rounded-[40px] bg-zinc-950  py-6 transition-all duration-300 ease-in-out">
+      <aside className="absolute left-0 top-0 z-30 flex h-full w-20 flex-col items-center rounded-[40px] bg-[var(--kapos-black)] py-6 transition-all duration-300 ease-in-out">
         <div className="mb-6 flex h-16 w-full items-center justify-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-zinc-800 bg-[#b4e610] shadow-inner">
+          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--kapos-charcoal)] bg-[var(--kapos-lime)] shadow-inner">
             {ICONS.logo}
           </div>
         </div>
@@ -465,13 +490,13 @@ export default function SideBar() {
                 className="pointer-events-none absolute bottom-full right-0 h-6 w-6"
                 style={{ backgroundColor: SURFACE_COLOR }}
               >
-                <div className="h-full w-full rounded-br-[24px] bg-zinc-950" />
+                <div className="h-full w-full rounded-br-[24px] bg-[var(--kapos-black)]" />
               </div>
               <div
                 className="pointer-events-none absolute right-0 top-full h-6 w-6"
                 style={{ backgroundColor: SURFACE_COLOR }}
               >
-                <div className="h-full w-full rounded-tr-[24px] bg-zinc-950" />
+                <div className="h-full w-full rounded-tr-[24px] bg-[var(--kapos-black)]" />
               </div>
             </div>
           ) : null}
@@ -496,13 +521,13 @@ export default function SideBar() {
                 <div className="relative z-10 flex h-full w-full items-center pl-4">
                   <div
                     className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition-all duration-300 ease-in-out ${isRouteActive
-                        ? `bg-white text-zinc-950 shadow-[0_4px_15px_rgba(0,0,0,0.15)] ${!openedCategoryKey
+                        ? `bg-[var(--kapos-card)] text-[var(--kapos-black)] shadow-[0_4px_15px_rgba(12,13,15,0.15)] ${!openedCategoryKey
                           ? "translate-x-2.5"
                           : "translate-x-0"
                         }`
                         : `rounded-full ${isOpened
-                          ? "bg-zinc-800 text-zinc-100"
-                          : "text-zinc-500 hover:bg-zinc-800 hover:text-zinc-200"
+                          ? "bg-[var(--kapos-charcoal)] text-white"
+                          : "text-[var(--kapos-text-muted)] hover:bg-[var(--kapos-charcoal)] hover:text-white"
                         }`
                       }`}
                   >
@@ -517,7 +542,7 @@ export default function SideBar() {
         <div className="mt-auto w-full flex-col space-y-4">
           <div className="group relative flex h-16 w-full items-center overflow-visible pl-4">
             <HoverTooltip label="Perfil" side="right" />
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-950 shadow-md">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--kapos-border)] bg-[var(--kapos-card)] text-[var(--kapos-black)] shadow-md">
               {ICONS.profile}
             </div>
           </div>
@@ -525,10 +550,10 @@ export default function SideBar() {
           <button
             type="button"
             onClick={() => void handleLogout()}
-            className="group relative flex h-14 w-full items-center pl-4 text-zinc-500 transition-colors hover:text-white"
+            className="group relative flex h-14 w-full items-center pl-4 text-[var(--kapos-text-muted)] transition-colors hover:text-white"
           >
             <HoverTooltip label="Salir" side="right" />
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full group-hover:bg-red-800">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full group-hover:bg-[var(--kapos-danger)]">
               {ICONS.logout}
             </div>
           </button>
@@ -536,31 +561,31 @@ export default function SideBar() {
       </aside>
 
       <div
-        className={`absolute left-25 -top-1 z-20 h-full w-[22rem] overflow-hidden rounded-[36px] border border-[#e7edd7] bg-white p-6 shadow-lg transition-all duration-300 ease-in-out ${openedCategoryKey
+        className={`absolute left-25 -top-1 z-20 h-full w-[22rem] overflow-hidden rounded-[36px] border border-[var(--kapos-border)] bg-[var(--kapos-card)] p-6 shadow-lg transition-all duration-300 ease-in-out ${openedCategoryKey
             ? "translate-x-0 opacity-100"
             : "pointer-events-none -translate-x-4 opacity-0"
           }`}
       >
-        <div className="border-b border-[#e6ecd7] pb-5">
+        <div className="border-b border-[var(--kapos-border)] pb-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.34em] text-[#91aa47]">
+              <p className="text-[0.7rem] font-semibold uppercase tracking-[0.34em] text-[var(--kapos-success)]">
                 Categoria
               </p>
-              <h2 className="mt-3 text-[1.9rem] font-semibold leading-tight tracking-[-0.04em] text-[#1f280f]">
+              <h2 className="mt-3 text-[1.9rem] font-semibold leading-tight tracking-[-0.04em] text-[var(--kapos-text)]">
                 {visibleCategory.label}
               </h2>
             </div>
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[#e2e8d2] bg-white/90 text-[#6d7856] shadow-[0_12px_22px_rgba(17,17,17,0.05)]">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl border border-[var(--kapos-border)] bg-white/90 text-[var(--kapos-text-soft)] shadow-[0_12px_22px_rgba(12,13,15,0.05)]">
               {visibleCategory.icon}
             </div>
           </div>
-          <p className="mt-3 max-w-[16rem] text-xs leading-6 text-[#65724b]">
+          <p className="mt-3 max-w-[16rem] text-xs leading-6 text-[var(--kapos-text-soft)]">
             Elige una subcategoria para cambiar el contenido central del ERP.
           </p>
         </div>
 
-        <div className="mt-4 max-h-[calc(100%-7rem)] pb-2 space-y-2.5 overflow-y-auto pr-1">
+        <div className="mt-4 max-h-[calc(100%-9rem)] pb-2 space-y-2.5 overflow-y-auto pr-1">
           {visibleCategory.items.map((item) => {
             const isActive = isActivePath(pathname, item.path);
 
@@ -570,15 +595,15 @@ export default function SideBar() {
                 href={item.path}
                 onClick={() => setOpenedCategoryKey(null)}
                 className={`group block rounded-[24px] border px-4 py-3.5 transition-all duration-200 ${isActive
-                    ? "border-[#21291a] bg-[linear-gradient(135deg,#171717_0%,#20251c_100%)] text-white shadow-lg"
-                    : "border-[#e5ebd8] bg-white/80 text-[#263019] shadow-xs hover:border-[#cbe27c] hover:bg-[#fcfff4] hover:shadow-md"
+                    ? "border-[var(--kapos-charcoal)] bg-[linear-gradient(135deg,var(--kapos-black)_0%,var(--kapos-charcoal)_100%)] text-white shadow-lg"
+                    : "border-[var(--kapos-border)] bg-white/80 text-[var(--kapos-text)] shadow-xs hover:border-[var(--kapos-border-strong)] hover:bg-[var(--kapos-lime-wash)] hover:shadow-md"
                   }`}
               >
                 <div className="flex items-start gap-3">
                   <div
                     className={`mt-0.5 flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border transition ${isActive
                         ? "border-white/10 bg-white/10 text-white"
-                        : "border-[#e4ead5] bg-[#f8fbe9] text-[#8bad2c] group-hover:border-[#d5e899] group-hover:bg-[#f2f9d7]"
+                        : "border-[var(--kapos-border)] bg-[var(--kapos-lime-wash)] text-[var(--kapos-success)] group-hover:border-[var(--kapos-border-strong)] group-hover:bg-[var(--kapos-lime-soft)]"
                       }`}
                   >
                     <span className="text-sm font-semibold">
@@ -591,14 +616,14 @@ export default function SideBar() {
                       <span
                         className={`text-sm transition ${isActive
                             ? "text-white/70"
-                            : "text-[#99a57a] group-hover:translate-x-0.5 group-hover:text-[#7fa31e]"
+                            : "text-[var(--kapos-text-muted)] group-hover:translate-x-0.5 group-hover:text-[var(--kapos-success)]"
                           }`}
                       >
                         ›
                       </span>
                     </div>
                     <p
-                      className={`mt-1 text-[0.72rem] leading-5 ${isActive ? "text-white/72" : "text-[#6b7651]"
+                      className={`mt-1 text-[0.72rem] leading-5 ${isActive ? "text-white/72" : "text-[var(--kapos-text-soft)]"
                         }`}
                     >
                       {item.description}

@@ -16,13 +16,13 @@ export function AdminPageHeader({
   return (
     <header className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
       <div className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.34em] text-[#8ea743]">
+        <p className="text-sm font-semibold uppercase tracking-[0.34em] text-[var(--kapos-success)]">
           {eyebrow}
         </p>
-        <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#18200f] md:text-[3.25rem]">
+        <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[var(--kapos-text)] md:text-[3.25rem]">
           {title}
         </h1>
-        <p className="max-w-3xl text-sm leading-8 text-[#59624d] md:text-lg">
+        <p className="max-w-3xl text-sm leading-8 text-[var(--kapos-text-soft)] md:text-lg">
           {description}
         </p>
       </div>
@@ -47,22 +47,65 @@ export function StatCard({
 }: StatCardProps) {
   const toneClass =
     tone === "accent"
-      ? "border-[#d8f06c] bg-[linear-gradient(135deg,#fbffe9_0%,#eef8c7_100%)]"
+      ? "border-[var(--kapos-border-strong)] bg-[linear-gradient(135deg,var(--kapos-lime-wash)_0%,var(--kapos-lime-soft)_100%)]"
       : tone === "dark"
-        ? "border-[#1e1f18] bg-[linear-gradient(135deg,#111111_0%,#23251e_100%)] text-white"
-        : "border-[#e9eddc] bg-white";
+        ? "border-[var(--kapos-charcoal)] bg-[linear-gradient(135deg,var(--kapos-black)_0%,var(--kapos-charcoal)_100%)] text-white"
+        : "border-[var(--kapos-border)] bg-[var(--kapos-card)]";
 
   const hintClass =
-    tone === "dark" ? "text-white/65" : "text-[#667053]";
+    tone === "dark" ? "text-white/65" : "text-[var(--kapos-text-soft)]";
 
   return (
     <article
-      className={`rounded-[32px] border p-6 shadow-[0_18px_38px_rgba(34,44,18,0.06)] ${toneClass}`}
+      className={`rounded-[32px] border p-6 shadow-[0_18px_38px_rgba(32,36,21,0.06)] ${toneClass}`}
     >
       <p className={`text-sm ${hintClass}`}>{label}</p>
       <strong className="mt-4 block text-4xl font-semibold tracking-[-0.04em]">{value}</strong>
       <p className={`mt-3 text-sm leading-7 ${hintClass}`}>{hint}</p>
     </article>
+  );
+}
+
+export type AdminModuleStat = StatCardProps & {
+  key?: string;
+};
+
+type AdminModuleHeaderProps = HeaderProps & {
+  stats?: AdminModuleStat[];
+  statsColumnsClassName?: string;
+};
+
+export function AdminModuleHeader({
+  eyebrow,
+  title,
+  description,
+  action,
+  stats = [],
+  statsColumnsClassName = "md:grid-cols-3",
+}: AdminModuleHeaderProps) {
+  return (
+    <div className="space-y-5">
+      <AdminPageHeader
+        eyebrow={eyebrow}
+        title={title}
+        description={description}
+        action={action}
+      />
+
+      {stats.length > 0 ? (
+        <div className={`grid gap-4 ${statsColumnsClassName}`}>
+          {stats.map((stat) => (
+            <StatCard
+              key={stat.key ?? stat.label}
+              label={stat.label}
+              value={stat.value}
+              hint={stat.hint}
+              tone={stat.tone}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
   );
 }
 
@@ -80,14 +123,14 @@ export function PanelCard({
   children,
 }: PanelProps) {
   return (
-    <section className="rounded-[34px] border border-[#e9eee0] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(251,252,246,0.95)_100%)] p-6 shadow-[0_20px_44px_rgba(34,44,18,0.05)]">
+    <section className="rounded-[34px] border border-[var(--kapos-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,248,242,0.95)_100%)] p-6 shadow-[0_20px_44px_rgba(32,36,21,0.05)]">
       <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
-          <h2 className="text-[1.7rem] font-semibold tracking-[-0.03em] text-[#1a210f]">
+          <h2 className="text-[1.7rem] font-semibold tracking-[-0.03em] text-[var(--kapos-text)]">
             {title}
           </h2>
           {description ? (
-            <p className="mt-2 max-w-2xl text-sm leading-7 text-[#5d664d]">
+            <p className="mt-2 max-w-2xl text-sm leading-7 text-[var(--kapos-text-soft)]">
               {description}
             </p>
           ) : null}
@@ -108,12 +151,12 @@ export function Tag({
 }) {
   const toneClass =
     tone === "accent"
-      ? "bg-[#edf8bf] text-[#2d4110]"
+      ? "bg-[var(--kapos-lime-soft)] text-[var(--kapos-text)]"
       : tone === "dark"
-        ? "bg-[#111111] text-white"
+        ? "bg-[var(--kapos-black)] text-white"
         : tone === "warn"
-          ? "bg-[#fff3dc] text-[#805e20]"
-          : "bg-[#f3f5ed] text-[#53623b]";
+          ? "bg-[color-mix(in_srgb,var(--kapos-warning)_14%,white)] text-[var(--kapos-warning)]"
+          : "bg-[var(--kapos-card-alt)] text-[var(--kapos-text-soft)]";
 
   return (
     <span
@@ -135,15 +178,15 @@ export function AdminMessage({
 }) {
   const toneClass =
     tone === "accent"
-      ? "border-[#d8f06c] bg-[#fbffe9]"
+      ? "border-[var(--kapos-border-strong)] bg-[var(--kapos-lime-wash)]"
       : tone === "warn"
-        ? "border-[#f1dfb8] bg-[#fff8ea]"
-        : "border-[#edf1e4] bg-[#fbfcf8]";
+        ? "border-[color-mix(in_srgb,var(--kapos-warning)_42%,white)] bg-[color-mix(in_srgb,var(--kapos-warning)_10%,white)]"
+        : "border-[var(--kapos-border)] bg-[var(--kapos-card-alt)]";
 
   return (
-    <div className={`rounded-[26px] border px-5 py-5 shadow-[0_14px_30px_rgba(34,44,18,0.04)] ${toneClass}`}>
-      <p className="font-semibold text-[#1a210f]">{title}</p>
-      <p className="mt-2 text-sm leading-7 text-[#5d664d]">{description}</p>
+    <div className={`rounded-[26px] border px-5 py-5 shadow-[0_14px_30px_rgba(32,36,21,0.04)] ${toneClass}`}>
+      <p className="font-semibold text-[var(--kapos-text)]">{title}</p>
+      <p className="mt-2 text-sm leading-7 text-[var(--kapos-text-soft)]">{description}</p>
     </div>
   );
 }

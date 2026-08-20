@@ -84,8 +84,11 @@ export function buildPermissionMatrixRows(
     .sort((first, second) => {
       const firstModule = modulesByKey.get(first.moduleKey);
       const secondModule = modulesByKey.get(second.moduleKey);
-      const moduleOrder =
-        (firstModule?.sortOrder ?? 999) - (secondModule?.sortOrder ?? 999);
+      const moduleOrder = first.moduleName.localeCompare(
+        second.moduleName,
+        "es",
+        { sensitivity: "base" },
+      );
 
       if (moduleOrder !== 0) {
         return moduleOrder;
@@ -123,9 +126,9 @@ export function AdminPermissionMatrix({
 
   return (
     <div
-      className={`mt-4 overflow-hidden rounded-[22px] border border-[#e4ead5] bg-white ${className}`}
+      className={`mt-4 overflow-hidden rounded-[22px] border border-[var(--kapos-border)] bg-[var(--kapos-card)] ${className}`}
     >
-      <div className="grid grid-cols-[0.75fr_0.85fr_1.8fr] border-b border-[#e8eedb] bg-[#f8fbef] px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[#7c8c51]">
+      <div className="grid grid-cols-[0.75fr_0.85fr_1.8fr] border-b border-[var(--kapos-border)] bg-[var(--kapos-lime-wash)] px-4 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-[var(--kapos-text-soft)]">
         <span>Modulo</span>
         <span>Submodulo</span>
         <span>Permisos</span>
@@ -135,22 +138,22 @@ export function AdminPermissionMatrix({
         {rows.map((row) => (
           <div
             key={row.key}
-            className="grid grid-cols-[0.75fr_0.85fr_1.8fr] gap-3 border-b border-[#edf1e4] px-4 py-3 last:border-b-0"
+            className="grid grid-cols-[0.75fr_0.85fr_1.8fr] gap-3 border-b border-[var(--kapos-border)] px-4 py-3 last:border-b-0"
           >
             <div>
-              <p className="text-sm font-semibold text-[#1b2111]">
+              <p className="text-sm font-semibold text-[var(--kapos-text)]">
                 {row.moduleName}
               </p>
-              <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[#8b9572]">
+              <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[var(--kapos-text-muted)]">
                 {row.moduleKey}
               </p>
             </div>
 
             <div>
-              <p className="text-sm font-semibold text-[#344222]">
+              <p className="text-sm font-semibold text-[var(--kapos-text)]">
                 {row.submoduleName}
               </p>
-              <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[#8b9572]">
+              <p className="mt-1 text-[11px] uppercase tracking-[0.16em] text-[var(--kapos-text-muted)]">
                 {row.submoduleKey}
               </p>
             </div>

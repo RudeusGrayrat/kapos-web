@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   AdminActionButton,
   ArrowLeftIcon,
@@ -14,9 +14,8 @@ import {
 } from "../../../components/admin/AdminDataTable";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
@@ -77,8 +76,6 @@ export default function CatalogoCategoriasPage() {
           .some((value) => String(value).toLowerCase().includes(search)),
     })(input);
   }
-
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -161,7 +158,7 @@ export default function CatalogoCategoriasPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Catalogo"
         title="Categorias"
         description="Orden visual y operativo para productos, POS y reportes."
@@ -177,12 +174,12 @@ export default function CatalogoCategoriasPage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Categorias", value: String(categories.length), hint: "Familias creadas.", tone: "dark" },
+          { label: "Activas", value: String(categories.filter((category) => category.isActive).length), hint: "Visibles para operar.", tone: "accent" },
+          { label: "Productos", value: String(categories.reduce((sum, category) => sum + (category._count?.products ?? 0), 0)), hint: "Productos clasificados." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Categorias" value={String(categories.length)} hint="Familias creadas." tone="dark" />
-        <StatCard label="Activas" value={String(categories.filter((category) => category.isActive).length)} hint="Visibles para operar." tone="accent" />
-        <StatCard label="Productos" value={String(categories.reduce((sum, category) => sum + (category._count?.products ?? 0), 0))} hint="Productos clasificados." />
-      </div>
       {error ? <AdminMessage title="No pudimos completar la accion" description={error} tone="warn" /> : null}
       {viewMode === "create" ? (
         <PanelCard title="Crear categoria" description="Ejemplos: waffles, batidos, toppings, bebidas.">
@@ -196,7 +193,7 @@ export default function CatalogoCategoriasPage() {
         <PanelCard title="Tabla de categorias" description="Listado real para organizar productos.">
           <AdminDataTable
             fetchData={fetchCategories}
-            reloadKey={reloadKey}
+            reloadKey={`${activeOrganizationId ?? ""}-${reloadKey}`}
             rowKey={(row) => row.id}
             permissionKeys={effectivePermissionKeys}
             searchPlaceholder="Buscar categoria..."

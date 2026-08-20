@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { AdminActionButton, ArrowLeftIcon, PencilIcon, PlusIcon, TrashIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
-import { AdminMessage, AdminPageHeader, PanelCard, StatCard, Tag } from "../../../components/admin/AdminBlocks";
+import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import { useAuth } from "../../../context/auth-context";
 import { useToast } from "../../../context/toast-context";
-import { createProduct, getProductCategories, getProducts, updateProduct } from "../../../lib/erp-api";
+import { createProduct, getOrganizationProfile, getProductCategories, getProducts, updateProduct } from "../../../lib/erp-api";
 import type { ProductCategorySummary, ProductSummary } from "../../../types/erp";
 
 const DEFAULT_TAX_RATE = 18;
@@ -17,10 +17,13 @@ export default function CatalogoProductosPage() {
   const toast = useToast();
   const [categories, setCategories] = useState<ProductCategorySummary[]>([]);
   const [products, setProducts] = useState<ProductSummary[]>([]);
-  const [reloadKey, setReloadKey] = useState(0);
+  const [reloadVersion, setReloadVersion] = useState(0);
+  const reloadKey = `${activeOrganizationId ?? "none"}:${reloadVersion}`;
+  const [defaultTaxRate, setDefaultTaxRate] = useState(DEFAULT_TAX_RATE);
   const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "create">("table");
   const [autoCost, setAutoCost] = useState(true);
+  const [autoEditCost, setAutoEditCost] = useState(true);
   const [form, setForm] = useState({
     name: "",
     sku: "",
@@ -28,7 +31,7 @@ export default function CatalogoProductosPage() {
     description: "",
     price: "0",
     cost: "",
-    taxRate: "",
+    taxRate: String(DEFAULT_TAX_RATE),
     type: "PRODUCT" as ProductSummary["type"],
     trackStock: true,
     availableForPos: true,
@@ -41,7 +44,7 @@ export default function CatalogoProductosPage() {
     description: "",
     price: "0",
     cost: "",
-    taxRate: "",
+    taxRate: String(DEFAULT_TAX_RATE),
     type: "PRODUCT" as ProductSummary["type"],
     status: "ACTIVE" as ProductSummary["status"],
     trackStock: true,
@@ -52,56 +55,64 @@ export default function CatalogoProductosPage() {
     return accessToken ?? (await refreshSession({ silent: true }))?.accessToken ?? null;
   }
 
-  function calculateTaxAmount(priceValue: string, taxRatePercent = DEFAULT_TAX_RATE) {
+  function calculateBaseWithoutTax(priceValue: string, taxRateValue: string | number) {
     const price = Number(priceValue || "0");
+    const taxRate = Number(taxRateValue || "0");
+
+    if (!Number.isFinite(price) || price <= 0 || !Number.isFinite(taxRate) || taxRate < 0) {
+      return "";
+    }
+
+    return (price / (1 + taxRate / 100)).toFixed(2);
+  }
+
+  function calculateTaxAmount(priceValue: string, taxRateValue: string | number) {
+    const price = Number(priceValue || "0");
+    const baseWithoutTax = Number(calculateBaseWithoutTax(priceValue, taxRateValue) || "0");
 
     if (!Number.isFinite(price) || price <= 0) {
       return "";
     }
 
-    return ((price * taxRatePercent) / 100).toFixed(2);
-  }
-
-  function calculateBaseWithoutTax(priceValue: string, taxAmountValue: string) {
-    const price = Number(priceValue || "0");
-    const taxAmount = Number(taxAmountValue || "0");
-
-    if (!Number.isFinite(price) || price <= 0) {
-      return "";
-    }
-
-    return Math.max(0, price - taxAmount).toFixed(2);
-  }
-
-  function calculateTaxRateFromAmount(priceValue: string, taxAmountValue: string) {
-    const price = Number(priceValue || "0");
-    const taxAmount = Number(taxAmountValue || "0");
-
-    if (!Number.isFinite(price) || price <= 0) {
-      return undefined;
-    }
-
-    return Number(((taxAmount / price) * 100).toFixed(2));
+    return Math.max(0, price - baseWithoutTax).toFixed(2);
   }
 
   function updateCreatePrice(price: string) {
-    const taxAmount = calculateTaxAmount(price);
     setForm((current) => ({
       ...current,
       price,
-      taxRate: taxAmount,
       cost: autoCost
-        ? calculateBaseWithoutTax(price, taxAmount)
+        ? calculateBaseWithoutTax(price, current.taxRate)
         : current.cost,
     }));
   }
 
-  function updateCreateTaxAmount(taxAmount: string) {
+  function updateCreateTaxRate(taxRate: string) {
     setForm((current) => ({
       ...current,
-      taxRate: taxAmount,
+      taxRate,
       cost: autoCost
-        ? calculateBaseWithoutTax(current.price, taxAmount)
+        ? calculateBaseWithoutTax(current.price, taxRate)
+        : current.cost,
+    }));
+  }
+
+  function updateEditPrice(price: string) {
+    setEditForm((current) => ({
+      ...current,
+      price,
+      cost: autoEditCost
+        ? calculateBaseWithoutTax(price, current.taxRate)
+        : current.cost,
+    }));
+  }
+
+  function updateEditTaxRate(taxRate: string) {
+    setEditForm((current) => ({
+      ...current,
+      taxRate,
+      cost: autoEditCost
+        ? calculateBaseWithoutTax(current.price, taxRate)
         : current.cost,
     }));
   }
@@ -109,16 +120,22 @@ export default function CatalogoProductosPage() {
   async function fetchProducts(input: { page: number; limit: number; search: string }) {
     const token = await resolveToken();
     if (!token || !activeOrganizationId) throw new Error("No hay organizacion activa.");
-    const [productResponse, categoryResponse] = await Promise.all([
+    const [productResponse, categoryResponse, organizationResponse] = await Promise.all([
       getProducts({ accessToken: token, organizationId: activeOrganizationId, ...input }),
       getProductCategories({ accessToken: token, organizationId: activeOrganizationId }),
+      getOrganizationProfile({ accessToken: token, organizationId: activeOrganizationId }).catch(() => null),
     ]);
+    if (organizationResponse) {
+      const configuredTaxRate = organizationResponse.settings.taxRate;
+      setDefaultTaxRate(configuredTaxRate);
+      setForm((current) => current.price === "0" && current.cost === ""
+        ? { ...current, taxRate: String(configuredTaxRate) }
+        : current);
+    }
     setProducts(productResponse.data);
     setCategories(categoryResponse);
     return { data: productResponse.data, total: productResponse.total };
   }
-
-  useEffect(() => setReloadKey((current) => current + 1), [activeOrganizationId]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -136,7 +153,7 @@ export default function CatalogoProductosPage() {
           description: form.description || undefined,
           price: Number(form.price || "0"),
           cost: form.cost ? Number(form.cost) : undefined,
-          taxRate: calculateTaxRateFromAmount(form.price, form.taxRate),
+          taxRate: Number(form.taxRate || "0"),
           type: form.type,
           trackStock: form.trackStock,
           availableForPos: form.availableForPos,
@@ -149,12 +166,12 @@ export default function CatalogoProductosPage() {
         description: "",
         price: "0",
         cost: "",
-        taxRate: "",
+        taxRate: String(defaultTaxRate),
         type: "PRODUCT",
         trackStock: true,
         availableForPos: true,
       });
-      setReloadKey((current) => current + 1);
+      setReloadVersion((current) => current + 1);
       setViewMode("table");
       toast.showSuccess("El producto fue creado correctamente.", "Producto creado");
     } catch (submitError) {
@@ -165,6 +182,8 @@ export default function CatalogoProductosPage() {
   }
 
   function openProductEditor(product: ProductSummary) {
+    const taxRate = String(product.taxRate ?? defaultTaxRate);
+    setAutoEditCost(true);
     setSelectedProduct(product);
     setEditForm({
       name: product.name,
@@ -172,8 +191,10 @@ export default function CatalogoProductosPage() {
       categoryId: product.categoryId ?? "",
       description: product.description ?? "",
       price: String(product.price),
-      cost: product.cost === null ? "" : String(product.cost),
-      taxRate: product.taxRate === null ? "" : calculateTaxAmount(String(product.price), product.taxRate),
+      cost: product.cost === null
+        ? calculateBaseWithoutTax(String(product.price), taxRate)
+        : String(product.cost),
+      taxRate,
       type: product.type,
       status: product.status,
       trackStock: product.trackStock,
@@ -198,7 +219,7 @@ export default function CatalogoProductosPage() {
           description: editForm.description || undefined,
           price: Number(editForm.price || "0"),
           cost: editForm.cost ? Number(editForm.cost) : undefined,
-          taxRate: calculateTaxRateFromAmount(editForm.price, editForm.taxRate),
+          taxRate: Number(editForm.taxRate || "0"),
           type: editForm.type,
           status: editForm.status,
           trackStock: editForm.trackStock,
@@ -206,7 +227,7 @@ export default function CatalogoProductosPage() {
         },
       });
       setSelectedProduct(null);
-      setReloadKey((current) => current + 1);
+      setReloadVersion((current) => current + 1);
       toast.showSuccess("Los cambios del producto fueron guardados.", "Producto actualizado");
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "No se pudo editar el producto.";
@@ -226,7 +247,7 @@ export default function CatalogoProductosPage() {
         productId: product.id,
         body: { status: product.status === "ACTIVE" ? "INACTIVE" : "ACTIVE" },
       });
-      setReloadKey((current) => current + 1);
+      setReloadVersion((current) => current + 1);
       toast.showSuccess("El estado del producto fue actualizado.", "Estado actualizado");
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "No se pudo cambiar el estado del producto.";
@@ -237,7 +258,7 @@ export default function CatalogoProductosPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Catalogo"
         title="Productos"
         description="Productos, insumos, servicios y combos que luego consumira el POS."
@@ -262,12 +283,12 @@ export default function CatalogoProductosPage() {
             </AdminActionButton>
           </div>
         }
+        stats={[
+          { label: "Productos", value: String(products.length), hint: "Pagina actual.", tone: "dark" },
+          { label: "Categorias", value: String(categories.length), hint: "Clasificacion disponible.", tone: "accent" },
+          { label: "Para POS", value: String(products.filter((product) => product.availableForPos).length), hint: "Visibles para vender." },
+        ]}
       />
-      <div className="grid gap-4 md:grid-cols-3">
-        <StatCard label="Productos" value={String(products.length)} hint="Pagina actual." tone="dark" />
-        <StatCard label="Categorias" value={String(categories.length)} hint="Clasificacion disponible." tone="accent" />
-        <StatCard label="Para POS" value={String(products.filter((product) => product.availableForPos).length)} hint="Visibles para vender." />
-      </div>
       {error ? <AdminMessage title="No pudimos crear el producto" description={error} tone="warn" /> : null}
       {viewMode === "create" ? (
         <PanelCard title="Crear producto" description="Alta rapida. Variantes y modificadores vendran en el siguiente bloque.">
@@ -278,11 +299,11 @@ export default function CatalogoProductosPage() {
             <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Categoria</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.categoryId} onChange={(event) => setForm((current) => ({ ...current, categoryId: event.target.value }))}><option value="">Sin categoria</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
             <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as ProductSummary["type"] }))}>{["PRODUCT", "SERVICE", "INGREDIENT", "COMBO"].map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
             <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Precio de venta</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.price} onChange={(event) => updateCreatePrice(event.target.value)} /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">IGV / impuesto</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.taxRate} placeholder="18.00" onChange={(event) => updateCreateTaxAmount(event.target.value)} /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Costo/base sin IGV</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.cost} onChange={(event) => { setAutoCost(false); setForm((current) => ({ ...current, cost: event.target.value })); }} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tasa IGV (%)</span><input type="number" min="0" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.taxRate} placeholder="18.00" onChange={(event) => updateCreateTaxRate(event.target.value)} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Costo referencial/base sin IGV</span><input type="number" min="0" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.cost} onChange={(event) => { setAutoCost(false); setForm((current) => ({ ...current, cost: event.target.value })); }} /><span className="block text-xs font-medium text-[#7a845f]">{autoCost ? "Se calcula automaticamente desde el precio." : "Editado manualmente."}</span></label>
             <div className="rounded-[20px] border border-[#e2e8d0] bg-[#fbfcf8] px-4 py-3 text-sm text-[#53613d]">
               <p>Base sin IGV: S/ {calculateBaseWithoutTax(form.price, form.taxRate) || "0.00"}</p>
-              <p>IGV calculado: S/ {form.taxRate || "0.00"}</p>
+              <p>IGV incluido: S/ {calculateTaxAmount(form.price, form.taxRate) || "0.00"}</p>
               <AdminActionButton
                 className="mt-3"
                 size="sm"
@@ -291,12 +312,12 @@ export default function CatalogoProductosPage() {
                   setAutoCost(true);
                   setForm((current) => ({
                     ...current,
-                    taxRate: calculateTaxAmount(current.price),
-                    cost: calculateBaseWithoutTax(current.price, calculateTaxAmount(current.price)),
+                    taxRate: String(defaultTaxRate),
+                    cost: calculateBaseWithoutTax(current.price, defaultTaxRate),
                   }));
                 }}
               >
-                Recalcular con 18%
+                Recalcular con {defaultTaxRate}%
               </AdminActionButton>
             </div>
             <label className="flex items-center gap-3 rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm font-semibold text-[#21300f]"><input type="checkbox" checked={form.availableForPos} onChange={(event) => setForm((current) => ({ ...current, availableForPos: event.target.checked }))} />Disponible para POS</label>
@@ -349,10 +370,29 @@ export default function CatalogoProductosPage() {
           <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Descripcion</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.description} onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))} /></label>
           <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Categoria</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.categoryId} onChange={(event) => setEditForm((current) => ({ ...current, categoryId: event.target.value }))}><option value="">Sin categoria</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
           <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.type} onChange={(event) => setEditForm((current) => ({ ...current, type: event.target.value as ProductSummary["type"] }))}>{["PRODUCT", "SERVICE", "INGREDIENT", "COMBO"].map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Precio</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.price} onChange={(event) => setEditForm((current) => ({ ...current, price: event.target.value }))} /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Costo</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.cost} onChange={(event) => setEditForm((current) => ({ ...current, cost: event.target.value }))} /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">IGV / impuesto</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.taxRate} onChange={(event) => setEditForm((current) => ({ ...current, taxRate: event.target.value }))} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Precio de venta</span><input type="number" min="0" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.price} onChange={(event) => updateEditPrice(event.target.value)} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Costo referencial/base sin IGV</span><input type="number" min="0" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.cost} onChange={(event) => { setAutoEditCost(false); setEditForm((current) => ({ ...current, cost: event.target.value })); }} /><span className="block text-xs font-medium text-[#7a845f]">{autoEditCost ? "Se recalcula al cambiar el precio." : "Editado manualmente."}</span></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tasa IGV (%)</span><input type="number" min="0" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.taxRate} onChange={(event) => updateEditTaxRate(event.target.value)} /></label>
           <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.status} onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value as ProductSummary["status"] }))}><option value="ACTIVE">Activo</option><option value="INACTIVE">Inactivo</option><option value="ARCHIVED">Archivado</option></select></label>
+          <div className="rounded-[20px] border border-[#e2e8d0] bg-[#fbfcf8] px-4 py-3 text-sm text-[#53613d] md:col-span-2">
+            <p>Base sin IGV: S/ {calculateBaseWithoutTax(editForm.price, editForm.taxRate) || "0.00"}</p>
+            <p>IGV incluido: S/ {calculateTaxAmount(editForm.price, editForm.taxRate) || "0.00"}</p>
+            <AdminActionButton
+              className="mt-3"
+              size="sm"
+              tone="ghost"
+              onClick={() => {
+                setAutoEditCost(true);
+                setEditForm((current) => ({
+                  ...current,
+                  taxRate: String(defaultTaxRate),
+                  cost: calculateBaseWithoutTax(current.price, defaultTaxRate),
+                }));
+              }}
+            >
+              Recalcular con {defaultTaxRate}%
+            </AdminActionButton>
+          </div>
           <label className="flex items-center gap-3 rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm font-semibold text-[#21300f]"><input type="checkbox" checked={editForm.availableForPos} onChange={(event) => setEditForm((current) => ({ ...current, availableForPos: event.target.checked }))} />Disponible para POS</label>
           <label className="flex items-center gap-3 rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm font-semibold text-[#21300f]"><input type="checkbox" checked={editForm.trackStock} onChange={(event) => setEditForm((current) => ({ ...current, trackStock: event.target.checked }))} />Controla stock</label>
         </form>

@@ -1,16 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f8f4;
-  --foreground: #111111;
-  --surface: #ffffff;
-  --surface-soft: #f2f5ea;
-  --sidebar: #0b0b0b;
-  --sidebar-strong: #151515;
-  --accent: #b4e610;
-  --accent-strong: #8fc900;
-  --accent-soft: #edf8bf;
-  --border-soft: #e7ecd9;
+  --kapos-lime: #0DAF12;
+  --kapos-lime-soft: #eef8bf;
+  --kapos-lime-wash: #f7fbd9;
+  --kapos-black: #0c0d0f;
+  --kapos-charcoal: #1a1d17;
+  --kapos-text: #202415;
+  --kapos-text-soft: #667055;
+  --kapos-text-muted: #8a9278;
+  --kapos-border: #e7ecd6;
+  --kapos-border-strong: #d8e2b6;
+  --kapos-card: #ffffff;
+  --kapos-card-alt: #f7f8f2;
+  --kapos-background: #f5f6ef;
+  --kapos-success: #0DAF12;
+  --kapos-danger: #d35f48;
+  --kapos-warning: #d6a514;
+  --background: var(--kapos-background);
+  --foreground: var(--kapos-text);
+  --surface: var(--kapos-card);
+  --surface-soft: var(--kapos-card-alt);
+  --sidebar: var(--kapos-black);
+  --sidebar-strong: var(--kapos-charcoal);
+  --accent: var(--kapos-lime);
+  --accent-strong: var(--kapos-success);
+  --accent-soft: var(--kapos-lime-soft);
+  --border-soft: var(--kapos-border);
 }
 
 @theme inline {
@@ -27,7 +43,7 @@ body {
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(143, 201, 0, 0.9) rgba(17, 17, 17, 0);
+  scrollbar-color: var(--kapos-lime) rgba(12, 13, 15, 0);
 }
 
 *::-webkit-scrollbar {
@@ -36,19 +52,19 @@ body {
 }
 
 *::-webkit-scrollbar-track {
-  background: linear-gradient(180deg, rgba(17, 17, 17, 0.06), rgba(17, 17, 17, 0.12));
+  background: linear-gradient(180deg, rgba(12, 13, 15, 0.06), rgba(12, 13, 15, 0.12));
   border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, #b4e610 0%, #8fc900 100%);
+  background: linear-gradient(180deg, var(--kapos-lime) 0%, var(--kapos-success) 100%);
   border: 2px solid rgba(255, 255, 255, 0.92);
   border-radius: 999px;
-  box-shadow: 0 6px 16px rgba(143, 201, 0, 0.2);
+  box-shadow: 0 6px 16px rgba(13, 175, 18, 0.2);
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, #c5ef35 0%, #9ed50a 100%);
+  background: linear-gradient(180deg, var(--kapos-lime) 0%, var(--kapos-success) 100%);
 }
 
 *::-webkit-scrollbar-corner {

@@ -71,6 +71,8 @@ export type ProductStockSummary = {
   productId: string;
   branchId: string;
   quantity: number;
+  reservedQuantity: number;
+  availableQuantity: number;
   minQuantity: number;
   status: "OK" | "LOW" | "OUT";
   product?: { id: string; name: string; sku: string | null; status: string };
@@ -186,7 +188,7 @@ export type InternalUserSummary = {
     email: string | null;
     firstName: string | null;
     lastName: string | null;
-    documentType: "DNI" | "CE" | "PASSPORT" | null;
+    documentType: "DNI" | "RUC" | "CE" | "PASSPORT" | null;
     documentNumber: string | null;
     phone: string | null;
     status: "ACTIVE" | "INVITED" | "SUSPENDED" | "DISABLED";
@@ -207,9 +209,250 @@ export type InternalUserSummary = {
   effectivePermissionKeys: string[];
 };
 
+export type OpenAccountStatus = "OPEN" | "PARTIALLY_PAID" | "CLOSED" | "CANCELLED";
+export type ServiceType = "LOCAL" | "DELIVERY" | "TAKEAWAY";
+export type KitchenTicketStatus =
+  | "DRAFT"
+  | "SENT"
+  | "IN_PREPARATION"
+  | "READY"
+  | "DELIVERED"
+  | "CANCELLED";
+
+export type DiningTableSummary = {
+  id: string;
+  organizationId: string;
+  branchId: string;
+  areaId: string;
+  code: string;
+  name: string;
+  capacity: number;
+  sortOrder: number;
+  isActive: boolean;
+  activeAccount: Pick<
+    OpenAccountSummary,
+    "id" | "accountNumber" | "status" | "total" | "paidTotal" | "balance" | "openedAt"
+  > | null;
+};
+
+export type DiningAreaSummary = {
+  id: string;
+  organizationId: string;
+  branchId: string;
+  name: string;
+  sortOrder: number;
+  isActive: boolean;
+  branch: { id: string; name: string; code: string | null };
+  tables: DiningTableSummary[];
+};
+
+export type OpenAccountItemSummary = {
+  id: string;
+  productId: string | null;
+  productName: string;
+  productSku: string | null;
+  quantity: number;
+  unitPrice: number;
+  taxRate: number;
+  taxAmount: number;
+  discountAmount: number;
+  total: number;
+  note: string | null;
+  status: "ACTIVE" | "CANCELLED";
+  stockReserved: boolean;
+  cancellationReason: string | null;
+  cancelledAt: string | null;
+  paidQuantity: number;
+  remainingQuantity: number;
+  kitchenTicketId: string | null;
+  kitchenTicket?: { id: string; sequence: number; status: KitchenTicketStatus } | null;
+};
+
+export type KitchenTicketSummary = {
+  id: string;
+  sequence: number;
+  status: KitchenTicketStatus;
+  note: string | null;
+  sentAt: string;
+  startedAt?: string | null;
+  readyAt?: string | null;
+  deliveredAt?: string | null;
+  openAccount?: {
+    id: string;
+    accountNumber: string;
+    serviceType: ServiceType;
+    diningTable: { id: string; name: string; code: string } | null;
+  };
+  items: OpenAccountItemSummary[];
+};
+
+export type OpenAccountPaymentAllocationSummary = {
+  openAccountItemId: string;
+  quantity: number;
+  amount: number;
+};
+
+export type OpenAccountPaymentSummary = {
+  id: string;
+  amount: number;
+  status: "CONFIRMED" | "CANCELLED";
+  provider: string | null;
+  providerRef: string | null;
+  createdAt: string;
+  allocations?: OpenAccountPaymentAllocationSummary[];
+  paymentMethod?: Pick<PaymentMethodSummary, "id" | "code" | "name" | "type"> | null;
+};
+
+export type OpenAccountSummary = {
+  id: string;
+  organizationId: string;
+  branchId: string;
+  diningTableId: string | null;
+  customerProfileId: string | null;
+  cashSessionId: string | null;
+  saleId: string | null;
+  accountNumber: string;
+  serviceType: ServiceType;
+  status: OpenAccountStatus;
+  version: number;
+  guestCount: number | null;
+  customerName: string | null;
+  customerPhone: string | null;
+  deliveryAddress: string | null;
+  deliveryReference: string | null;
+  note: string | null;
+  subtotal: number;
+  discountTotal: number;
+  total: number;
+  paidTotal: number;
+  balance: number;
+  openedAt: string;
+  closedAt: string | null;
+  prebillGeneratedAt: string | null;
+  updatedAt: string;
+  branch?: { id: string; name: string; code: string | null };
+  diningTable?: {
+    id: string;
+    code: string;
+    name: string;
+    area: { id: string; name: string };
+  } | null;
+  tableLinks?: Array<{
+    id: string;
+    diningTableId: string;
+    assignedAt: string;
+    diningTable: {
+      id: string;
+      code: string;
+      name: string;
+      area: { id: string; name: string };
+    };
+  }>;
+  customerProfile?: {
+    id: string;
+    externalCustomerCode: string | null;
+    user: {
+      firstName: string | null;
+      lastName: string | null;
+      email: string | null;
+      phone: string | null;
+    };
+  } | null;
+  items?: OpenAccountItemSummary[];
+  kitchenTickets?: KitchenTicketSummary[];
+  payments?: OpenAccountPaymentSummary[];
+  _count?: { items: number; kitchenTickets: number; payments: number };
+};
+
+export type CustomerSummary = {
+  id: string;
+  externalCustomerCode: string | null;
+  loyaltyTier: string | null;
+  status: "ACTIVE" | "BLOCKED" | "ARCHIVED";
+  createdAt: string;
+  user: {
+    id: string;
+    email: string | null;
+    documentType: "DNI" | "RUC" | "CE" | "PASSPORT" | null;
+    documentNumber: string | null;
+    firstName: string | null;
+    lastName: string | null;
+    phone: string | null;
+    status: string;
+  };
+  loyaltyWallet: {
+    redeemablePoints: number;
+    lifetimePoints: number;
+  } | null;
+};
+
 export type PaginatedErpResponse<T> = {
   data: T[];
   total: number;
   page: number;
   limit: number;
+};
+
+export type BillingProviderConfigSummary = {
+  provider: string;
+  environment: "TEST" | "PRODUCTION";
+  baseUrl: string;
+  endpoint: string;
+  authorizationScheme: "BEARER" | "RAW" | "TOKEN";
+  pdfFormat: "TICKET" | "A4";
+  enabled: boolean;
+  hasToken: boolean;
+  configured: boolean;
+  updatedAt: string | null;
+};
+
+export type BillingSeriesSummary = {
+  id: string;
+  branchId: string;
+  documentType: "BOLETA" | "FACTURA";
+  series: string;
+  nextNumber: number;
+  enabled: boolean;
+  branch: { id: string; name: string; code: string | null };
+};
+
+export type BillingDocumentStatus =
+  | "PENDING"
+  | "ISSUING"
+  | "BILLED"
+  | "FAILED"
+  | "CANCELLED";
+
+export type BillingDocumentSummary = {
+  id: string;
+  type: "TICKET" | "BOLETA" | "FACTURA";
+  status: BillingDocumentStatus;
+  provider: string | null;
+  externalId: string | null;
+  series: string | null;
+  number: string | null;
+  pdfUrl: string | null;
+  xmlUrl: string | null;
+  cdrUrl: string | null;
+  errorMessage: string | null;
+  rawResponse?: unknown;
+  issuedAt: string | null;
+  createdAt: string;
+  sale: {
+    id: string;
+    saleNumber: string;
+    total: number;
+    soldAt: string;
+    status: string;
+    branch: { id: string; name: string };
+    customerProfile: {
+      id: string;
+      user: {
+        firstName: string | null;
+        lastName: string | null;
+        documentType: "DNI" | "RUC" | "CE" | "PASSPORT" | null;
+        documentNumber: string | null;
+      };
+    } | null;
+  };
 };

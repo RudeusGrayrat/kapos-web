@@ -271,7 +271,7 @@ export function AdminDataTable<T>({
       <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         {changeSearch ? (
           <input
-            className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24] md:max-w-sm"
+            className="w-full rounded-[20px] border border-[var(--kapos-border)] bg-[var(--kapos-card)] px-4 py-3 text-sm outline-none transition focus:border-[var(--kapos-lime)] md:max-w-sm"
             placeholder={searchPlaceholder}
             value={currentSearch ?? ""}
             onChange={(event) => changeSearch(event.target.value)}
@@ -280,7 +280,7 @@ export function AdminDataTable<T>({
           <div />
         )}
         {hasPagination ? (
-          <div className="flex items-center justify-end gap-2 text-sm text-[#61704c]">
+          <div className="flex items-center justify-end gap-2 text-sm text-[var(--kapos-text-soft)]">
             <span>
               {firstItem}-{lastItem} de {tableTotal}
             </span>
@@ -309,9 +309,9 @@ export function AdminDataTable<T>({
     return (
       <>
         {controls}
-        <div className="rounded-[26px] border border-[#f0d6d1] bg-[#fff7f5] px-5 py-6">
-          <p className="font-semibold text-[#5b2018]">No se pudo cargar la tabla</p>
-          <p className="mt-2 text-sm leading-7 text-[#7b443d]">{fetchError}</p>
+        <div className="rounded-[26px] border border-[color-mix(in_srgb,var(--kapos-danger)_34%,white)] bg-[color-mix(in_srgb,var(--kapos-danger)_7%,white)] px-5 py-6">
+          <p className="font-semibold text-[var(--kapos-danger)]">No se pudo cargar la tabla</p>
+          <p className="mt-2 text-sm leading-7 text-[var(--kapos-danger)]">{fetchError}</p>
         </div>
       </>
     );
@@ -321,11 +321,11 @@ export function AdminDataTable<T>({
     return (
       <>
         {controls}
-        <div className="rounded-[26px] border border-[#edf1e4] bg-[#fbfcf8] px-5 py-6">
-          <p className="font-semibold text-[#1a210f]">
+        <div className="rounded-[26px] border border-[var(--kapos-border)] bg-[var(--kapos-card-alt)] px-5 py-6">
+          <p className="font-semibold text-[var(--kapos-text)]">
             {isFetching ? "Cargando..." : emptyTitle}
           </p>
-          <p className="mt-2 text-sm leading-7 text-[#5d664d]">
+          <p className="mt-2 text-sm leading-7 text-[var(--kapos-text-soft)]">
             {isFetching ? "Estamos consultando los datos de la tabla." : emptyDescription}
           </p>
         </div>
@@ -336,9 +336,9 @@ export function AdminDataTable<T>({
   return (
     <>
       {controls}
-      <div className="overflow-x-auto rounded-[26px] border border-[#edf1e4] bg-white">
+      <div className="overflow-x-auto rounded-[26px] border border-[var(--kapos-border)] bg-[var(--kapos-card)]">
         <table className="min-w-full text-left text-sm">
-        <thead className="bg-[#fbfcf8] text-[#75815d]">
+        <thead className="bg-[var(--kapos-card-alt)] text-[var(--kapos-text-muted)]">
           <tr>
             {columns.map((column) => (
               <th
@@ -355,13 +355,13 @@ export function AdminDataTable<T>({
               </th>
             ))}
             {visibleActions.length > 0 ? (
-              <th className="px-5 py-4 text-right text-xs font-semibold uppercase tracking-[0.24em] text-[#75815d]">
+              <th className="px-5 py-4 text-right text-xs font-semibold uppercase tracking-[0.24em] text-[var(--kapos-text-muted)]">
                 Acciones
               </th>
             ) : null}
           </tr>
         </thead>
-        <tbody className="divide-y divide-[#edf1e4]">
+        <tbody className="divide-y divide-[var(--kapos-border)]">
           {tableRows.map((row) => {
             const rowActions = visibleActions.filter(
               (action) => !action.visible || action.visible(row),
@@ -370,7 +370,7 @@ export function AdminDataTable<T>({
             return (
               <tr
                 key={rowKey(row)}
-                className="bg-white transition-colors hover:bg-[#fcfef9]"
+                className="bg-[var(--kapos-card)] transition-colors hover:bg-[var(--kapos-lime-wash)]"
               >
                 {columns.map((column) => (
                   <td
@@ -389,7 +389,7 @@ export function AdminDataTable<T>({
                 {visibleActions.length > 0 ? (
                   <td className="px-5 py-4">
                     {rowActions.length > 0 ? (
-                      <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[#eef2e4] bg-[#fbfcf8] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
+                      <div className="flex flex-wrap justify-end gap-2 rounded-full border border-[var(--kapos-border)] bg-[var(--kapos-card-alt)] p-1.5 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)]">
                         {rowActions.map((action) => (
                           <div key={action.label} className="group relative">
                             <HoverTooltip label={action.label}>

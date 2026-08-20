@@ -9,9 +9,8 @@ import {
 } from "../../../components/admin/AdminActionButton";
 import {
   AdminMessage,
-  AdminPageHeader,
+  AdminModuleHeader,
   PanelCard,
-  StatCard,
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import {
@@ -273,7 +272,7 @@ export default function PlatformPermissionsPage() {
 
   return (
     <section className="space-y-8">
-      <AdminPageHeader
+      <AdminModuleHeader
         eyebrow="Superadmin"
         title="Permisos, llaves y alcance"
         description="Esta vista define el corazon de Kapos: que puede crear, editar, leer o delegar cada rol y hasta donde alcanza ese permiso."
@@ -300,38 +299,14 @@ export default function PlatformPermissionsPage() {
             </AdminActionButton>
           </div>
         }
+        statsColumnsClassName="md:grid-cols-4"
+        stats={[
+          { label: "Permisos base", value: String(permissions.length), hint: "Inventario real de permisos sembrados en Kapos." },
+          { label: "Permisos de plataforma", value: String(permissions.filter((permission) => permission.scope === "PLATFORM").length), hint: "Solo visibles para el gobierno maestro de la plataforma.", tone: "dark" },
+          { label: "Permisos de organizacion", value: String(permissions.filter((permission) => permission.scope === "ORGANIZATION").length), hint: "Se delegan a owners y admins del cliente.", tone: "accent" },
+          { label: "Permisos de sede", value: String(permissions.filter((permission) => permission.scope === "BRANCH").length), hint: "Controlan acciones limitadas a una sucursal concreta." },
+        ]}
       />
-
-      <div className="grid gap-4 md:grid-cols-4">
-        <StatCard
-          label="Permisos base"
-          value={String(permissions.length)}
-          hint="Inventario real de permisos sembrados en Kapos."
-        />
-        <StatCard
-          label="Permisos de plataforma"
-          value={String(
-            permissions.filter((permission) => permission.scope === "PLATFORM").length,
-          )}
-          hint="Solo visibles para el gobierno maestro de la plataforma."
-          tone="dark"
-        />
-        <StatCard
-          label="Permisos de organizacion"
-          value={String(
-            permissions.filter((permission) => permission.scope === "ORGANIZATION").length,
-          )}
-          hint="Se delegan a owners y admins del cliente."
-          tone="accent"
-        />
-        <StatCard
-          label="Permisos de sede"
-          value={String(
-            permissions.filter((permission) => permission.scope === "BRANCH").length,
-          )}
-          hint="Controlan acciones limitadas a una sucursal concreta."
-        />
-      </div>
 
       {error ? (
         <AdminMessage title="No pudimos cargar los permisos" description={error} tone="warn" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useSyncExternalStore } from "react";
 import type { ReactNode } from "react";
 import { createPortal } from "react-dom";
 import {
@@ -18,6 +18,10 @@ type AdminOverlayPanelProps = {
   footer?: ReactNode;
 };
 
+const subscribeToClient = () => () => undefined;
+const getClientSnapshot = () => true;
+const getServerSnapshot = () => false;
+
 export function AdminOverlayPanel({
   open,
   onClose,
@@ -27,15 +31,11 @@ export function AdminOverlayPanel({
   children,
   footer,
 }: AdminOverlayPanelProps) {
-  const [mounted, setMounted] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-
-    return () => {
-      setMounted(false);
-    };
-  }, []);
+  const mounted = useSyncExternalStore(
+    subscribeToClient,
+    getClientSnapshot,
+    getServerSnapshot,
+  );
 
   useEffect(() => {
     if (!open) {
@@ -64,12 +64,12 @@ export function AdminOverlayPanel({
 
   return createPortal(
     <div
-      className="fixed inset-0 z-[120] bg-[rgba(10,10,10,0.16)] backdrop-blur-sm"
+      className="fixed inset-0 z-[120] bg-[rgba(12,13,15,0.16)] backdrop-blur-sm"
       onClick={onClose}
     >
       <div className="flex h-full w-full justify-center items-center p-3 md:p-4">
         <section
-          className="relative flex max-h-[80vh] w-full max-w-[68rem] flex-col overflow-hidden rounded-[36px] border border-[#e7edd5] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(248,250,241,0.98)_100%)] shadow-[0_30px_80px_rgba(18,24,11,0.18)]"
+          className="relative flex max-h-[80vh] w-full max-w-[68rem] flex-col overflow-hidden rounded-[36px] border border-[var(--kapos-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,248,242,0.98)_100%)] shadow-[0_30px_80px_rgba(12,13,15,0.18)]"
           onClick={(event) => event.stopPropagation()}
         >
           <div className="absolute right-5 top-5 z-10">
@@ -84,14 +84,14 @@ export function AdminOverlayPanel({
 
           <div className="overflow-y-auto px-6 pb-6 pt-8 md:px-8 md:pb-8 md:pt-10">
             <div className="max-w-[26rem]">
-              <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[#91aa47]">
+              <p className="text-xs font-semibold uppercase tracking-[0.34em] text-[var(--kapos-success)]">
                 {eyebrow}
               </p>
-              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-[#18200f]">
+              <h2 className="mt-3 text-3xl font-semibold tracking-[-0.04em] text-[var(--kapos-text)]">
                 {title}
               </h2>
               {description ? (
-                <p className="mt-3 text-sm leading-7 text-[#5a6647] md:text-base">
+                <p className="mt-3 text-sm leading-7 text-[var(--kapos-text-soft)] md:text-base">
                   {description}
                 </p>
               ) : null}
@@ -101,7 +101,7 @@ export function AdminOverlayPanel({
           </div>
 
           {footer ? (
-            <div className="border-t border-[#e8eddc] bg-white/70 px-6 py-4 md:px-8">
+            <div className="border-t border-[var(--kapos-border)] bg-white/70 px-6 py-4 md:px-8">
               {footer}
             </div>
           ) : null}

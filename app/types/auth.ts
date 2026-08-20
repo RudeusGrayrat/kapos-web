@@ -1,4 +1,4 @@
-export type DocumentType = "DNI" | "CE" | "PASSPORT";
+export type DocumentType = "DNI" | "RUC" | "CE" | "PASSPORT";
 
 export type UserStatus = "ACTIVE" | "INVITED" | "SUSPENDED" | "DISABLED";
 
