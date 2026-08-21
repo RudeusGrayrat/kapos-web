@@ -290,6 +290,47 @@ export function AuthProvider({ children }: AuthProviderProps) {
     };
   }, [refreshSession]);
 
+  useEffect(() => {
+    if (!accessToken) return;
+
+    const expiresAt = getJwtExpirationMs(accessToken);
+    if (!expiresAt) return;
+
+    const refreshMarginMs = 60_000;
+    const refreshDelay = Math.max(0, expiresAt - Date.now() - refreshMarginMs);
+    const timeoutId = window.setTimeout(() => {
+      void refreshSession({ silent: true });
+    }, refreshDelay);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [accessToken, refreshSession]);
+
+  useEffect(() => {
+    function refreshWhenSessionMayBeStale() {
+      const token = accessTokenRef.current;
+      const expiresAt = token ? getJwtExpirationMs(token) : null;
+      const shouldRefresh = !expiresAt || expiresAt - Date.now() <= 60_000;
+
+      if (shouldRefresh) {
+        void refreshSession({ silent: true });
+      }
+    }
+
+    function handleVisibilityChange() {
+      if (document.visibilityState === "visible") {
+        refreshWhenSessionMayBeStale();
+      }
+    }
+
+    window.addEventListener("focus", refreshWhenSessionMayBeStale);
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      window.removeEventListener("focus", refreshWhenSessionMayBeStale);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [refreshSession]);
+
   const value = useMemo<AuthContextValue>(
     () => {
       const activeOrganization =
@@ -413,4 +454,17 @@ export function navigateAfterAuth(navigate: () => void) {
   startTransition(() => {
     navigate();
   });
+}
+
+function getJwtExpirationMs(token: string): number | null {
+  try {
+    const [, payload] = token.split(".");
+    if (!payload) return null;
+    const normalizedPayload = payload.replace(/-/g, "+").replace(/_/g, "/");
+    const decodedPayload = JSON.parse(window.atob(normalizedPayload)) as { exp?: unknown };
+
+    return typeof decodedPayload.exp === "number" ? decodedPayload.exp * 1000 : null;
+  } catch {
+    return null;
+  }
 }

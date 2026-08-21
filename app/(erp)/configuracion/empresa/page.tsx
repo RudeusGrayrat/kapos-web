@@ -3,13 +3,30 @@
 import { useEffect, useState } from "react";
 import { AdminActionButton, PlusIcon } from "../../../components/admin/AdminActionButton";
 import { AdminMessage, AdminModuleHeader, PanelCard } from "../../../components/admin/AdminBlocks";
+import { AdminImageField } from "../../../components/admin/AdminImageField";
 import { useAuth } from "../../../context/auth-context";
+import { useToast } from "../../../context/toast-context";
 import { getOrganizationProfile, updateOrganizationProfile } from "../../../lib/erp-api";
 import { isApiError } from "../../../lib/api";
 import type { OrganizationProfile } from "../../../types/erp";
 
+const currencyOptions = [
+  { value: "PEN", label: "Soles peruanos (PEN)" },
+  { value: "USD", label: "Dólares americanos (USD)" },
+  { value: "EUR", label: "Euros (EUR)" },
+];
+
+const timezoneOptions = [
+  { value: "America/Lima", label: "Perú - Lima (America/Lima)" },
+  { value: "America/Bogota", label: "Colombia - Bogotá (America/Bogota)" },
+  { value: "America/Santiago", label: "Chile - Santiago (America/Santiago)" },
+  { value: "America/Mexico_City", label: "México - CDMX (America/Mexico_City)" },
+  { value: "America/New_York", label: "EE.UU. Este (America/New_York)" },
+];
+
 export default function ConfigEmpresaPage() {
   const { accessToken, activeOrganizationId, refreshSession, reloadCurrentUser } = useAuth();
+  const toast = useToast();
   const [profile, setProfile] = useState<OrganizationProfile | null>(null);
   const [form, setForm] = useState({
     legalName: "",
@@ -25,7 +42,6 @@ export default function ConfigEmpresaPage() {
   });
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function resolveToken() {
@@ -77,7 +93,6 @@ export default function ConfigEmpresaPage() {
     if (!token || !activeOrganizationId) return;
     setIsSubmitting(true);
     setError(null);
-    setMessage(null);
     try {
       await updateOrganizationProfile({
         accessToken: token,
@@ -89,9 +104,11 @@ export default function ConfigEmpresaPage() {
       });
       await loadProfile();
       await reloadCurrentUser();
-      setMessage("Datos de empresa actualizados correctamente.");
+      toast.showSuccess("Datos de empresa actualizados correctamente.", "Empresa actualizada");
     } catch (submitError) {
-      setError(isApiError(submitError) ? submitError.messages.join(" ") : submitError instanceof Error ? submitError.message : "No se pudo actualizar la empresa.");
+      const message = isApiError(submitError) ? submitError.messages.join(" ") : submitError instanceof Error ? submitError.message : "No se pudo actualizar la empresa.";
+      setError(message);
+      toast.showError(message, "No pudimos guardar");
     } finally {
       setIsSubmitting(false);
     }
@@ -115,7 +132,6 @@ export default function ConfigEmpresaPage() {
       />
 
       {error ? <AdminMessage title="No pudimos guardar" description={error} tone="warn" /> : null}
-      {message ? <AdminMessage title="Listo" description={message} tone="accent" /> : null}
 
       <PanelCard title="Perfil operativo" description={isLoading ? "Cargando datos reales..." : "Estos datos alimentaran tickets, facturacion, POS y reportes."}>
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
@@ -125,11 +141,8 @@ export default function ConfigEmpresaPage() {
             ["documentNumber", "RUC", "20601234567"],
             ["email", "Correo", "contacto@basti.com"],
             ["phone", "Telefono", "+51 999 888 777"],
-            ["currencyCode", "Moneda", "PEN"],
-            ["timezone", "Zona horaria", "America/Lima"],
             ["taxRate", "IGV %", "18"],
             ["receiptFooter", "Pie de ticket", "Gracias por tu compra."],
-            ["logoUrl", "Logo URL", "https://..."],
           ].map(([key, label, placeholder]) => (
             <label key={key} className="space-y-2">
               <span className="text-sm font-semibold text-[#21300f]">{label}</span>
@@ -141,6 +154,49 @@ export default function ConfigEmpresaPage() {
               />
             </label>
           ))}
+          <label className="space-y-2">
+            <span className="text-sm font-semibold text-[#21300f]">Moneda</span>
+            <select
+              className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+              value={form.currencyCode}
+              onChange={(event) => setForm((current) => ({ ...current, currencyCode: event.target.value }))}
+            >
+              {currencyOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+          <label className="space-y-2">
+            <span className="text-sm font-semibold text-[#21300f]">Zona horaria</span>
+            <select
+              className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+              value={form.timezone}
+              onChange={(event) => setForm((current) => ({ ...current, timezone: event.target.value }))}
+            >
+              {timezoneOptions.map((option) => (
+                <option key={option.value} value={option.value}>{option.label}</option>
+              ))}
+            </select>
+          </label>
+          <div className="md:col-span-2">
+            <AdminImageField
+              label="Logo de empresa"
+              value={form.logoUrl}
+              description="Se usa como identidad visual de la organizacion en el ERP y queda preparado para tickets, comprobantes, reportes y documentos internos."
+              maxBytes={150 * 1024}
+              maxWidth={1200}
+              maxHeight={600}
+              onChange={(logoUrl) => {
+                setForm((current) => ({ ...current, logoUrl }));
+                setError(null);
+              }}
+              onError={(message) => {
+                setError(message);
+                toast.showError(message, "Logo no valido");
+              }}
+              onInfo={(message) => toast.showInfo(message, "Logo preparado")}
+            />
+          </div>
           <div className="md:col-span-2 flex justify-end">
             <AdminActionButton type="submit" disabled={isSubmitting} tone="primary" icon={<PlusIcon />}>
               {isSubmitting ? "Guardando..." : "Guardar empresa"}

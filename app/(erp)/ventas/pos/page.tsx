@@ -32,6 +32,7 @@ import {
   getOpenCashSession,
   getPaymentMethods,
   getProducts,
+  issueSaleBillingDocument,
   joinOpenAccountTable,
   moveOpenAccountTable,
   recordOpenAccountPayment,
@@ -57,6 +58,8 @@ const serviceLabels: Record<ServiceType, string> = {
   DELIVERY: "Delivery",
   TAKEAWAY: "Para llevar",
 };
+
+type PosBillingDocumentType = "TICKET" | "BOLETA" | "FACTURA";
 
 function accountLabel(account: OpenAccountSummary) {
   return account.diningTable?.name ?? account.customerName ?? serviceLabels[account.serviceType];
@@ -86,6 +89,20 @@ function printPrebill(account: OpenAccountSummary, targetWindow?: Window | null)
   printWindow.document.close();
 }
 
+function printInternalTicket(account: OpenAccountSummary, targetWindow?: Window | null) {
+  const printWindow = targetWindow ?? window.open("", "_blank", "width=440,height=720");
+  if (!printWindow) throw new Error("El navegador bloqueó la ventana de impresión.");
+  const rows = (account.items ?? [])
+    .filter((item) => item.status === "ACTIVE")
+    .map((item) => `<tr><td>${item.quantity} × ${escapeHtml(item.productName)}</td><td>S/ ${item.total.toFixed(2)}</td></tr>`)
+    .join("");
+  const payments = (account.payments ?? [])
+    .map((payment) => `<tr><td>${escapeHtml(payment.paymentMethod?.name ?? "Pago")}</td><td>S/ ${payment.amount.toFixed(2)}</td></tr>`)
+    .join("");
+  printWindow.document.write(`<!doctype html><html><head><title>Ticket ${escapeHtml(account.sale?.saleNumber ?? account.accountNumber)}</title><style>body{font-family:Arial,sans-serif;max-width:360px;margin:24px auto;color:#151713}h1{text-align:center;letter-spacing:.08em}.center{text-align:center;color:#666}table{width:100%;border-collapse:collapse;margin:18px 0}td{padding:8px 0;border-bottom:1px dashed #bbb}td:last-child{text-align:right}.total{font-size:22px;font-weight:700;display:flex;justify-content:space-between}.note{margin-top:22px;border:1px solid #222;padding:10px;font-size:11px;font-weight:700;text-align:center}</style></head><body><h1>KAPOS</h1><p class="center">TICKET INTERNO<br>${escapeHtml(account.sale?.saleNumber ?? account.accountNumber)}<br>${escapeHtml(accountLabel(account))}<br>${new Date().toLocaleString("es-PE")}</p><table>${rows}</table><div class="total"><span>Total</span><span>S/ ${account.total.toFixed(2)}</span></div><h3>Pagos</h3><table>${payments}</table><div class="note">NO ES COMPROBANTE ELECTRONICO SUNAT</div><script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}</script></body></html>`);
+  printWindow.document.close();
+}
+
 export default function PosPage() {
   const { accessToken, activeOrganizationId, effectivePermissionKeys, refreshSession } = useAuth();
   const [branches, setBranches] = useState<BranchSummary[]>([]);
@@ -111,12 +128,21 @@ export default function PosPage() {
   const [itemForm, setItemForm] = useState({ productId: "", quantity: "1", note: "" });
   const [paymentForm, setPaymentForm] = useState({ paymentMethodId: "", amount: "" });
   const [paymentCustomerProfileId, setPaymentCustomerProfileId] = useState("");
+  const [billingDocumentType, setBillingDocumentType] = useState<PosBillingDocumentType>("TICKET");
+  const [billingRecipient, setBillingRecipient] = useState({
+    documentNumber: "",
+    name: "",
+    address: "",
+    email: "",
+  });
   const [tableAction, setTableAction] = useState<"MOVE" | "JOIN" | null>(null);
   const [targetTableId, setTargetTableId] = useState("");
   const [splitByItems, setSplitByItems] = useState(false);
   const [itemAllocations, setItemAllocations] = useState<Record<string, number>>({});
   const [cancelItemId, setCancelItemId] = useState<string | null>(null);
   const [cancelReason, setCancelReason] = useState("");
+  const [lastClosedAccount, setLastClosedAccount] = useState<OpenAccountSummary | null>(null);
+  const [lastBillingMessage, setLastBillingMessage] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -203,6 +229,8 @@ export default function PosPage() {
     if (!token || !activeOrganizationId) return;
     try {
       const detail = await getOpenAccount({ accessToken: token, organizationId: activeOrganizationId, accountId });
+      setLastClosedAccount(null);
+      setLastBillingMessage(null);
       setSelectedAccount(detail);
       setPaymentCustomerProfileId(detail.customerProfileId ?? "");
       setPaymentForm((current) => ({ ...current, amount: detail.balance.toFixed(2) }));
@@ -240,6 +268,8 @@ export default function PosPage() {
         },
       });
       setSelectedAccount(account);
+      setLastClosedAccount(null);
+      setLastBillingMessage(null);
       setPaymentCustomerProfileId(account.customerProfileId ?? "");
       setShowCreate(false);
       setNewAccount({ diningTableId: "", customerName: "", customerPhone: "", deliveryAddress: "", deliveryReference: "", customerProfileId: "", guestCount: "2", note: "" });
@@ -419,6 +449,10 @@ export default function PosPage() {
     event.preventDefault();
     const token = await resolveToken();
     if (!token || !activeOrganizationId || !selectedAccount || !cashSessionId) return;
+    if (billingDocumentType === "FACTURA" && (!/^\d{11}$/.test(billingRecipient.documentNumber.trim()) || !billingRecipient.name.trim())) {
+      setError("Para emitir factura ingresa RUC de 11 digitos y razon social.");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -444,12 +478,28 @@ export default function PosPage() {
           cashSessionId,
           paymentMethodId: paymentForm.paymentMethodId || undefined,
           amount: Number(paymentForm.amount),
+          billingDocumentType,
+          billingRecipient: billingDocumentType === "FACTURA"
+            ? {
+                documentType: "RUC",
+                documentNumber: billingRecipient.documentNumber.trim(),
+                name: billingRecipient.name.trim(),
+                address: billingRecipient.address.trim() || undefined,
+                email: billingRecipient.email.trim() || undefined,
+              }
+            : undefined,
           allocations: splitByItems
             ? Object.entries(itemAllocations).map(([itemId, quantity]) => ({ itemId, quantity }))
             : undefined,
         },
       });
-      setSelectedAccount(account.status === "CLOSED" ? null : account);
+      if (account.status === "CLOSED") {
+        setLastClosedAccount(account);
+        setLastBillingMessage(null);
+        setSelectedAccount(null);
+      } else {
+        setSelectedAccount(account);
+      }
       setSplitByItems(false);
       setItemAllocations({});
       await Promise.all([refreshAccounts(), refreshDiningAreas()]);
@@ -467,6 +517,36 @@ export default function PosPage() {
   const canGeneratePrebill = effectivePermissionKeys.includes("sales.orders.prebill");
   const canCancelItems = effectivePermissionKeys.includes("sales.orders.cancel_item");
 
+  async function handlePrintInternalTicket() {
+    if (!lastClosedAccount) return;
+    try {
+      printInternalTicket(lastClosedAccount);
+    } catch (printError) {
+      setError(printError instanceof Error ? printError.message : "No se pudo imprimir el ticket.");
+    }
+  }
+
+  async function handleIssueLastClosedAccount() {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !lastClosedAccount?.sale?.id || billingDocumentType === "TICKET") return;
+    setBusy(true);
+    setError(null);
+    try {
+      const document = await issueSaleBillingDocument({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        saleId: lastClosedAccount.sale.id,
+        documentType: billingDocumentType,
+      });
+      setLastBillingMessage(`${billingDocumentType === "FACTURA" ? "Factura" : "Boleta"} ${document.series}-${document.number} emitida.`);
+      if (document.pdfUrl) window.open(document.pdfUrl, "_blank", "noopener,noreferrer");
+    } catch (issueError) {
+      setError(issueError instanceof Error ? issueError.message : "No se pudo emitir el comprobante.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
     <section className="space-y-7">
       <AdminModuleHeader
@@ -478,6 +558,37 @@ export default function PosPage() {
 
       {error ? <AdminMessage title="La operación necesita atención" description={error} tone="warn" /> : null}
       {!cashSessionId ? <AdminMessage title="Caja cerrada" description="Puedes preparar pedidos, pero debes abrir una caja en esta sucursal antes de cobrar." tone="warn" /> : null}
+      {lastClosedAccount ? (
+        <PanelCard
+          title="Pago registrado"
+          description={`Cuenta ${accountLabel(lastClosedAccount)} cerrada por S/ ${lastClosedAccount.total.toFixed(2)}. Puedes imprimir sin ir a Finanzas.`}
+        >
+          {lastBillingMessage ? <AdminMessage title="Comprobante listo" description={lastBillingMessage} tone="accent" /> : null}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-black text-[#202415]">{lastClosedAccount.sale?.saleNumber ?? lastClosedAccount.accountNumber}</p>
+              <p className="mt-1 text-sm text-[#667055]">
+                {billingDocumentType === "TICKET"
+                  ? "Ticket interno: no pasa por Nubefact ni SUNAT."
+                  : "Boleta/factura: emite en Nubefact y abre el PDF fiscal."}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <AdminActionButton icon={<Printer className="h-4 w-4" />} onClick={() => void handlePrintInternalTicket()}>
+                Imprimir ticket
+              </AdminActionButton>
+              {billingDocumentType !== "TICKET" ? (
+                <AdminActionButton tone="primary" icon={<ReceiptText className="h-4 w-4" />} disabled={busy || !lastClosedAccount.sale?.id} onClick={() => void handleIssueLastClosedAccount()}>
+                  Emitir y abrir PDF
+                </AdminActionButton>
+              ) : null}
+              <AdminActionButton tone="ghost" onClick={() => setLastClosedAccount(null)}>
+                Cerrar panel
+              </AdminActionButton>
+            </div>
+          </div>
+        </PanelCard>
+      ) : null}
 
       <div className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
         <PanelCard title="Cuentas abiertas" description={`${accounts.length} operaciones sincronizadas`}>
@@ -501,11 +612,27 @@ export default function PosPage() {
                   <button key={type} type="button" onClick={() => setServiceType(type)} className={`rounded-[24px] border p-5 text-left transition ${serviceType === type ? "border-[#a6ca32] bg-[#f3fad6]" : "border-[#e4ead6] bg-white"}`}><span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-[#4f651c]">{type === "LOCAL" ? <Utensils className="h-5 w-5" /> : type === "DELIVERY" ? <MapPin className="h-5 w-5" /> : <ShoppingBag className="h-5 w-5" />}</span><strong className="mt-4 block text-[#1d2611]">{serviceLabels[type]}</strong></button>
                 ))}
               </div>
-              {serviceType === "LOCAL" ? <div className="grid gap-4 md:grid-cols-2"><label className="space-y-2"><span className="text-sm font-semibold">Mesa</span><select className={inputClass} value={newAccount.diningTableId} onChange={(event) => setNewAccount((current) => ({ ...current, diningTableId: event.target.value }))} required><option value="">Selecciona una mesa libre</option>{availableTables.map((table) => <option key={table.id} value={table.id}>{table.areaName} · {table.name}</option>)}</select></label><label className="space-y-2"><span className="text-sm font-semibold">Comensales</span><input className={inputClass} type="number" min="1" value={newAccount.guestCount} onChange={(event) => setNewAccount((current) => ({ ...current, guestCount: event.target.value }))} /></label></div> : null}
-              {serviceType === "DELIVERY" ? <div className="grid gap-4 md:grid-cols-2"><input className={inputClass} placeholder="Nombre del cliente" value={newAccount.customerName} onChange={(event) => setNewAccount((current) => ({ ...current, customerName: event.target.value }))} required /><input className={inputClass} placeholder="Teléfono" value={newAccount.customerPhone} onChange={(event) => setNewAccount((current) => ({ ...current, customerPhone: event.target.value }))} /><input className={`${inputClass} md:col-span-2`} placeholder="Dirección de entrega" value={newAccount.deliveryAddress} onChange={(event) => setNewAccount((current) => ({ ...current, deliveryAddress: event.target.value }))} required /><input className={`${inputClass} md:col-span-2`} placeholder="Referencia (opcional)" value={newAccount.deliveryReference} onChange={(event) => setNewAccount((current) => ({ ...current, deliveryReference: event.target.value }))} /></div> : null}
-              <label className="space-y-2"><span className="text-sm font-semibold">Cliente para puntos (opcional)</span><select className={inputClass} value={newAccount.customerProfileId} onChange={(event) => setNewAccount((current) => ({ ...current, customerProfileId: event.target.value }))}><option value="">Venta sin cliente identificado</option>{customers.map((customer) => <option key={customer.id} value={customer.id}>{customerOptionLabel(customer)}</option>)}</select></label>
-              <textarea className={inputClass} placeholder="Observación general (opcional)" value={newAccount.note} onChange={(event) => setNewAccount((current) => ({ ...current, note: event.target.value }))} />
-              <div className="flex justify-end gap-3"><AdminActionButton tone="ghost" onClick={() => setShowCreate(false)}>Cancelar</AdminActionButton><AdminActionButton type="submit" tone="primary" disabled={busy}>Abrir cuenta</AdminActionButton></div>
+              {serviceType === "LOCAL" ?
+                <div className="grid gap-4 md:grid-cols-2"><label className="space-y-2"><span className="text-sm font-semibold">Mesa</span><select className={inputClass} value={newAccount.diningTableId} onChange={(event) => setNewAccount((current) => ({ ...current, diningTableId: event.target.value }))} required><option value="">Selecciona una mesa libre</option>{availableTables.map((table) => <option key={table.id} value={table.id}>{table.areaName} · {table.name}</option>)}</select></label><label className="space-y-2"><span className="text-sm font-semibold">Comensales</span><input className={inputClass} type="number" min="1" value={newAccount.guestCount} onChange={(event) => setNewAccount((current) => ({ ...current, guestCount: event.target.value }))} /></label>
+                </div> : null}
+              {serviceType === "DELIVERY" ?
+                <div className="grid gap-4 md:grid-cols-2"><input className={inputClass} placeholder="Nombre del cliente" value={newAccount.customerName} onChange={(event) => setNewAccount((current) => ({ ...current, customerName: event.target.value }))} required /><input className={inputClass} placeholder="Teléfono" value={newAccount.customerPhone} onChange={(event) => setNewAccount((current) => ({ ...current, customerPhone: event.target.value }))} /><input className={`${inputClass} md:col-span-2`} placeholder="Dirección de entrega" value={newAccount.deliveryAddress} onChange={(event) => setNewAccount((current) => ({ ...current, deliveryAddress: event.target.value }))} required /><input className={`${inputClass} md:col-span-2`} placeholder="Referencia (opcional)" value={newAccount.deliveryReference} onChange={(event) => setNewAccount((current) => ({ ...current, deliveryReference: event.target.value }))} />
+                </div> : null}
+              <div className=" flex flex-col gap-2">
+                <label className="space-y-3">
+                  <span className="text-sm font-semibold">Cliente para puntos (opcional)</span>
+                  <select className={inputClass} value={newAccount.customerProfileId} onChange={(event) => setNewAccount((current) => ({ ...current, customerProfileId: event.target.value }))}>
+                    <option value="">Venta sin cliente identificado</option>{customers.map((customer) => <option key={customer.id} value={customer.id}>{customerOptionLabel(customer)}</option>)}
+                  </select>
+                </label>
+                <textarea className={inputClass} placeholder="Observación general (opcional)" value={newAccount.note} onChange={(event) => setNewAccount((current) => ({ ...current, note: event.target.value }))} />
+              </div>
+              <div className="flex justify-end gap-3">
+                <AdminActionButton tone="ghost" onClick={() => setShowCreate(false)}>Cancelar
+                </AdminActionButton>
+                <AdminActionButton type="submit" tone="primary" disabled={busy}>Abrir cuenta
+                </AdminActionButton>
+              </div>
             </form>
           </PanelCard>
         ) : selectedAccount ? (
@@ -545,7 +672,7 @@ export default function PosPage() {
             </PanelCard>
 
             <PanelCard title="Agregar productos" description="Cada observación viaja con el ítem hacia cocina.">
-              <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_120px_minmax(0,1fr)_auto]" onSubmit={handleAddItem}><select className={inputClass} value={itemForm.productId} onChange={(event) => setItemForm((current) => ({ ...current, productId: event.target.value }))} required>{products.map((product) => <option key={product.id} value={product.id}>{product.name} · S/ {product.price.toFixed(2)}</option>)}</select><input className={inputClass} type="number" min="0.001" step="0.001" value={itemForm.quantity} onChange={(event) => setItemForm((current) => ({ ...current, quantity: event.target.value }))} /><input className={inputClass} placeholder="Ej. sin cebolla" value={itemForm.note} onChange={(event) => setItemForm((current) => ({ ...current, note: event.target.value }))} /><AdminActionButton type="submit" tone="accent" icon={<PackagePlus className="h-4 w-4" />} disabled={busy}>Agregar</AdminActionButton></form>
+              <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_120px_minmax(0,1fr)_auto]" onSubmit={handleAddItem}><select className={inputClass} value={itemForm.productId} onChange={(event) => setItemForm((current) => ({ ...current, productId: event.target.value }))} required>{products.map((product) => <option key={product.id} value={product.id}>{product.name} · S/ {product.price.toFixed(2)}</option>)}</select><input className={inputClass} type="number" min="1" step="1" value={itemForm.quantity} onChange={(event) => setItemForm((current) => ({ ...current, quantity: event.target.value.replace(/\D/g, "") || "1" }))} /><input className={inputClass} placeholder="Ej. sin cebolla" value={itemForm.note} onChange={(event) => setItemForm((current) => ({ ...current, note: event.target.value }))} /><AdminActionButton type="submit" tone="accent" icon={<PackagePlus className="h-4 w-4" />} disabled={busy}>Agregar</AdminActionButton></form>
               <div className="mt-5 divide-y divide-[#edf0e6]">
                 {selectedAccount.items?.map((item) => (
                   <div key={item.id} className={`py-3 ${item.status === "CANCELLED" ? "opacity-55" : ""}`}>
@@ -574,13 +701,32 @@ export default function PosPage() {
 
             <PanelCard title="Cobrar cuenta" description="Cobra un monto libre o selecciona exactamente qué productos paga cada persona.">
               <label className="mb-4 block space-y-2">
-                <span className="text-sm font-semibold">Cliente fiscal / puntos</span>
+                <span className="text-sm font-semibold">Cliente para puntos</span>
                 <select className={inputClass} value={paymentCustomerProfileId} onChange={(event) => setPaymentCustomerProfileId(event.target.value)}>
                   <option value="">Cliente final / Clientes varios</option>
                   {customers.map((customer) => <option key={customer.id} value={customer.id}>{customerOptionLabel(customer)}</option>)}
                 </select>
-                <small className="block leading-5 text-[#6b7558]">Para boleta con DNI o factura con RUC, selecciona el cliente antes de registrar el último pago.</small>
+                <small className="block leading-5 text-[#6b7558]">Este cliente acumula puntos. Si emites factura, los datos fiscales se llenan aparte.</small>
               </label>
+              <div className="mb-4 rounded-[24px] border border-[#e0e8ce] bg-[#fbfcf7] p-4">
+                <span className="text-sm font-semibold">Comprobante</span>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(["TICKET", "BOLETA", "FACTURA"] as PosBillingDocumentType[]).map((type) => (
+                    <AdminActionButton key={type} active={billingDocumentType === type} onClick={() => setBillingDocumentType(type)}>
+                      {type === "TICKET" ? "Ticket" : type === "BOLETA" ? "Boleta" : "Factura"}
+                    </AdminActionButton>
+                  ))}
+                </div>
+                {billingDocumentType === "FACTURA" ? (
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    <input className={inputClass} placeholder="RUC de 11 digitos" value={billingRecipient.documentNumber} onChange={(event) => setBillingRecipient((current) => ({ ...current, documentNumber: event.target.value.replace(/\D/g, "").slice(0, 11) }))} required />
+                    <input className={inputClass} placeholder="Razon social" value={billingRecipient.name} onChange={(event) => setBillingRecipient((current) => ({ ...current, name: event.target.value }))} required />
+                    <input className={`${inputClass} md:col-span-2`} placeholder="Direccion fiscal (opcional)" value={billingRecipient.address} onChange={(event) => setBillingRecipient((current) => ({ ...current, address: event.target.value }))} />
+                    <input className={`${inputClass} md:col-span-2`} placeholder="Correo para envio (opcional)" value={billingRecipient.email} onChange={(event) => setBillingRecipient((current) => ({ ...current, email: event.target.value }))} />
+                    <p className="md:col-span-2 text-xs leading-5 text-[#6b7558]">La factura usara estos datos. El cliente seleccionado arriba solo sirve para puntos e historial.</p>
+                  </div>
+                ) : null}
+              </div>
               <div className="mb-4 flex flex-wrap gap-2">
                 <AdminActionButton active={!splitByItems} onClick={() => { setSplitByItems(false); setItemAllocations({}); setPaymentForm((current) => ({ ...current, amount: selectedAccount.balance.toFixed(2) })); }}>Monto libre</AdminActionButton>
                 <AdminActionButton active={splitByItems} icon={<Split className="h-4 w-4" />} onClick={() => { setSplitByItems(true); setItemAllocations({}); setPaymentForm((current) => ({ ...current, amount: "0.00" })); }}>Dividir por productos</AdminActionButton>

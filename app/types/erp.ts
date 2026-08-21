@@ -361,6 +361,12 @@ export type OpenAccountSummary = {
   items?: OpenAccountItemSummary[];
   kitchenTickets?: KitchenTicketSummary[];
   payments?: OpenAccountPaymentSummary[];
+  sale?: {
+    id: string;
+    saleNumber: string;
+    status: string;
+    billingDocuments?: Array<Pick<BillingDocumentSummary, "id" | "type" | "status" | "pdfUrl">>;
+  } | null;
   _count?: { items: number; kitchenTickets: number; payments: number };
 };
 
@@ -409,7 +415,7 @@ export type BillingProviderConfigSummary = {
 export type BillingSeriesSummary = {
   id: string;
   branchId: string;
-  documentType: "BOLETA" | "FACTURA";
+  documentType: "BOLETA" | "FACTURA" | "NOTA_CREDITO" | "NOTA_DEBITO";
   series: string;
   nextNumber: number;
   enabled: boolean;
@@ -427,6 +433,11 @@ export type BillingDocumentSummary = {
   id: string;
   type: "TICKET" | "BOLETA" | "FACTURA";
   status: BillingDocumentStatus;
+  recipientDocumentType: "DNI" | "RUC" | "CE" | "PASSPORT" | null;
+  recipientDocumentNumber: string | null;
+  recipientName: string | null;
+  recipientAddress: string | null;
+  recipientEmail: string | null;
   provider: string | null;
   externalId: string | null;
   series: string | null;

@@ -894,6 +894,14 @@ export function recordOpenAccountPayment(
       paymentMethodId?: string;
       paymentIntentId?: string;
       amount: number;
+      billingDocumentType?: "TICKET" | "BOLETA" | "FACTURA";
+      billingRecipient?: {
+        documentType?: "DNI" | "RUC" | "CE" | "PASSPORT";
+        documentNumber?: string;
+        name?: string;
+        address?: string;
+        email?: string;
+      };
       allocations?: Array<{ itemId: string; quantity: number }>;
       provider?: string;
       providerRef?: string;
@@ -1102,6 +1110,23 @@ export function issueBillingDocument(
 ) {
   return apiRequest<BillingDocumentSummary>(
     `/erp/billing/documents/${input.documentId}/issue`,
+    {
+      method: "POST",
+      accessToken: input.accessToken,
+      headers: organizationHeaders(input.organizationId),
+      body: { documentType: input.documentType },
+    },
+  );
+}
+
+export function issueSaleBillingDocument(
+  input: OrganizationRequestInput & {
+    saleId: string;
+    documentType: "BOLETA" | "FACTURA";
+  },
+) {
+  return apiRequest<BillingDocumentSummary>(
+    `/erp/billing/sales/${input.saleId}/issue`,
     {
       method: "POST",
       accessToken: input.accessToken,

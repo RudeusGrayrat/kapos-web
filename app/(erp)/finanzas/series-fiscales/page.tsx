@@ -13,6 +13,27 @@ const inputClass =
   "w-full rounded-[18px] border border-[#dfe7cf] bg-white px-4 py-3 text-sm text-[#1f2813] outline-none transition focus:border-[#a9cf24]";
 
 type SeriesFormMode = "create" | "edit";
+type SeriesDocumentType = BillingSeriesSummary["documentType"];
+
+const documentTypeOptions: Array<{
+  value: SeriesDocumentType;
+  label: string;
+  defaultSeries: string;
+  hint: string;
+}> = [
+  { value: "BOLETA", label: "Boleta", defaultSeries: "B001", hint: "Comprobante para consumidor final." },
+  { value: "FACTURA", label: "Factura", defaultSeries: "F001", hint: "Comprobante con RUC." },
+  { value: "NOTA_CREDITO", label: "Nota de crédito", defaultSeries: "BC01", hint: "Ajuste o anulación sobre un comprobante emitido." },
+  { value: "NOTA_DEBITO", label: "Nota de débito", defaultSeries: "BD01", hint: "Aumento o cargo adicional sobre un comprobante emitido." },
+];
+
+function nextDefaultSeries(documentType: SeriesDocumentType) {
+  return documentTypeOptions.find((option) => option.value === documentType)?.defaultSeries ?? "B001";
+}
+
+function documentTypeLabel(documentType: SeriesDocumentType) {
+  return documentTypeOptions.find((option) => option.value === documentType)?.label ?? documentType;
+}
 
 export default function SeriesFiscalesPage() {
   const { accessToken, activeOrganizationId, effectivePermissionKeys, refreshSession } = useAuth();
@@ -21,7 +42,7 @@ export default function SeriesFiscalesPage() {
   const [seriesForm, setSeriesForm] = useState({
     id: "",
     branchId: "",
-    documentType: "BOLETA" as "BOLETA" | "FACTURA",
+    documentType: "BOLETA" as SeriesDocumentType,
     series: "B001",
     nextNumber: "1",
     enabled: true,
@@ -149,7 +170,7 @@ export default function SeriesFiscalesPage() {
         description="Controla series y correlativos por sucursal sin mezclar credenciales ni comprobantes."
         action={canCreateSeries ? <AdminActionButton tone="primary" icon={<ReceiptText className="h-4 w-4" />} onClick={openCreateSeries}>Crear serie</AdminActionButton> : <ReceiptText className="h-6 w-6 text-[#6d8a20]" />}
         stats={[
-          { label: "Series", value: String(seriesRows.length), hint: "Boletas y facturas configuradas.", tone: "dark" },
+          { label: "Series", value: String(seriesRows.length), hint: "Boletas, facturas y notas configuradas.", tone: "dark" },
           { label: "Activas", value: String(activeSeries), hint: "Disponibles para emitir.", tone: "accent" },
           { label: "Sucursales", value: String(branches.length), hint: "Sedes habilitadas para configurar." },
         ]}
@@ -164,7 +185,7 @@ export default function SeriesFiscalesPage() {
             <article key={row.id} className="rounded-[20px] border border-[#e8eddd] bg-white p-4">
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#849252]">{row.documentType}</p>
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#849252]">{documentTypeLabel(row.documentType)}</p>
                   <h3 className="mt-1 text-2xl font-semibold text-[#1b2111]">{row.series}</h3>
                   <p className="mt-1 text-sm text-[#6b7558]">{row.branch.name}</p>
                 </div>
@@ -178,7 +199,7 @@ export default function SeriesFiscalesPage() {
             </article>
           ))}
         </div>
-        {!loading && seriesRows.length === 0 ? <AdminMessage title="Sin series" description="Configura una serie B para boleta y una F para factura en cada sucursal que emitirá." /> : null}
+        {!loading && seriesRows.length === 0 ? <AdminMessage title="Sin series" description="Configura series para boletas, facturas y, cuando corresponda, notas de crédito o débito." /> : null}
       </PanelCard>
 
       <AdminOverlayPanel
@@ -192,7 +213,7 @@ export default function SeriesFiscalesPage() {
         <form id="billing-series-form" className="space-y-4" onSubmit={submitSeries}>
           <label className="space-y-2"><span className="text-sm font-semibold">Sucursal</span><select className={inputClass} value={seriesForm.branchId} onChange={(event) => setSeriesForm((current) => ({ ...current, branchId: event.target.value }))} required><option value="">Selecciona una sucursal</option>{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-2"><span className="text-sm font-semibold">Comprobante</span><select className={inputClass} value={seriesForm.documentType} onChange={(event) => setSeriesForm((current) => ({ ...current, documentType: event.target.value as "BOLETA" | "FACTURA", series: event.target.value === "FACTURA" ? "F001" : "B001" }))}><option value="BOLETA">Boleta</option><option value="FACTURA">Factura</option></select></label>
+            <label className="space-y-2"><span className="text-sm font-semibold">Comprobante</span><select className={inputClass} value={seriesForm.documentType} onChange={(event) => { const documentType = event.target.value as SeriesDocumentType; setSeriesForm((current) => ({ ...current, documentType, series: nextDefaultSeries(documentType) })); }}>{documentTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select><p className="text-xs leading-5 text-[#667055]">{documentTypeOptions.find((option) => option.value === seriesForm.documentType)?.hint}</p></label>
             <label className="space-y-2"><span className="text-sm font-semibold">Serie</span><input className={inputClass} maxLength={4} value={seriesForm.series} onChange={(event) => setSeriesForm((current) => ({ ...current, series: event.target.value.toUpperCase() }))} required /></label>
           </div>
           <label className="space-y-2"><span className="text-sm font-semibold">Próximo correlativo</span><input className={inputClass} type="number" min="1" value={seriesForm.nextNumber} onChange={(event) => setSeriesForm((current) => ({ ...current, nextNumber: event.target.value }))} required /></label>

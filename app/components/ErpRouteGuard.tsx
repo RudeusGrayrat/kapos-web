@@ -16,7 +16,7 @@ type ErpRouteGuardProps = {
   children: ReactNode;
 };
 
-const ALWAYS_ALLOWED_PATHS = new Set(["/dashboard", "/home"]);
+const ALWAYS_ALLOWED_PATHS = new Set(["/dashboard"]);
 
 function routeMatches(pathname: string, route: string) {
   return pathname === route || pathname.startsWith(`${route}/`);
