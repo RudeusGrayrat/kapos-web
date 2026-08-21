@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "./context/auth-context";
 
@@ -18,8 +19,15 @@ export default function LandingPage() {
       <header className="sticky top-0 z-20 border-b border-white/40 bg-[#fbf7ed]/85 backdrop-blur-xl">
         <div className="mx-auto flex w-full max-w-[1300px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#2f3c1d] text-sm font-black text-white shadow-[0_12px_30px_rgba(47,60,29,0.24)]">
-              K
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white p-2 shadow-[0_12px_30px_rgba(47,60,29,0.18)]">
+              <Image
+                src="/brand/kapos-k.svg"
+                alt="Kapos"
+                width={28}
+                height={31}
+                className="h-full w-full object-contain"
+                priority
+              />
             </div>
             <div>
               <p className="text-sm font-black uppercase tracking-[0.28em] text-[#7f714c]">
@@ -60,6 +68,14 @@ export default function LandingPage() {
 
       <section className="mx-auto grid min-h-[calc(100vh-90px)] w-full max-w-[1300px] items-center gap-10 px-6 py-16 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
+          <Image
+            src="/brand/kapos-logo.svg"
+            alt="Kapos"
+            width={250}
+            height={91}
+            className="mb-8 h-auto w-52 md:w-64"
+            priority
+          />
           <p className="inline-flex rounded-full border border-[#ddd1b8] bg-white/75 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-[#8f7d56]">
             Plataforma ERP
           </p>

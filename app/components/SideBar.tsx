@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
@@ -51,7 +52,14 @@ type Category = {
 
 const ICONS = {
   logo: (
-    <span className="text-2xl font-black tracking-wider text-white">K</span>
+    <Image
+      src="/brand/kapos-k.svg"
+      alt="Kapos"
+      width={28}
+      height={31}
+      className="h-8 w-8 object-contain"
+      priority
+    />
   ),
   dashboard: (
     <Grid2x2 className="h-5 w-5" strokeWidth={2.2} />
@@ -471,7 +479,7 @@ export default function SideBar() {
     >
       <aside className="absolute left-0 top-0 z-30 flex h-full w-20 flex-col items-center rounded-[40px] bg-[var(--kapos-black)] py-6 transition-all duration-300 ease-in-out">
         <div className="mb-6 flex h-16 w-full items-center justify-center">
-          <div className="flex h-11 w-11 items-center justify-center rounded-full border border-[var(--kapos-charcoal)] bg-[var(--kapos-lime)] shadow-inner">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white shadow-[0_16px_30px_rgba(0,0,0,0.28)]">
             {ICONS.logo}
           </div>
         </div>
