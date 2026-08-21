@@ -94,9 +94,6 @@ export function UnbuiltModuleNotice({ path }: UnbuiltModuleNoticeProps) {
               <Link href="/dashboard">
                 <AdminActionButton tone="primary">Ir al dashboard</AdminActionButton>
               </Link>
-              <Link href="/home">
-                <AdminActionButton tone="secondary">Volver al inicio ERP</AdminActionButton>
-              </Link>
             </div>
           </div>
         </div>

@@ -127,23 +127,6 @@ const SURFACE_COLOR = "var(--kapos-background)";
 
 const CATEGORIES: Category[] = [
   {
-    key: "dashboard",
-    label: "Dashboard",
-    icon: ICONS.dashboard,
-    items: [
-      {
-        label: "Vista general",
-        path: "/dashboard",
-        description: "Resumen ejecutivo y actividad general.",
-      },
-      {
-        label: "Centro de actividad",
-        path: "/home",
-        description: "Entrada principal de trabajo para el usuario.",
-      },
-    ],
-  },
-  {
     key: "rrhh",
     label: "Recursos humanos",
     icon: ICONS.rrhh,
@@ -335,6 +318,7 @@ function filterCatalogByActiveContext(
   const organizationModules = new Set(activeOrganization?.moduleKeys ?? []);
 
   return catalog
+    .filter((moduleItem) => moduleItem.key !== "dashboard")
     .map((moduleItem) => {
       const filteredSubmodules = moduleItem.submodules.filter((submodule) => {
         if (
@@ -398,7 +382,7 @@ function getActiveCategory(pathname: string, categories: Category[]) {
   return (
     categories.find((category) =>
       category.items.some((item) => isActivePath(pathname, item.path)),
-    ) ?? categories[0]
+    ) ?? null
   );
 }
 
@@ -417,7 +401,7 @@ export default function SideBar() {
             activeOrganization,
           ).map(mapNavigationModuleToCategory)
         : CATEGORIES.filter((category) =>
-            ["dashboard", "platform"].includes(category.key)
+            ["platform"].includes(category.key)
               ? !category.requiresPlatform || Boolean(platformContext)
               : false,
           ),
@@ -436,9 +420,11 @@ export default function SideBar() {
     activeCategory;
 
   const animatedCategory = openedCategoryKey ? visibleCategory : activeCategory;
-  const activeIndex = visibleCategories.findIndex(
-    (category) => category.key === animatedCategory.key,
-  );
+  const activeIndex = animatedCategory
+    ? visibleCategories.findIndex(
+        (category) => category.key === animatedCategory.key,
+      )
+    : -1;
 
   const handleLogout = async () => {
     await logout();
@@ -479,9 +465,14 @@ export default function SideBar() {
     >
       <aside className="absolute left-0 top-0 z-30 flex h-full w-20 flex-col items-center rounded-[40px] bg-[var(--kapos-black)] py-6 transition-all duration-300 ease-in-out">
         <div className="mb-6 flex h-16 w-full items-center justify-center">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white shadow-[0_16px_30px_rgba(0,0,0,0.28)]">
+          <Link
+            href="/dashboard"
+            aria-label="Ir al dashboard"
+            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/10 bg-white shadow-[0_16px_30px_rgba(0,0,0,0.28)] transition-transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-[var(--kapos-lime)] focus:ring-offset-2 focus:ring-offset-[var(--kapos-black)]"
+            onClick={() => setOpenedCategoryKey(null)}
+          >
             {ICONS.logo}
-          </div>
+          </Link>
         </div>
 
         <nav className="relative flex w-full flex-col space-y-3 overflow-visible">
@@ -510,7 +501,7 @@ export default function SideBar() {
           ) : null}
 
           {visibleCategories.map((category) => {
-            const isRouteActive = activeCategory.key === category.key;
+            const isRouteActive = activeCategory?.key === category.key;
             const isOpened = openedCategoryKey === category.key;
 
             return (
@@ -568,7 +559,8 @@ export default function SideBar() {
         </div>
       </aside>
 
-      <div
+      {visibleCategory ? (
+        <div
         className={`absolute left-25 -top-1 z-20 h-full w-[22rem] overflow-hidden rounded-[36px] border border-[var(--kapos-border)] bg-[var(--kapos-card)] p-6 shadow-lg transition-all duration-300 ease-in-out ${openedCategoryKey
             ? "translate-x-0 opacity-100"
             : "pointer-events-none -translate-x-4 opacity-0"
@@ -642,7 +634,8 @@ export default function SideBar() {
             );
           })}
         </div>
-      </div>
+        </div>
+      ) : null}
     </div>
   );
 }

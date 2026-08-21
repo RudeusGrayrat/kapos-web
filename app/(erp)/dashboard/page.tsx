@@ -10,7 +10,7 @@ export default function DashboardPage() {
               Dashboard
             </p>
             <h1 className="text-3xl font-semibold text-[#2c341c] md:text-4xl">
-              Panel principal del ERP
+              Dashboard operativo
             </h1>
             <p className="max-w-3xl text-sm leading-7 text-[#5b6645] md:text-base">
               Este contenido cambia por ruta, pero el sidebar permanece porque vive
