@@ -38,7 +38,7 @@ type CategoryForm = {
 const EMPTY_FORM: CategoryForm = {
   name: "",
   description: "",
-  color: "#b4e610",
+  color: "#00C70D",
   sortOrder: "0",
   isActive: true,
 };
@@ -107,7 +107,7 @@ export default function CatalogoCategoriasPage() {
     setEditForm({
       name: category.name,
       description: category.description ?? "",
-      color: category.color ?? "#b4e610",
+      color: category.color ?? "#00C70D",
       sortOrder: String(category.sortOrder),
       isActive: category.isActive,
     });
@@ -184,8 +184,8 @@ export default function CatalogoCategoriasPage() {
       {viewMode === "create" ? (
         <PanelCard title="Crear categoria" description="Ejemplos: waffles, batidos, toppings, bebidas.">
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Descripcion</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} /></label>
             <div className="flex justify-end"><AdminActionButton type="submit" tone="primary" icon={<PlusIcon />}>Crear categoria</AdminActionButton></div>
           </form>
         </PanelCard>
@@ -200,7 +200,7 @@ export default function CatalogoCategoriasPage() {
             emptyTitle="Aun no hay categorias"
             emptyDescription="Crea categorias para ordenar el catalogo."
             columns={[
-              { key: "name", label: "Categoria", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.name}</p><p className="text-xs text-[#7a845f]">{row.slug}</p></div> },
+              { key: "name", label: "Categoria", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.name}</p><p className="text-xs text-[#A1A1A1]">{row.slug}</p></div> },
               { key: "products", label: "Productos", align: "center", render: (row) => row._count?.products ?? 0 },
               { key: "order", label: "Orden", align: "center", render: (row) => row.sortOrder },
               { key: "status", label: "Estado", render: (row) => <Tag tone={row.isActive ? "accent" : "soft"}>{row.isActive ? "Activa" : "Inactiva"}</Tag> },
@@ -229,10 +229,10 @@ export default function CatalogoCategoriasPage() {
       >
         {editForm ? (
           <form id="category-edit-form" className="grid gap-4 md:grid-cols-2" onSubmit={handleUpdateCategory}>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.name} onChange={(event) => setEditForm((current) => current ? { ...current, name: event.target.value } : current)} required /></label>
-            <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Descripcion</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.description} onChange={(event) => setEditForm((current) => current ? { ...current, description: event.target.value } : current)} /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Orden</span><input type="number" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.sortOrder} onChange={(event) => setEditForm((current) => current ? { ...current, sortOrder: event.target.value } : current)} /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.isActive ? "ACTIVE" : "INACTIVE"} onChange={(event) => setEditForm((current) => current ? { ...current, isActive: event.target.value === "ACTIVE" } : current)}><option value="ACTIVE">Activa</option><option value="INACTIVE">Inactiva</option></select></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.name} onChange={(event) => setEditForm((current) => current ? { ...current, name: event.target.value } : current)} required /></label>
+            <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.description} onChange={(event) => setEditForm((current) => current ? { ...current, description: event.target.value } : current)} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Orden</span><input type="number" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.sortOrder} onChange={(event) => setEditForm((current) => current ? { ...current, sortOrder: event.target.value } : current)} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Estado</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.isActive ? "ACTIVE" : "INACTIVE"} onChange={(event) => setEditForm((current) => current ? { ...current, isActive: event.target.value === "ACTIVE" } : current)}><option value="ACTIVE">Activa</option><option value="INACTIVE">Inactiva</option></select></label>
           </form>
         ) : null}
       </AdminOverlayPanel>

@@ -1,20 +1,26 @@
 @import "tailwindcss";
 
 :root {
-  --kapos-lime: #0DAF12;
-  --kapos-lime-soft: #eef8bf;
-  --kapos-lime-wash: #f7fbd9;
-  --kapos-black: #0c0d0f;
-  --kapos-charcoal: #1a1d17;
-  --kapos-text: #202415;
-  --kapos-text-soft: #667055;
-  --kapos-text-muted: #8a9278;
-  --kapos-border: #e7ecd6;
-  --kapos-border-strong: #d8e2b6;
+  --kapos-green: #00C70D;
+  --kapos-green-dark: #00920A;
+  --kapos-green-strong: #40D653;
+  --kapos-green-mid: #7EE98A;
+  --kapos-green-soft: #B8F5BC;
+  --kapos-green-wash: #E8FCEB;
+  --kapos-lime: var(--kapos-green);
+  --kapos-lime-soft: var(--kapos-green-soft);
+  --kapos-lime-wash: var(--kapos-green-wash);
+  --kapos-black: #0D0D0D;
+  --kapos-charcoal: #1A1A1A;
+  --kapos-text: #0D0D0D;
+  --kapos-text-soft: #535353;
+  --kapos-text-muted: #A1A1A1;
+  --kapos-border: #E4E4E4;
+  --kapos-border-strong: #A1A1A1;
   --kapos-card: #ffffff;
-  --kapos-card-alt: #f7f8f2;
-  --kapos-background: #f5f6ef;
-  --kapos-success: #0DAF12;
+  --kapos-card-alt: #F8F8F8;
+  --kapos-background: #F1F1F1;
+  --kapos-success: #00C70D;
   --kapos-danger: #d35f48;
   --kapos-warning: #d6a514;
   --background: var(--kapos-background);
@@ -37,6 +43,9 @@
 }
 
 body {
+  background:
+    radial-gradient(circle at 88% 8%, rgba(0, 199, 13, 0.06), transparent 26rem),
+    linear-gradient(180deg, #ffffff 0%, var(--kapos-background) 100%);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
@@ -52,19 +61,19 @@ body {
 }
 
 *::-webkit-scrollbar-track {
-  background: linear-gradient(180deg, rgba(12, 13, 15, 0.06), rgba(12, 13, 15, 0.12));
+  background: rgba(13, 13, 13, 0.06);
   border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, var(--kapos-lime) 0%, var(--kapos-success) 100%);
+  background: linear-gradient(180deg, var(--kapos-green) 0%, var(--kapos-green-dark) 100%);
   border: 2px solid rgba(255, 255, 255, 0.92);
   border-radius: 999px;
-  box-shadow: 0 6px 16px rgba(13, 175, 18, 0.2);
+  box-shadow: 0 6px 16px rgba(0, 199, 13, 0.24);
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(180deg, var(--kapos-lime) 0%, var(--kapos-success) 100%);
+  background: linear-gradient(180deg, var(--kapos-green-strong) 0%, var(--kapos-green) 100%);
 }
 
 *::-webkit-scrollbar-corner {

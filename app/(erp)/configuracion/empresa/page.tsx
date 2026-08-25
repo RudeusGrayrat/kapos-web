@@ -145,9 +145,9 @@ export default function ConfigEmpresaPage() {
             ["receiptFooter", "Pie de ticket", "Gracias por tu compra."],
           ].map(([key, label, placeholder]) => (
             <label key={key} className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">{label}</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">{label}</span>
               <input
-                className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 placeholder={placeholder}
                 value={form[key as keyof typeof form]}
                 onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))}
@@ -155,9 +155,9 @@ export default function ConfigEmpresaPage() {
             </label>
           ))}
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-[#21300f]">Moneda</span>
+            <span className="text-sm font-semibold text-[#0D0D0D]">Moneda</span>
             <select
-              className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+              className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
               value={form.currencyCode}
               onChange={(event) => setForm((current) => ({ ...current, currencyCode: event.target.value }))}
             >
@@ -167,9 +167,9 @@ export default function ConfigEmpresaPage() {
             </select>
           </label>
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-[#21300f]">Zona horaria</span>
+            <span className="text-sm font-semibold text-[#0D0D0D]">Zona horaria</span>
             <select
-              className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+              className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
               value={form.timezone}
               onChange={(event) => setForm((current) => ({ ...current, timezone: event.target.value }))}
             >

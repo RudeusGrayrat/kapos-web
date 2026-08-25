@@ -9,7 +9,7 @@ import { createCustomer, getCustomers } from "../../../lib/erp-api";
 import type { CustomerSummary } from "../../../types/erp";
 
 const inputClass =
-  "w-full rounded-[18px] border border-[#dfe7cf] bg-white px-4 py-3 text-sm text-[#1f2813] outline-none transition focus:border-[#a9cf24]";
+  "w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#00C70D]";
 
 const emptyForm = {
   firstName: "",
@@ -124,12 +124,12 @@ export default function ClientesPage() {
         </PanelCard>
       ) : (
         <PanelCard title="Directorio de clientes" description="Busca por nombre, documento, correo, teléfono o código.">
-          <label className="relative block"><Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#7c8769]" /><input className="w-full rounded-full border border-[#dfe7cf] bg-white py-3 pl-11 pr-4 text-sm outline-none focus:border-[#a9cf24]" placeholder="Buscar cliente" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
+          <label className="relative block"><Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A1A1A1]" /><input className="w-full rounded-full border border-[#E4E4E4] bg-white py-3 pl-11 pr-4 text-sm outline-none focus:border-[#00C70D]" placeholder="Buscar cliente" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
           {customers.length === 0 ? <div className="mt-6"><AdminMessage title="No encontramos clientes" description="Registra el primero para comenzar a asociar ventas y puntos." /></div> : null}
           <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {customers.map((customer) => {
               const name = [customer.user.firstName, customer.user.lastName].filter(Boolean).join(" ") || customer.user.email || customer.user.phone || "Cliente sin nombre";
-              return <article key={customer.id} className="rounded-[28px] border border-[#e4ead6] bg-white p-5"><div className="flex items-start justify-between"><span className="grid h-12 w-12 place-items-center rounded-[18px] bg-[#eff7d1] text-[#506818]"><UserRound className="h-5 w-5" /></span><Tag tone="accent">Activo</Tag></div><h3 className="mt-4 text-lg font-semibold text-[#1a210f]">{name}</h3><p className="mt-1 text-xs text-[#747e63]">{customer.user.documentNumber ?? customer.externalCustomerCode ?? "Sin código"}</p><div className="mt-5 flex items-center justify-between rounded-2xl bg-[#f6f9e9] p-3"><span className="flex items-center gap-2 text-sm text-[#65714d]"><Sparkles className="h-4 w-4" />Puntos</span><strong className="text-[#314313]">{customer.loyaltyWallet?.redeemablePoints ?? 0}</strong></div><div className="mt-4 space-y-1 text-xs text-[#707a5f]"><p>{customer.user.phone ?? "Sin teléfono"}</p><p>{customer.user.email ?? "Sin correo"}</p></div>{customer.user.email ? <p className="mt-4 flex items-center gap-2 text-xs text-[#55701e]"><CheckCircle2 className="h-4 w-4" />Preparado para invitación futura</p> : null}</article>;
+              return <article key={customer.id} className="rounded-[28px] border border-[#E4E4E4] bg-white p-5"><div className="flex items-start justify-between"><span className="grid h-12 w-12 place-items-center rounded-[18px] bg-[#E8FCEB] text-[#00C70D]"><UserRound className="h-5 w-5" /></span><Tag tone="accent">Activo</Tag></div><h3 className="mt-4 text-lg font-semibold text-[#1a210f]">{name}</h3><p className="mt-1 text-xs text-[#A1A1A1]">{customer.user.documentNumber ?? customer.externalCustomerCode ?? "Sin código"}</p><div className="mt-5 flex items-center justify-between rounded-2xl bg-[#E8FCEB] p-3"><span className="flex items-center gap-2 text-sm text-[#65714d]"><Sparkles className="h-4 w-4" />Puntos</span><strong className="text-[#00C70D]">{customer.loyaltyWallet?.redeemablePoints ?? 0}</strong></div><div className="mt-4 space-y-1 text-xs text-[#535353]"><p>{customer.user.phone ?? "Sin teléfono"}</p><p>{customer.user.email ?? "Sin correo"}</p></div>{customer.user.email ? <p className="mt-4 flex items-center gap-2 text-xs text-[#00C70D]"><CheckCircle2 className="h-4 w-4" />Preparado para invitación futura</p> : null}</article>;
             })}
           </div>
         </PanelCard>

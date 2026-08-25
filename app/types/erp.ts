@@ -467,3 +467,88 @@ export type BillingDocumentSummary = {
     } | null;
   };
 };
+
+export type DashboardRange = "today" | "last_7_days" | "last_30_days";
+export type DashboardScope = "PLATFORM" | "ORGANIZATION";
+export type DashboardTone = "accent" | "dark" | "soft" | "warn" | "danger";
+
+export type DashboardWidgetDefinition = {
+  key: string;
+  moduleKey: string;
+  title: string;
+  description: string;
+  requiredAnyPermissionPrefix: string[];
+  defaultSize: "sm" | "md" | "lg";
+};
+
+export type DashboardMetricWidget = {
+  key: string;
+  type: "metric";
+  moduleKey: string;
+  title: string;
+  value: string;
+  hint: string;
+  tone: DashboardTone;
+  trend?: number | null;
+};
+
+export type DashboardListWidget = {
+  key: string;
+  type: "list";
+  moduleKey: string;
+  title: string;
+  hint: string;
+  tone: DashboardTone;
+  items: Array<{
+    id: string;
+    label: string;
+    value: string;
+    meta?: string;
+    tone?: DashboardTone;
+  }>;
+};
+
+export type DashboardChartWidget = {
+  key: string;
+  type: "chart";
+  moduleKey: string;
+  title: string;
+  hint: string;
+  tone: DashboardTone;
+  data: Array<{ label: string; value: number }>;
+};
+
+export type DashboardWidget =
+  | DashboardMetricWidget
+  | DashboardListWidget
+  | DashboardChartWidget;
+
+export type DashboardShortcut = {
+  key: string;
+  label: string;
+  route: string;
+  moduleKey: string;
+  permissionKey: string | null;
+};
+
+export type DashboardNotification = {
+  key: string;
+  title: string;
+  description: string;
+  tone: DashboardTone;
+  route?: string;
+};
+
+export type DashboardSummary = {
+  context: {
+    scope: DashboardScope;
+    title: string;
+    range: DashboardRange;
+    moduleKeys: string[];
+    permissionCount: number;
+  };
+  availableWidgets: DashboardWidgetDefinition[];
+  widgets: DashboardWidget[];
+  shortcuts: DashboardShortcut[];
+  notifications: DashboardNotification[];
+};

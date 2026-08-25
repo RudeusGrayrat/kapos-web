@@ -26,6 +26,8 @@ import type {
   BillingDocumentSummary,
   BillingProviderConfigSummary,
   BillingSeriesSummary,
+  DashboardRange,
+  DashboardSummary,
 } from "../types/erp";
 
 type OrganizationRequestInput = {
@@ -37,6 +39,26 @@ function organizationHeaders(organizationId: string) {
   return {
     "x-organization-id": organizationId,
   };
+}
+
+export function getDashboard(input: {
+  accessToken: string;
+  organizationId?: string | null;
+  range?: DashboardRange;
+}) {
+  const params = new URLSearchParams();
+  if (input.range) params.set("range", input.range);
+  const query = params.toString();
+
+  return apiRequest<DashboardSummary>(
+    `/erp/dashboard${query ? `?${query}` : ""}`,
+    {
+      accessToken: input.accessToken,
+      headers: input.organizationId
+        ? organizationHeaders(input.organizationId)
+        : undefined,
+    },
+  );
 }
 
 export function getOrganizationProfile(input: OrganizationRequestInput) {

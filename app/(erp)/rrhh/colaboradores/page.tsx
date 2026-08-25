@@ -2,13 +2,13 @@ export default function ColaboradoresPage() {
   return (
     <section className="space-y-6">
       <header className="space-y-3">
-        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#9f8d63]">
+        <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#00C70D]">
           RRHH
         </p>
-        <h1 className="text-3xl font-semibold text-[#2c341c]">
+        <h1 className="text-3xl font-semibold text-[#0D0D0D]">
           Colaboradores
         </h1>
-        <p className="max-w-3xl text-sm leading-7 text-[#5b6645] md:text-base">
+        <p className="max-w-3xl text-sm leading-7 text-[#535353] md:text-base">
           Base para administrar altas, bajas, contratos y datos maestros del
           personal.
         </p>

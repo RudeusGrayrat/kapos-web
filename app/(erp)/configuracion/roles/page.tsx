@@ -215,10 +215,10 @@ export default function ConfigRolesPage() {
         <PanelCard title="Crear rol personalizado" description="Ejemplo: cajero-sede-centro, supervisor-turno o almacen-basico.">
           <form className="space-y-5" onSubmit={handleCreate}>
             <div className="grid gap-4 md:grid-cols-2">
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Key</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#a9cf24]" placeholder="cajero.personalizado" value={form.key} onChange={(event) => setForm((current) => ({ ...current, key: event.target.value.toLowerCase() }))} required /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="Cajero personalizado" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Key</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#00C70D]" placeholder="cajero.personalizado" value={form.key} onChange={(event) => setForm((current) => ({ ...current, key: event.target.value.toLowerCase() }))} required /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="Cajero personalizado" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required /></label>
             </div>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Descripcion</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} /></label>
             {renderPermissionSelector("create", form.permissionKeys)}
             <div className="flex justify-end gap-3">
               <AdminActionButton tone="ghost" onClick={() => setMode("table")}>Cancelar</AdminActionButton>
@@ -237,7 +237,7 @@ export default function ConfigRolesPage() {
             emptyTitle="Aun no hay roles"
             emptyDescription="Crea un rol personalizado para esta organizacion."
             columns={[
-              { key: "name", label: "Rol", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.name}</p><p className="text-xs text-[#7a845f]">{row.key}</p></div> },
+              { key: "name", label: "Rol", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.name}</p><p className="text-xs text-[#A1A1A1]">{row.key}</p></div> },
               { key: "type", label: "Tipo", render: (row) => <Tag tone={row.isSystem ? "dark" : "accent"}>{row.isSystem ? "Sistema" : "Personalizado"}</Tag> },
               { key: "permissions", label: "Permisos", align: "center", render: (row) => row.permissionCount },
               { key: "members", label: "Usuarios", align: "center", render: (row) => row.memberCount },
@@ -267,10 +267,10 @@ export default function ConfigRolesPage() {
       >
         <form id="internal-role-edit-form" className="space-y-5" onSubmit={handleUpdate}>
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Key</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-[#f8faf2] px-4 py-3 text-sm outline-none" value={editForm.key} disabled /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} disabled={selectedRole?.isSystem} required /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Key</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-[#f8faf2] px-4 py-3 text-sm outline-none" value={editForm.key} disabled /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} disabled={selectedRole?.isSystem} required /></label>
           </div>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Descripcion</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.description} onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))} disabled={selectedRole?.isSystem} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.description} onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))} disabled={selectedRole?.isSystem} /></label>
           {selectedRole?.isSystem ? (
             <div className="flex flex-wrap gap-2">
               {editForm.permissionKeys.map((key) => <Tag key={key}>{key}</Tag>)}

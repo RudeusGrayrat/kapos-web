@@ -9,7 +9,7 @@ import { getBranches, getKitchenTickets, updateKitchenTicket } from "../../../li
 import type { BranchSummary, KitchenTicketStatus, KitchenTicketSummary } from "../../../types/erp";
 
 const inputClass =
-  "rounded-[18px] border border-[#dfe7cf] bg-white px-4 py-3 text-sm text-[#1f2813] outline-none focus:border-[#a9cf24]";
+  "rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none focus:border-[#00C70D]";
 
 const columns: Array<{ status: KitchenTicketStatus; label: string; tone: string }> = [
   { status: "SENT", label: "Por preparar", tone: "border-[#f0d6aa] bg-[#fff8e9]" },
@@ -144,7 +144,7 @@ export default function KitchenPage() {
 
               <div className="mt-3 space-y-4">
                 {rows.length === 0 ? (
-                  <div className="grid min-h-44 place-items-center rounded-[24px] border border-dashed border-black/10 bg-white/50 text-center text-sm text-[#737a63]">
+                  <div className="grid min-h-44 place-items-center rounded-[24px] border border-dashed border-black/10 bg-white/50 text-center text-sm text-[#A1A1A1]">
                     <div><ChefHat className="mx-auto mb-2 h-6 w-6" />Sin comandas</div>
                   </div>
                 ) : null}
@@ -157,7 +157,7 @@ export default function KitchenPage() {
                       <div className="flex items-start justify-between gap-3">
                         <div>
                           <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#7e865f]">Comanda #{ticket.sequence}</p>
-                          <h3 className="mt-1 text-xl font-semibold text-[#1b2111]">{destination}</h3>
+                          <h3 className="mt-1 text-xl font-semibold text-[#0D0D0D]">{destination}</h3>
                           <p className="mt-1 text-xs text-[#7a816d]">{ticket.openAccount?.accountNumber}</p>
                         </div>
                         <span className="rounded-full bg-[#171917] px-3 py-1 text-xs font-semibold text-white">{elapsedLabel(ticket.sentAt)}</span>
@@ -170,7 +170,7 @@ export default function KitchenPage() {
                           </div>
                         ))}
                       </div>
-                      {ticket.note ? <p className="mt-3 rounded-2xl bg-[#f5f6ef] p-3 text-sm text-[#596147]">{ticket.note}</p> : null}
+                      {ticket.note ? <p className="mt-3 rounded-2xl bg-[#F1F1F1] p-3 text-sm text-[#596147]">{ticket.note}</p> : null}
                       {action ? (
                         <AdminActionButton
                           tone="primary"

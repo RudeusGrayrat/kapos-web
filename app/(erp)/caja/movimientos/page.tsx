@@ -161,28 +161,28 @@ export default function CajaMovimientosPage() {
         <PanelCard title="Nuevo movimiento" description="Todo movimiento queda ligado a la sesion abierta.">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Caja abierta</span>
-              <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={selectedSessionId} onChange={(event) => setSelectedSessionId(event.target.value)} required>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Caja abierta</span>
+              <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={selectedSessionId} onChange={(event) => setSelectedSessionId(event.target.value)} required>
                 <option value="">No hay caja abierta</option>
                 {openSessions.map((session) => <option key={session.id} value={session.id}>{session.cashRegister?.name} - {session.branch?.name}</option>)}
               </select>
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Tipo</span>
-              <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as CashMovementType }))}>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Tipo</span>
+              <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as CashMovementType }))}>
                 {movementTypes.map((type) => <option key={type.value} value={type.value}>{type.label}</option>)}
               </select>
             </label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Monto</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Concepto</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="Compra menor, retiro, ingreso extra..." value={form.concept} onChange={(event) => setForm((current) => ({ ...current, concept: event.target.value }))} required /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Monto</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.amount} onChange={(event) => setForm((current) => ({ ...current, amount: event.target.value }))} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Concepto</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="Compra menor, retiro, ingreso extra..." value={form.concept} onChange={(event) => setForm((current) => ({ ...current, concept: event.target.value }))} required /></label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Metodo de pago</span>
-              <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.paymentMethodId} onChange={(event) => setForm((current) => ({ ...current, paymentMethodId: event.target.value }))}>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Metodo de pago</span>
+              <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.paymentMethodId} onChange={(event) => setForm((current) => ({ ...current, paymentMethodId: event.target.value }))}>
                 <option value="">Sin metodo</option>
                 {paymentMethods.map((method) => <option key={method.id} value={method.id}>{method.name}</option>)}
               </select>
             </label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nota</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.note} onChange={(event) => setForm((current) => ({ ...current, note: event.target.value }))} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nota</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.note} onChange={(event) => setForm((current) => ({ ...current, note: event.target.value }))} /></label>
             <div className="flex justify-end"><AdminActionButton type="submit" tone="primary" icon={<PlusIcon />} disabled={!selectedSession}>Registrar movimiento</AdminActionButton></div>
           </form>
         </PanelCard>
@@ -197,7 +197,7 @@ export default function CajaMovimientosPage() {
             emptyTitle={selectedSession ? "Aun no hay movimientos" : "No hay caja abierta"}
             emptyDescription={selectedSession ? "Registra el primer ingreso, gasto o retiro." : "Abre una caja para registrar movimientos."}
             columns={[
-              { key: "concept", label: "Concepto", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.concept}</p><p className="text-xs text-[#7a845f]">{row.paymentMethod?.name ?? "sin metodo"}</p></div> },
+              { key: "concept", label: "Concepto", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.concept}</p><p className="text-xs text-[#A1A1A1]">{row.paymentMethod?.name ?? "sin metodo"}</p></div> },
               { key: "type", label: "Tipo", render: (row) => <Tag tone={["EXPENSE", "WITHDRAWAL"].includes(row.type) ? "warn" : "accent"}>{row.type}</Tag> },
               { key: "amount", label: "Monto", align: "right", render: (row) => `S/ ${row.amount.toFixed(2)}` },
               { key: "date", label: "Fecha", render: (row) => new Date(row.occurredAt).toLocaleString("es-PE") },

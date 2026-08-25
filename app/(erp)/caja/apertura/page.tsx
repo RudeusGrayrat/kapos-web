@@ -249,15 +249,15 @@ export default function CajaAperturaPage() {
           <PanelCard title="Crear caja" description="Caja fisica o logica dentro de una sucursal.">
             <form className="space-y-4" onSubmit={handleCreateRegister}>
               <label className="space-y-2">
-                <span className="text-sm font-semibold text-[#21300f]">Sucursal</span>
-                <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={registerForm.branchId} onChange={(event) => setRegisterForm((current) => ({ ...current, branchId: event.target.value }))} required>
+                <span className="text-sm font-semibold text-[#0D0D0D]">Sucursal</span>
+                <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={registerForm.branchId} onChange={(event) => setRegisterForm((current) => ({ ...current, branchId: event.target.value }))} required>
                   <option value="">Selecciona sucursal</option>
                   {branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}
                 </select>
               </label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Codigo</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#a9cf24]" placeholder="principal" value={registerForm.code} onChange={(event) => setRegisterForm((current) => ({ ...current, code: event.target.value.toLowerCase() }))} required /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="Caja principal" value={registerForm.name} onChange={(event) => setRegisterForm((current) => ({ ...current, name: event.target.value }))} required /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Orden</span><input type="number" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={registerForm.sortOrder} onChange={(event) => setRegisterForm((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Codigo</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#00C70D]" placeholder="principal" value={registerForm.code} onChange={(event) => setRegisterForm((current) => ({ ...current, code: event.target.value.toLowerCase() }))} required /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="Caja principal" value={registerForm.name} onChange={(event) => setRegisterForm((current) => ({ ...current, name: event.target.value }))} required /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Orden</span><input type="number" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={registerForm.sortOrder} onChange={(event) => setRegisterForm((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
               <div className="flex justify-end"><AdminActionButton type="submit" tone="primary" icon={<PlusIcon />}>Crear caja</AdminActionButton></div>
             </form>
           </PanelCard>
@@ -265,21 +265,21 @@ export default function CajaAperturaPage() {
           <PanelCard title="Abrir caja" description="Registra el monto inicial del turno.">
             <form className="space-y-4" onSubmit={handleOpenSession}>
               <label className="space-y-2">
-                <span className="text-sm font-semibold text-[#21300f]">Sucursal</span>
-                <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={openForm.branchId} onChange={(event) => setOpenForm((current) => ({ ...current, branchId: event.target.value, cashRegisterId: "" }))} required>
+                <span className="text-sm font-semibold text-[#0D0D0D]">Sucursal</span>
+                <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={openForm.branchId} onChange={(event) => setOpenForm((current) => ({ ...current, branchId: event.target.value, cashRegisterId: "" }))} required>
                   <option value="">Selecciona sucursal</option>
                   {branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}
                 </select>
               </label>
               <label className="space-y-2">
-                <span className="text-sm font-semibold text-[#21300f]">Caja</span>
-                <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={openForm.cashRegisterId} onChange={(event) => setOpenForm((current) => ({ ...current, cashRegisterId: event.target.value }))} required>
+                <span className="text-sm font-semibold text-[#0D0D0D]">Caja</span>
+                <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={openForm.cashRegisterId} onChange={(event) => setOpenForm((current) => ({ ...current, cashRegisterId: event.target.value }))} required>
                   <option value="">Selecciona caja</option>
                   {availableRegisters.map((register) => <option key={register.id} value={register.id}>{register.name}</option>)}
                 </select>
               </label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Monto inicial</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={openForm.openingAmount} onChange={(event) => setOpenForm((current) => ({ ...current, openingAmount: event.target.value }))} /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nota</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={openForm.openingNote} onChange={(event) => setOpenForm((current) => ({ ...current, openingNote: event.target.value }))} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Monto inicial</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={openForm.openingAmount} onChange={(event) => setOpenForm((current) => ({ ...current, openingAmount: event.target.value }))} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nota</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={openForm.openingNote} onChange={(event) => setOpenForm((current) => ({ ...current, openingNote: event.target.value }))} /></label>
               <div className="flex justify-end"><AdminActionButton type="submit" tone="primary" icon={<PlusIcon />}>Abrir caja</AdminActionButton></div>
             </form>
           </PanelCard>
@@ -294,7 +294,7 @@ export default function CajaAperturaPage() {
             emptyTitle="Aun no hay cajas"
             emptyDescription="Crea una caja para poder abrir turno."
             columns={[
-              { key: "name", label: "Caja", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.name}</p><p className="text-xs text-[#7a845f]">{row.code}</p></div> },
+              { key: "name", label: "Caja", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.name}</p><p className="text-xs text-[#A1A1A1]">{row.code}</p></div> },
               { key: "branch", label: "Sucursal", render: (row) => row.branch?.name ?? "Sin sucursal" },
               { key: "order", label: "Orden", align: "center", render: (row) => row.sortOrder },
               { key: "status", label: "Estado", render: (row) => <Tag tone={row.status === "ACTIVE" ? "accent" : "soft"}>{row.status}</Tag> },
@@ -322,11 +322,11 @@ export default function CajaAperturaPage() {
         }
       >
         <form id="cash-register-edit-form" className="grid gap-4 md:grid-cols-2" onSubmit={handleUpdateRegister}>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Sucursal</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.branchId} onChange={(event) => setEditForm((current) => ({ ...current, branchId: event.target.value }))}>{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Codigo</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#a9cf24]" value={editForm.code} onChange={(event) => setEditForm((current) => ({ ...current, code: event.target.value.toLowerCase() }))} required /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} required /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Orden</span><input type="number" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.sortOrder} onChange={(event) => setEditForm((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.status} onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value as CashRegisterSummary["status"] }))}><option value="ACTIVE">Activa</option><option value="INACTIVE">Inactiva</option><option value="ARCHIVED">Archivada</option></select></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Sucursal</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.branchId} onChange={(event) => setEditForm((current) => ({ ...current, branchId: event.target.value }))}>{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Codigo</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#00C70D]" value={editForm.code} onChange={(event) => setEditForm((current) => ({ ...current, code: event.target.value.toLowerCase() }))} required /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} required /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Orden</span><input type="number" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.sortOrder} onChange={(event) => setEditForm((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Estado</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.status} onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value as CashRegisterSummary["status"] }))}><option value="ACTIVE">Activa</option><option value="INACTIVE">Inactiva</option><option value="ARCHIVED">Archivada</option></select></label>
         </form>
       </AdminOverlayPanel>
     </section>

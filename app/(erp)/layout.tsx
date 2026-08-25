@@ -31,13 +31,13 @@ export default function ErpLayout({ children }: ErpLayoutProps) {
   }
 
   return (
-    <div className="min-h-screen overflow-y-hidden bg-[var(--kapos-background)] ">
+    <div className="min-h-screen overflow-y-hidden bg-[var(--kapos-background)]">
       <div className="mx-auto flex max-h-screen w-full overflow-y-hidden">
         <SideBar />
 
         <main className="min-w-0 overflow-y-hidden flex-1 px-4 py-6 lg:pr-6">
-          <div className="min-h-[calc(100vh-3rem)] overflow-y-hidden rounded-4xl border border-[var(--kapos-border)]  p-4 shadow-lg md:p-6">
-            <div className="min-w-0 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-[34px] p-3  md:p-5">
+          <div className="min-h-[calc(100vh-3rem)] overflow-y-hidden rounded-[34px] border border-[var(--kapos-border)] bg-white/82 p-4   md:p-6">
+            <div className="min-w-0 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-[28px] p-3 md:p-5">
               <ErpRouteGuard>{children}</ErpRouteGuard>
             </div>
           </div>

@@ -10,7 +10,7 @@ import { deleteBillingSeries, getBillingSeries, getBranches, updateBillingSeries
 import type { BillingSeriesSummary, BranchSummary } from "../../../types/erp";
 
 const inputClass =
-  "w-full rounded-[18px] border border-[#dfe7cf] bg-white px-4 py-3 text-sm text-[#1f2813] outline-none transition focus:border-[#a9cf24]";
+  "w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#00C70D]";
 
 type SeriesFormMode = "create" | "edit";
 type SeriesDocumentType = BillingSeriesSummary["documentType"];
@@ -168,7 +168,7 @@ export default function SeriesFiscalesPage() {
         eyebrow="Finanzas"
         title="Series fiscales"
         description="Controla series y correlativos por sucursal sin mezclar credenciales ni comprobantes."
-        action={canCreateSeries ? <AdminActionButton tone="primary" icon={<ReceiptText className="h-4 w-4" />} onClick={openCreateSeries}>Crear serie</AdminActionButton> : <ReceiptText className="h-6 w-6 text-[#6d8a20]" />}
+        action={canCreateSeries ? <AdminActionButton tone="primary" icon={<ReceiptText className="h-4 w-4" />} onClick={openCreateSeries}>Crear serie</AdminActionButton> : <ReceiptText className="h-6 w-6 text-[#00C70D]" />}
         stats={[
           { label: "Series", value: String(seriesRows.length), hint: "Boletas, facturas y notas configuradas.", tone: "dark" },
           { label: "Activas", value: String(activeSeries), hint: "Disponibles para emitir.", tone: "accent" },
@@ -186,7 +186,7 @@ export default function SeriesFiscalesPage() {
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#849252]">{documentTypeLabel(row.documentType)}</p>
-                  <h3 className="mt-1 text-2xl font-semibold text-[#1b2111]">{row.series}</h3>
+                  <h3 className="mt-1 text-2xl font-semibold text-[#0D0D0D]">{row.series}</h3>
                   <p className="mt-1 text-sm text-[#6b7558]">{row.branch.name}</p>
                 </div>
                 <Tag tone={row.enabled ? "accent" : "soft"}>{row.enabled ? "Activa" : "Inactiva"}</Tag>
@@ -213,7 +213,7 @@ export default function SeriesFiscalesPage() {
         <form id="billing-series-form" className="space-y-4" onSubmit={submitSeries}>
           <label className="space-y-2"><span className="text-sm font-semibold">Sucursal</span><select className={inputClass} value={seriesForm.branchId} onChange={(event) => setSeriesForm((current) => ({ ...current, branchId: event.target.value }))} required><option value="">Selecciona una sucursal</option>{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>
           <div className="grid gap-4 sm:grid-cols-2">
-            <label className="space-y-2"><span className="text-sm font-semibold">Comprobante</span><select className={inputClass} value={seriesForm.documentType} onChange={(event) => { const documentType = event.target.value as SeriesDocumentType; setSeriesForm((current) => ({ ...current, documentType, series: nextDefaultSeries(documentType) })); }}>{documentTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select><p className="text-xs leading-5 text-[#667055]">{documentTypeOptions.find((option) => option.value === seriesForm.documentType)?.hint}</p></label>
+            <label className="space-y-2"><span className="text-sm font-semibold">Comprobante</span><select className={inputClass} value={seriesForm.documentType} onChange={(event) => { const documentType = event.target.value as SeriesDocumentType; setSeriesForm((current) => ({ ...current, documentType, series: nextDefaultSeries(documentType) })); }}>{documentTypeOptions.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select><p className="text-xs leading-5 text-[#535353]">{documentTypeOptions.find((option) => option.value === seriesForm.documentType)?.hint}</p></label>
             <label className="space-y-2"><span className="text-sm font-semibold">Serie</span><input className={inputClass} maxLength={4} value={seriesForm.series} onChange={(event) => setSeriesForm((current) => ({ ...current, series: event.target.value.toUpperCase() }))} required /></label>
           </div>
           <label className="space-y-2"><span className="text-sm font-semibold">Próximo correlativo</span><input className={inputClass} type="number" min="1" value={seriesForm.nextNumber} onChange={(event) => setSeriesForm((current) => ({ ...current, nextNumber: event.target.value }))} required /></label>

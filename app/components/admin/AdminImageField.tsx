@@ -78,15 +78,15 @@ export function AdminImageField({
   }
 
   return (
-    <div className="rounded-[28px] border border-[#e7ecd6] bg-[#f7f8f2] p-4">
+    <div className="rounded-[28px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
       <div className="grid gap-5 lg:grid-cols-[260px_1fr] lg:items-start">
         <div className="space-y-3">
-          <div className="flex min-h-40 items-center justify-center overflow-hidden rounded-[24px] border border-[#d8e2b6] bg-white p-4">
+          <div className="flex min-h-40 items-center justify-center overflow-hidden rounded-[24px] border border-[#A1A1A1] bg-white p-4">
             {value ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={value} alt={label} className="max-h-32 max-w-full object-contain" />
             ) : (
-              <div className="grid place-items-center gap-2 text-center text-sm text-[#8a9278]">
+              <div className="grid place-items-center gap-2 text-center text-sm text-[#A1A1A1]">
                 <ImagePlus className="size-8" />
                 <span>Sin imagen configurada</span>
               </div>
@@ -96,7 +96,7 @@ export function AdminImageField({
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-[#d8e2b6] bg-white px-3 py-2 text-xs font-black text-[#202415] transition hover:border-[#b8f20c]"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-[#A1A1A1] bg-white px-3 py-2 text-xs font-black text-[#0D0D0D] transition hover:border-[#00C70D]"
                 onClick={() => setIsPreviewOpen(true)}
               >
                 <ZoomIn className="size-4" />
@@ -104,7 +104,7 @@ export function AdminImageField({
               </button>
               <button
                 type="button"
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-[#d8e2b6] bg-white px-3 py-2 text-xs font-black text-[#202415] transition hover:border-[#b8f20c]"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-[#A1A1A1] bg-white px-3 py-2 text-xs font-black text-[#0D0D0D] transition hover:border-[#00C70D]"
                 onClick={openImage}
               >
                 <Eye className="size-4" />
@@ -116,14 +116,14 @@ export function AdminImageField({
 
         <div className="space-y-4">
           <div>
-            <p className="text-sm font-black text-[#202415]">{label}</p>
-            {description ? <p className="mt-1 text-sm leading-6 text-[#667055]">{description}</p> : null}
+            <p className="text-sm font-black text-[#0D0D0D]">{label}</p>
+            {description ? <p className="mt-1 text-sm leading-6 text-[#535353]">{description}</p> : null}
           </div>
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-[#21300f]">URL de imagen</span>
+            <span className="text-sm font-semibold text-[#0D0D0D]">URL de imagen</span>
             <input
-              className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#b8f20c]"
+              className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
               placeholder={placeholder}
               value={value}
               onChange={(event) => onChange(event.target.value)}
@@ -134,7 +134,7 @@ export function AdminImageField({
             <input ref={inputRef} type="file" accept={accept} className="hidden" onChange={handleFileChange} />
             <button
               type="button"
-              className="inline-flex items-center gap-2 rounded-full bg-[#202415] px-4 py-2 text-sm font-black text-white shadow-[0_14px_30px_rgba(32,36,21,0.18)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
+              className="inline-flex items-center gap-2 rounded-full bg-[#0D0D0D] px-4 py-2 text-sm font-black text-white shadow-[0_14px_30px_rgba(32,36,21,0.18)] transition hover:-translate-y-0.5 disabled:cursor-not-allowed disabled:opacity-60"
               onClick={() => inputRef.current?.click()}
               disabled={isProcessing}
             >
@@ -144,7 +144,7 @@ export function AdminImageField({
             {value ? (
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full border border-[#d8e2b6] bg-white px-4 py-2 text-sm font-black text-[#202415] transition hover:border-[#d35f48] hover:text-[#d35f48]"
+                className="inline-flex items-center gap-2 rounded-full border border-[#A1A1A1] bg-white px-4 py-2 text-sm font-black text-[#0D0D0D] transition hover:border-[#d35f48] hover:text-[#d35f48]"
                 onClick={() => onChange("")}
               >
                 <Trash2 className="size-4" />
@@ -153,33 +153,33 @@ export function AdminImageField({
             ) : null}
           </div>
 
-          <p className="text-xs leading-5 text-[#667055]">{helperText}</p>
+          <p className="text-xs leading-5 text-[#535353]">{helperText}</p>
         </div>
       </div>
 
       {isPreviewOpen ? (
-        <div className="fixed inset-0 z-[10001] grid place-items-center bg-[#0c0d0f]/70 p-5 backdrop-blur-sm">
-          <div className="w-full max-w-4xl rounded-[32px] border border-white/20 bg-[#f5f6ef] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.35)]">
+        <div className="fixed inset-0 z-[10001] grid place-items-center bg-[#0D0D0D]/70 p-5 backdrop-blur-sm">
+          <div className="w-full max-w-4xl rounded-[32px] border border-white/20 bg-[#F1F1F1] p-5 shadow-[0_28px_90px_rgba(0,0,0,0.35)]">
             <div className="mb-4 flex items-center justify-between gap-3">
               <div>
-                <p className="text-sm font-black text-[#202415]">Vista ampliada</p>
-                <p className="text-xs text-[#667055]">Usa el zoom para revisar bordes, proporción y legibilidad.</p>
+                <p className="text-sm font-black text-[#0D0D0D]">Vista ampliada</p>
+                <p className="text-xs text-[#535353]">Usa el zoom para revisar bordes, proporción y legibilidad.</p>
               </div>
               <button
                 type="button"
-                className="grid size-10 place-items-center rounded-full bg-white text-[#202415] shadow-sm"
+                className="grid size-10 place-items-center rounded-full bg-white text-[#0D0D0D] shadow-sm"
                 onClick={() => setIsPreviewOpen(false)}
                 aria-label="Cerrar vista ampliada"
               >
                 <X className="size-5" />
               </button>
             </div>
-            <div className="flex max-h-[60vh] items-center justify-center overflow-auto rounded-[26px] border border-[#d8e2b6] bg-white p-8">
+            <div className="flex max-h-[60vh] items-center justify-center overflow-auto rounded-[26px] border border-[#A1A1A1] bg-white p-8">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={value} alt={label} style={{ transform: `scale(${zoom})` }} className="max-h-[46vh] max-w-full object-contain transition-transform" />
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-3">
-              <span className="text-xs font-black text-[#667055]">Zoom</span>
+              <span className="text-xs font-black text-[#535353]">Zoom</span>
               <input
                 type="range"
                 min="1"
@@ -187,11 +187,11 @@ export function AdminImageField({
                 step="0.1"
                 value={zoom}
                 onChange={(event) => setZoom(Number(event.target.value))}
-                className="h-2 min-w-52 accent-[#0DAF12]"
+                className="h-2 min-w-52 accent-[#00C70D]"
               />
               <button
                 type="button"
-                className="inline-flex items-center gap-2 rounded-full border border-[#d8e2b6] bg-white px-3 py-2 text-xs font-black text-[#202415]"
+                className="inline-flex items-center gap-2 rounded-full border border-[#A1A1A1] bg-white px-3 py-2 text-xs font-black text-[#0D0D0D]"
                 onClick={() => setZoom(1)}
               >
                 <RotateCcw className="size-4" />

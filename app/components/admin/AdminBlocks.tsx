@@ -47,9 +47,9 @@ export function StatCard({
 }: StatCardProps) {
   const toneClass =
     tone === "accent"
-      ? "border-[var(--kapos-border-strong)] bg-[linear-gradient(135deg,var(--kapos-lime-wash)_0%,var(--kapos-lime-soft)_100%)]"
+      ? "border-[color-mix(in_srgb,var(--kapos-green)_16%,white)] bg-[linear-gradient(135deg,#ffffff_0%,var(--kapos-green-wash)_100%)]"
       : tone === "dark"
-        ? "border-[var(--kapos-charcoal)] bg-[linear-gradient(135deg,var(--kapos-black)_0%,var(--kapos-charcoal)_100%)] text-white"
+        ? "border-[var(--kapos-black)] bg-[linear-gradient(135deg,var(--kapos-black)_0%,#141414_100%)] text-white"
         : "border-[var(--kapos-border)] bg-[var(--kapos-card)]";
 
   const hintClass =
@@ -57,7 +57,7 @@ export function StatCard({
 
   return (
     <article
-      className={`rounded-[32px] border p-6 shadow-[0_18px_38px_rgba(32,36,21,0.06)] ${toneClass}`}
+      className={`rounded-[24px] border p-6 shadow-[0_18px_38px_rgba(13,13,13,0.06)] ${toneClass}`}
     >
       <p className={`text-sm ${hintClass}`}>{label}</p>
       <strong className="mt-4 block text-4xl font-semibold tracking-[-0.04em]">{value}</strong>
@@ -123,7 +123,7 @@ export function PanelCard({
   children,
 }: PanelProps) {
   return (
-    <section className="rounded-[34px] border border-[var(--kapos-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.98)_0%,rgba(247,248,242,0.95)_100%)] p-6 shadow-[0_20px_44px_rgba(32,36,21,0.05)]">
+    <section className="rounded-[24px] border border-[var(--kapos-border)] bg-[linear-gradient(180deg,rgba(255,255,255,0.99)_0%,rgba(248,248,248,0.96)_100%)] p-6 shadow-[0_20px_44px_rgba(13,13,13,0.055)]">
       <div className="mb-5 flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <h2 className="text-[1.7rem] font-semibold tracking-[-0.03em] text-[var(--kapos-text)]">
@@ -151,7 +151,7 @@ export function Tag({
 }) {
   const toneClass =
     tone === "accent"
-      ? "bg-[var(--kapos-lime-soft)] text-[var(--kapos-text)]"
+      ? "bg-[color-mix(in_srgb,var(--kapos-green)_13%,white)] text-[var(--kapos-green-dark)]"
       : tone === "dark"
         ? "bg-[var(--kapos-black)] text-white"
         : tone === "warn"
@@ -178,13 +178,13 @@ export function AdminMessage({
 }) {
   const toneClass =
     tone === "accent"
-      ? "border-[var(--kapos-border-strong)] bg-[var(--kapos-lime-wash)]"
+      ? "border-[color-mix(in_srgb,var(--kapos-green)_18%,white)] bg-[var(--kapos-green-wash)]"
       : tone === "warn"
         ? "border-[color-mix(in_srgb,var(--kapos-warning)_42%,white)] bg-[color-mix(in_srgb,var(--kapos-warning)_10%,white)]"
         : "border-[var(--kapos-border)] bg-[var(--kapos-card-alt)]";
 
   return (
-    <div className={`rounded-[26px] border px-5 py-5 shadow-[0_14px_30px_rgba(32,36,21,0.04)] ${toneClass}`}>
+    <div className={`rounded-[22px] border px-5 py-5 shadow-[0_14px_30px_rgba(13,13,13,0.04)] ${toneClass}`}>
       <p className="font-semibold text-[var(--kapos-text)]">{title}</p>
       <p className="mt-2 text-sm leading-7 text-[var(--kapos-text-soft)]">{description}</p>
     </div>

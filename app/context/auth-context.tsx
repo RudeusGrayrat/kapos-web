@@ -2,7 +2,6 @@
 
 import {
   createContext,
-  startTransition,
   useCallback,
   useContext,
   useEffect,
@@ -448,12 +447,6 @@ export function getProfileStatus(user: AuthUser | null): string {
   }
 
   return "Perfil basico";
-}
-
-export function navigateAfterAuth(navigate: () => void) {
-  startTransition(() => {
-    navigate();
-  });
 }
 
 function getJwtExpirationMs(token: string): number | null {

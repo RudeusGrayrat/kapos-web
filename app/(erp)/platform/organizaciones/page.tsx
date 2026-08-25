@@ -440,36 +440,36 @@ export default function PlatformOrganizationsPage() {
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Razon social</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="Basti Foods S.A.C." value={form.legalName} onChange={(event) => setForm((current) => ({ ...current, legalName: event.target.value }))} required />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Razon social</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="Basti Foods S.A.C." value={form.legalName} onChange={(event) => setForm((current) => ({ ...current, legalName: event.target.value }))} required />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Nombre comercial</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="Basti" value={form.tradeName} onChange={(event) => setForm((current) => ({ ...current, tradeName: event.target.value }))} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Nombre comercial</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="Basti" value={form.tradeName} onChange={(event) => setForm((current) => ({ ...current, tradeName: event.target.value }))} />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">RUC o documento</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="20601234567" value={form.documentNumber} onChange={(event) => setForm((current) => ({ ...current, documentNumber: event.target.value }))} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">RUC o documento</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="20601234567" value={form.documentNumber} onChange={(event) => setForm((current) => ({ ...current, documentNumber: event.target.value }))} />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Correo</span>
-                  <input type="email" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="contacto@basti.com" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Correo</span>
+                  <input type="email" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="contacto@basti.com" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Telefono</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder="+51 999 888 777" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Telefono</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="+51 999 888 777" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Estado inicial</span>
-                  <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as "ACTIVE" | "TRIAL" | "SUSPENDED" | "DISABLED" | "ARCHIVED" }))}>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Estado inicial</span>
+                  <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as "ACTIVE" | "TRIAL" | "SUSPENDED" | "DISABLED" | "ARCHIVED" }))}>
                     <option value="TRIAL">Prueba</option>
                     <option value="ACTIVE">Activa</option>
                     <option value="SUSPENDED">Suspendida</option>
                   </select>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Owner inicial</span>
-                  <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.ownerUserId} onChange={(event) => setForm((current) => ({ ...current, ownerUserId: event.target.value }))}>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Owner inicial</span>
+                  <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.ownerUserId} onChange={(event) => setForm((current) => ({ ...current, ownerUserId: event.target.value }))}>
                     <option value="">Sin owner por ahora</option>
                     {users.map((user) => (
                       <option key={user.id} value={user.id}>
@@ -477,14 +477,14 @@ export default function PlatformOrganizationsPage() {
                       </option>
                     ))}
                   </select>
-                  <p className="text-xs leading-5 text-[#74805f]">
+                  <p className="text-xs leading-5 text-[#A1A1A1]">
                     El owner es la persona responsable inicial de esa empresa dentro de Kapos. Luego podra entrar y terminar de configurarla.
                   </p>
                 </label>
               </div>
 
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-[#21300f]">Modulos base</p>
+                <p className="text-sm font-semibold text-[#0D0D0D]">Modulos base</p>
                 <div className="flex flex-wrap gap-2">
                   {organizationModules.map((moduleItem) => {
                     const active = form.moduleKeys.includes(moduleItem.key);
@@ -528,10 +528,10 @@ export default function PlatformOrganizationsPage() {
                   label: "Empresa",
                   render: (organization) => (
                     <div>
-                      <p className="font-semibold text-[#1b2111]">
+                      <p className="font-semibold text-[#0D0D0D]">
                         {organization.tradeName ?? organization.legalName}
                       </p>
-                      <p className="text-xs text-[#7a845f]">/{organization.slug}</p>
+                      <p className="text-xs text-[#A1A1A1]">/{organization.slug}</p>
                     </div>
                   ),
                 },
@@ -611,7 +611,7 @@ export default function PlatformOrganizationsPage() {
             ].map((step, index) => (
               <li
                 key={step}
-                className="flex gap-3 rounded-[18px] border border-[#edf1e4] bg-[#fafcf6] px-3 py-2"
+                className="flex gap-3 rounded-[18px] border border-[#E4E4E4] bg-[#F8F8F8] px-3 py-2"
               >
                 <span className="font-semibold text-[#91aa47]">{index + 1}.</span>
                 <span>{step}</span>
@@ -689,28 +689,28 @@ export default function PlatformOrganizationsPage() {
             >
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Razon social</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.legalName} onChange={(event) => setEditForm((current) => current ? { ...current, legalName: event.target.value } : current)} required />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Razon social</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.legalName} onChange={(event) => setEditForm((current) => current ? { ...current, legalName: event.target.value } : current)} required />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Nombre comercial</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.tradeName} onChange={(event) => setEditForm((current) => current ? { ...current, tradeName: event.target.value } : current)} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Nombre comercial</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.tradeName} onChange={(event) => setEditForm((current) => current ? { ...current, tradeName: event.target.value } : current)} />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Documento</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.documentNumber} onChange={(event) => setEditForm((current) => current ? { ...current, documentNumber: event.target.value } : current)} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Documento</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.documentNumber} onChange={(event) => setEditForm((current) => current ? { ...current, documentNumber: event.target.value } : current)} />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Correo</span>
-                  <input type="email" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.email} onChange={(event) => setEditForm((current) => current ? { ...current, email: event.target.value } : current)} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Correo</span>
+                  <input type="email" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.email} onChange={(event) => setEditForm((current) => current ? { ...current, email: event.target.value } : current)} />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Telefono</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.phone} onChange={(event) => setEditForm((current) => current ? { ...current, phone: event.target.value } : current)} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Telefono</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.phone} onChange={(event) => setEditForm((current) => current ? { ...current, phone: event.target.value } : current)} />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Estado</span>
-                  <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.status} onChange={(event) => setEditForm((current) => current ? { ...current, status: event.target.value as typeof editForm.status } : current)}>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Estado</span>
+                  <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.status} onChange={(event) => setEditForm((current) => current ? { ...current, status: event.target.value as typeof editForm.status } : current)}>
                     <option value="TRIAL">Prueba</option>
                     <option value="ACTIVE">Activa</option>
                     <option value="SUSPENDED">Suspendida</option>
@@ -719,8 +719,8 @@ export default function PlatformOrganizationsPage() {
                   </select>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Owner</span>
-                  <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.ownerUserId} onChange={(event) => setEditForm((current) => current ? { ...current, ownerUserId: event.target.value } : current)}>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Owner</span>
+                  <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.ownerUserId} onChange={(event) => setEditForm((current) => current ? { ...current, ownerUserId: event.target.value } : current)}>
                     <option value="">Sin cambio</option>
                     {users.map((user) => (
                       <option key={user.id} value={user.id}>
@@ -731,7 +731,7 @@ export default function PlatformOrganizationsPage() {
                 </label>
               </div>
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-[#21300f]">Modulos activos</p>
+                <p className="text-sm font-semibold text-[#0D0D0D]">Modulos activos</p>
                 <div className="flex flex-wrap gap-2">
                   {organizationModules.map((moduleItem) => {
                     const active = editForm.moduleKeys.includes(moduleItem.key);
@@ -765,13 +765,13 @@ export default function PlatformOrganizationsPage() {
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <article className="rounded-[28px] border border-[#e7edd5] bg-white/90 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Identidad
                   </p>
                   <p className="mt-3 text-2xl font-semibold text-[#18200f]">
                     {selectedOrganization.tradeName ?? selectedOrganization.legalName}
                   </p>
-                  <p className="mt-2 text-sm text-[#61704c]">
+                  <p className="mt-2 text-sm text-[#535353]">
                     {selectedOrganization.legalName}
                   </p>
                   <p className="mt-3 text-xs uppercase tracking-[0.22em] text-[#889368]">
@@ -780,7 +780,7 @@ export default function PlatformOrganizationsPage() {
                 </article>
 
                 <article className="rounded-[28px] border border-[#e7edd5] bg-[linear-gradient(135deg,#fcffe9_0%,#f6fadf_100%)] p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Estado actual
                   </p>
                   <div className="mt-4">
@@ -796,28 +796,28 @@ export default function PlatformOrganizationsPage() {
                       {formatOrganizationStatus(selectedOrganization.status)}
                     </Tag>
                   </div>
-                  <p className="mt-4 text-sm leading-7 text-[#53613d]">
+                  <p className="mt-4 text-sm leading-7 text-[#535353]">
                     Owner: {selectedOrganization.ownerName ?? "Sin owner asignado"}
                   </p>
                 </article>
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
-                <article className="rounded-[24px] border border-[#edf1e4] bg-[#fbfcf8] p-4">
+                <article className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
                   <p className="text-xs uppercase tracking-[0.24em] text-[#8a9668]">Documento</p>
-                  <p className="mt-3 font-semibold text-[#1b2111]">
+                  <p className="mt-3 font-semibold text-[#0D0D0D]">
                     {selectedOrganization.documentNumber ?? "Sin documento"}
                   </p>
                 </article>
-                <article className="rounded-[24px] border border-[#edf1e4] bg-[#fbfcf8] p-4">
+                <article className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
                   <p className="text-xs uppercase tracking-[0.24em] text-[#8a9668]">Modulos</p>
-                  <p className="mt-3 font-semibold text-[#1b2111]">
+                  <p className="mt-3 font-semibold text-[#0D0D0D]">
                     {selectedOrganization.activeModules}
                   </p>
                 </article>
-                <article className="rounded-[24px] border border-[#edf1e4] bg-[#fbfcf8] p-4">
+                <article className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
                   <p className="text-xs uppercase tracking-[0.24em] text-[#8a9668]">Colaboradores</p>
-                  <p className="mt-3 font-semibold text-[#1b2111]">
+                  <p className="mt-3 font-semibold text-[#0D0D0D]">
                     {selectedOrganization.activeWorkers}
                   </p>
                 </article>
@@ -826,10 +826,10 @@ export default function PlatformOrganizationsPage() {
               <article className="rounded-[28px] border border-[#e7edd5] bg-white/90 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                    <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                       Usuarios internos
                     </p>
-                    <p className="mt-2 text-sm leading-6 text-[#61704c]">
+                    <p className="mt-2 text-sm leading-6 text-[#535353]">
                       Personas vinculadas a esta empresa. No se mezclan con los
                       usuarios globales de Kapos.
                     </p>
@@ -839,17 +839,17 @@ export default function PlatformOrganizationsPage() {
 
                 <div className="mt-4 space-y-3">
                   {isLoadingOrganizationUsers ? (
-                    <p className="rounded-[22px] border border-[#edf1e4] bg-[#fbfcf8] px-4 py-4 text-sm text-[#61704c]">
+                    <p className="rounded-[22px] border border-[#E4E4E4] bg-[#F8F8F8] px-4 py-4 text-sm text-[#535353]">
                       Cargando usuarios de esta organizacion...
                     </p>
                   ) : organizationUsers.length > 0 ? (
                     organizationUsers.map((membership) => (
                       <div
                         key={membership.id}
-                        className="grid gap-3 rounded-[22px] border border-[#edf1e4] bg-[#fbfcf8] px-4 py-4 md:grid-cols-[1fr_auto]"
+                        className="grid gap-3 rounded-[22px] border border-[#E4E4E4] bg-[#F8F8F8] px-4 py-4 md:grid-cols-[1fr_auto]"
                       >
                         <div>
-                          <p className="font-semibold text-[#1b2111]">
+                          <p className="font-semibold text-[#0D0D0D]">
                             {[
                               membership.user.firstName,
                               membership.user.lastName,
@@ -860,7 +860,7 @@ export default function PlatformOrganizationsPage() {
                               membership.user.documentNumber ||
                               "Usuario sin nombre"}
                           </p>
-                          <p className="mt-1 text-xs text-[#7a845f]">
+                          <p className="mt-1 text-xs text-[#A1A1A1]">
                             {membership.user.email ?? "Sin correo"} -{" "}
                             {membership.employeeCode ?? "Sin codigo interno"}
                           </p>
@@ -882,7 +882,7 @@ export default function PlatformOrganizationsPage() {
                       </div>
                     ))
                   ) : (
-                    <p className="rounded-[22px] border border-[#edf1e4] bg-[#fbfcf8] px-4 py-4 text-sm text-[#61704c]">
+                    <p className="rounded-[22px] border border-[#E4E4E4] bg-[#F8F8F8] px-4 py-4 text-sm text-[#535353]">
                       Esta organizacion aun no tiene usuarios internos vinculados.
                     </p>
                   )}

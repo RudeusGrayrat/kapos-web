@@ -323,10 +323,10 @@ export default function PlatformPermissionsPage() {
         {viewMode === "create" ? (
           <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Key</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Key</span>
               <input
                 required
-                className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#00C70D]"
                 placeholder="platform.organizations.read"
                 value={form.key}
                 onChange={(event) =>
@@ -336,15 +336,15 @@ export default function PlatformPermissionsPage() {
                   }))
                 }
               />
-              <p className="text-xs leading-5 text-[#74805f]">
+              <p className="text-xs leading-5 text-[#A1A1A1]">
                 Usa una llave tecnica tipo contexto.recurso.accion. Ejemplos: platform.users.read, settings.roles.update.
               </p>
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Nombre</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span>
               <input
                 required
-                className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 placeholder="Ver organizaciones"
                 value={form.name}
                 onChange={(event) =>
@@ -353,9 +353,9 @@ export default function PlatformPermissionsPage() {
               />
             </label>
             <label className="space-y-2 md:col-span-2">
-              <span className="text-sm font-semibold text-[#21300f]">Descripcion</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span>
               <input
-                className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 placeholder="Permite listar las organizaciones registradas en la plataforma."
                 value={form.description}
                 onChange={(event) =>
@@ -367,9 +367,9 @@ export default function PlatformPermissionsPage() {
               />
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Modulo</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Modulo</span>
               <select
-                className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 value={form.moduleKey}
                 onChange={(event) =>
                   setForm((current) => ({
@@ -388,9 +388,9 @@ export default function PlatformPermissionsPage() {
               </select>
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Submodulo</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Submodulo</span>
               <select
-                className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 value={form.submoduleKey}
                 onChange={(event) =>
                   setForm((current) => ({ ...current, submoduleKey: event.target.value }))
@@ -405,9 +405,9 @@ export default function PlatformPermissionsPage() {
               </select>
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Scope</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Scope</span>
               <select
-                className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 value={form.scope}
                 onChange={(event) =>
                   setForm((current) => ({
@@ -421,14 +421,14 @@ export default function PlatformPermissionsPage() {
                 <option value="BRANCH">BRANCH</option>
                 <option value="OWN">OWN</option>
               </select>
-              <p className="text-xs leading-5 text-[#74805f]">
+              <p className="text-xs leading-5 text-[#A1A1A1]">
                 Scope define hasta donde llega el permiso: propio, sede, toda la organizacion o toda la plataforma.
               </p>
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Audience</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Audience</span>
               <select
-                className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 value={form.audience}
                 onChange={(event) =>
                   setForm((current) => ({
@@ -441,7 +441,7 @@ export default function PlatformPermissionsPage() {
                 <option value="PLATFORM">PLATFORM</option>
                 <option value="BOTH">BOTH</option>
               </select>
-              <p className="text-xs leading-5 text-[#74805f]">
+              <p className="text-xs leading-5 text-[#A1A1A1]">
                 Audience define si este permiso pertenece al mundo platform, organization o a ambos.
               </p>
             </label>
@@ -484,8 +484,8 @@ export default function PlatformPermissionsPage() {
                   label: "Permiso",
                   render: (row) => (
                     <div>
-                      <p className="font-semibold text-[#1b2111]">{row.name}</p>
-                      <p className="text-xs text-[#7a845f]">{row.key}</p>
+                      <p className="font-semibold text-[#0D0D0D]">{row.name}</p>
+                      <p className="text-xs text-[#A1A1A1]">{row.key}</p>
                     </div>
                   ),
                 },
@@ -537,7 +537,7 @@ export default function PlatformPermissionsPage() {
                 return (
                   <article
                     key={groupKey}
-                    className="rounded-[26px] border border-[#edf1e4] bg-[#fbfcf8] p-5"
+                    className="rounded-[26px] border border-[#E4E4E4] bg-[#F8F8F8] p-5"
                   >
                     <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-lg font-semibold text-[#1a210f]">
@@ -626,28 +626,28 @@ export default function PlatformPermissionsPage() {
               className="grid gap-4 md:grid-cols-2"
               onSubmit={handleUpdatePermission}
             >
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.name} onChange={(event) => setEditForm((current) => current ? { ...current, name: event.target.value } : current)} required /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Modulo</span><select className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.moduleKey} onChange={(event) => setEditForm((current) => current ? { ...current, moduleKey: event.target.value, submoduleKey: "" } : current)}><option value="">Sin modulo</option>{modules.map((moduleItem) => (<option key={moduleItem.id} value={moduleItem.key}>{moduleItem.name}</option>))}</select></label>
-              <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Descripcion</span><input className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.description} onChange={(event) => setEditForm((current) => current ? { ...current, description: event.target.value } : current)} /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Submodulo</span><select className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.submoduleKey} onChange={(event) => setEditForm((current) => current ? { ...current, submoduleKey: event.target.value } : current)}><option value="">Sin submodulo</option>{modules.find((moduleItem) => moduleItem.key === editForm.moduleKey)?.submodules.map((submodule) => (<option key={submodule.id} value={submodule.key}>{submodule.name}</option>))}</select></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Scope</span><select className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.scope} onChange={(event) => setEditForm((current) => current ? { ...current, scope: event.target.value as typeof editForm.scope } : current)}><option value="ORGANIZATION">ORGANIZATION</option><option value="PLATFORM">PLATFORM</option><option value="BRANCH">BRANCH</option><option value="OWN">OWN</option></select></label>
-              <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Audience</span><select className="w-full rounded-[18px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.audience} onChange={(event) => setEditForm((current) => current ? { ...current, audience: event.target.value as typeof editForm.audience } : current)}><option value="ORGANIZATION">ORGANIZATION</option><option value="PLATFORM">PLATFORM</option><option value="BOTH">BOTH</option></select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.name} onChange={(event) => setEditForm((current) => current ? { ...current, name: event.target.value } : current)} required /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Modulo</span><select className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.moduleKey} onChange={(event) => setEditForm((current) => current ? { ...current, moduleKey: event.target.value, submoduleKey: "" } : current)}><option value="">Sin modulo</option>{modules.map((moduleItem) => (<option key={moduleItem.id} value={moduleItem.key}>{moduleItem.name}</option>))}</select></label>
+              <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span><input className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.description} onChange={(event) => setEditForm((current) => current ? { ...current, description: event.target.value } : current)} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Submodulo</span><select className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.submoduleKey} onChange={(event) => setEditForm((current) => current ? { ...current, submoduleKey: event.target.value } : current)}><option value="">Sin submodulo</option>{modules.find((moduleItem) => moduleItem.key === editForm.moduleKey)?.submodules.map((submodule) => (<option key={submodule.id} value={submodule.key}>{submodule.name}</option>))}</select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Scope</span><select className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.scope} onChange={(event) => setEditForm((current) => current ? { ...current, scope: event.target.value as typeof editForm.scope } : current)}><option value="ORGANIZATION">ORGANIZATION</option><option value="PLATFORM">PLATFORM</option><option value="BRANCH">BRANCH</option><option value="OWN">OWN</option></select></label>
+              <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Audience</span><select className="w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.audience} onChange={(event) => setEditForm((current) => current ? { ...current, audience: event.target.value as typeof editForm.audience } : current)}><option value="ORGANIZATION">ORGANIZATION</option><option value="PLATFORM">PLATFORM</option><option value="BOTH">BOTH</option></select></label>
             </form>
           ) : (
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <article className="rounded-[28px] border border-[#e7edd5] bg-white/90 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Llave
                   </p>
                   <p className="mt-3 text-2xl font-semibold text-[#18200f]">
                     {selectedPermission.name}
                   </p>
-                  <p className="mt-2 text-sm text-[#61704c]">{selectedPermission.key}</p>
+                  <p className="mt-2 text-sm text-[#535353]">{selectedPermission.key}</p>
                 </article>
 
                 <article className="rounded-[28px] border border-[#e7edd5] bg-[linear-gradient(135deg,#fcffe9_0%,#f6fadf_100%)] p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Alcance
                   </p>
                   <div className="mt-4">
@@ -664,7 +664,7 @@ export default function PlatformPermissionsPage() {
                     </Tag>
                   </div>
                   {selectedPermission.description ? (
-                    <p className="mt-4 text-sm leading-7 text-[#53613d]">
+                    <p className="mt-4 text-sm leading-7 text-[#535353]">
                       {selectedPermission.description}
                     </p>
                   ) : null}
@@ -672,15 +672,15 @@ export default function PlatformPermissionsPage() {
               </div>
 
               <div className="grid gap-4 md:grid-cols-2">
-                <article className="rounded-[24px] border border-[#edf1e4] bg-[#fbfcf8] p-4">
+                <article className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
                   <p className="text-xs uppercase tracking-[0.24em] text-[#8a9668]">Modulo</p>
-                  <p className="mt-3 font-semibold text-[#1b2111]">
+                  <p className="mt-3 font-semibold text-[#0D0D0D]">
                     {humanizeCatalogKey(selectedPermission.moduleKey)}
                   </p>
                 </article>
-                <article className="rounded-[24px] border border-[#edf1e4] bg-[#fbfcf8] p-4">
+                <article className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
                   <p className="text-xs uppercase tracking-[0.24em] text-[#8a9668]">Submodulo</p>
-                  <p className="mt-3 font-semibold text-[#1b2111]">
+                  <p className="mt-3 font-semibold text-[#0D0D0D]">
                     {humanizeCatalogKey(selectedPermission.submoduleKey)}
                   </p>
                 </article>

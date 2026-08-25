@@ -12,7 +12,7 @@ import { getBillingDocuments, issueBillingDocument } from "../../../lib/erp-api"
 import type { BillingDocumentStatus, BillingDocumentSummary } from "../../../types/erp";
 
 const inputClass =
-  "w-full rounded-[18px] border border-[#dfe7cf] bg-white px-4 py-3 text-sm text-[#1f2813] outline-none transition focus:border-[#a9cf24]";
+  "w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#00C70D]";
 
 function statusLabel(status: BillingDocumentStatus) {
   return {
@@ -135,7 +135,7 @@ export default function FacturacionPage() {
         eyebrow="Finanzas"
         title="Facturación"
         description="Bandeja operativa de comprobantes: emisión, reintentos, errores y documentos generados."
-        action={<ReceiptText className="h-6 w-6 text-[#6d8a20]" />}
+        action={<ReceiptText className="h-6 w-6 text-[#00C70D]" />}
         stats={[
           { label: "Comprobantes", value: String(documentTotal), hint: "Resultados según el filtro actual.", tone: "dark" },
           { label: "Pendientes", value: "Filtro", hint: "Usa el selector para revisar por estado.", tone: "accent" },
@@ -170,9 +170,9 @@ export default function FacturacionPage() {
           emptyTitle="No hay comprobantes"
           emptyDescription="Cuando cobres desde Web o Mobile, las ventas aparecerán en esta bandeja."
           columns={[
-            { key: "sale", label: "Venta", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.sale.saleNumber}</p><p className="text-xs text-[#7a845f]">{row.sale.branch.name} · {new Date(row.sale.soldAt).toLocaleString("es-PE")}</p></div> },
-            { key: "document", label: "Comprobante", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.series && row.number ? `${row.series}-${row.number}` : row.type === "TICKET" ? "Por definir" : row.type}</p><p className="text-xs text-[#7a845f]">{row.type}</p></div> },
-            { key: "customer", label: "Cliente", render: (row) => { const user = row.sale.customerProfile?.user; return <div><p className="font-medium text-[#29331a]">{user ? [user.firstName, user.lastName].filter(Boolean).join(" ") || "Sin nombre" : "Clientes varios"}</p><p className="text-xs text-[#7a845f]">{user?.documentNumber ?? "Sin documento"}</p></div>; } },
+            { key: "sale", label: "Venta", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.sale.saleNumber}</p><p className="text-xs text-[#A1A1A1]">{row.sale.branch.name} · {new Date(row.sale.soldAt).toLocaleString("es-PE")}</p></div> },
+            { key: "document", label: "Comprobante", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.series && row.number ? `${row.series}-${row.number}` : row.type === "TICKET" ? "Por definir" : row.type}</p><p className="text-xs text-[#A1A1A1]">{row.type}</p></div> },
+            { key: "customer", label: "Cliente", render: (row) => { const user = row.sale.customerProfile?.user; return <div><p className="font-medium text-[#29331a]">{user ? [user.firstName, user.lastName].filter(Boolean).join(" ") || "Sin nombre" : "Clientes varios"}</p><p className="text-xs text-[#A1A1A1]">{user?.documentNumber ?? "Sin documento"}</p></div>; } },
             { key: "total", label: "Total", align: "right", render: (row) => <strong>S/ {row.sale.total.toFixed(2)}</strong> },
             { key: "status", label: "Estado", render: (row) => <div className="max-w-56"><Tag tone={statusTone(row.status)}>{statusLabel(row.status)}</Tag>{row.errorMessage ? <p className="mt-2 text-xs leading-5 text-[#925048]">{row.errorMessage}</p> : null}</div> },
           ]}
@@ -194,7 +194,7 @@ export default function FacturacionPage() {
         footer={<div className="flex justify-end gap-3"><AdminActionButton onClick={() => setSelectedDocument(null)} disabled={busy}>Cancelar</AdminActionButton><AdminActionButton tone="primary" icon={<FileCheck2 className="h-4 w-4" />} onClick={() => void confirmIssue()} disabled={busy}>Emitir ahora</AdminActionButton></div>}
       >
         <div className="grid gap-5 md:grid-cols-2">
-          <div className="rounded-[26px] border border-[#e7edd9] bg-[#fbfcf7] p-5"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#849252]">Venta</p><p className="mt-3 text-2xl font-semibold text-[#19210f]">{selectedDocument?.sale.saleNumber}</p><p className="mt-2 text-sm text-[#657052]">S/ {selectedDocument?.sale.total.toFixed(2)}</p></div>
+          <div className="rounded-[26px] border border-[#e7edd9] bg-[#F8F8F8] p-5"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#849252]">Venta</p><p className="mt-3 text-2xl font-semibold text-[#19210f]">{selectedDocument?.sale.saleNumber}</p><p className="mt-2 text-sm text-[#657052]">S/ {selectedDocument?.sale.total.toFixed(2)}</p></div>
           <label className="space-y-2"><span className="text-sm font-semibold">Tipo de comprobante</span><select className={inputClass} value={issueType} onChange={(event) => setIssueType(event.target.value as "BOLETA" | "FACTURA")} disabled={Boolean(selectedDocument?.series)}><option value="BOLETA">Boleta</option><option value="FACTURA">Factura</option></select><small className="block leading-5 text-[#6b7558]">La factura requiere un cliente registrado con RUC de 11 dígitos.</small></label>
         </div>
       </AdminOverlayPanel>

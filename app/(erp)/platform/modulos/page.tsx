@@ -434,10 +434,10 @@ export default function PlatformModulesPage() {
             <form className="space-y-4" onSubmit={handleCreateModule}>
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Key</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Key</span>
                   <input
                     required
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#00C70D]"
                     placeholder="rrhh"
                     value={moduleForm.key}
                     onChange={(event) =>
@@ -447,15 +447,15 @@ export default function PlatformModulesPage() {
                       }))
                     }
                   />
-                  <p className="text-xs leading-5 text-[#74805f]">
+                  <p className="text-xs leading-5 text-[#A1A1A1]">
                     Clave tecnica corta y estable del modulo. Ejemplos: rrhh, ventas, finanzas, configuracion.
                   </p>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Nombre</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span>
                   <input
                     required
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     placeholder="Recursos humanos"
                     value={moduleForm.name}
                     onChange={(event) =>
@@ -464,23 +464,23 @@ export default function PlatformModulesPage() {
                   />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Icono</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Icono</span>
                   <input
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     placeholder="users"
                     value={moduleForm.icon}
                     onChange={(event) =>
                       setModuleForm((current) => ({ ...current, icon: event.target.value }))
                     }
                   />
-                  <p className="text-xs leading-5 text-[#74805f]">
+                  <p className="text-xs leading-5 text-[#A1A1A1]">
                     Campo tecnico opcional para guardar una referencia de icono si luego quieres administrarlo desde base de datos.
                   </p>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Audience</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Audience</span>
                   <select
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     value={moduleForm.audience}
                     onChange={(event) =>
                       setModuleForm((current) => ({
@@ -495,17 +495,17 @@ export default function PlatformModulesPage() {
                   </select>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Orden</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Orden</span>
                   <input
                     type="number"
                     min="0"
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     value={moduleForm.sortOrder}
                     onChange={(event) =>
                       setModuleForm((current) => ({ ...current, sortOrder: event.target.value }))
                     }
                   />
-                  <p className="text-xs leading-5 text-[#74805f]">
+                  <p className="text-xs leading-5 text-[#A1A1A1]">
                     Menor numero aparece primero en el sidebar. Usa saltos de 10 para poder insertar modulos entre medio.
                   </p>
                 </label>
@@ -535,10 +535,10 @@ export default function PlatformModulesPage() {
             <form className="space-y-4" onSubmit={handleCreateSubmodule}>
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2 md:col-span-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Modulo padre</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Modulo padre</span>
                   <select
                     required
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     value={submoduleForm.moduleKey}
                     onChange={(event) =>
                       setSubmoduleForm((current) => ({
@@ -556,10 +556,10 @@ export default function PlatformModulesPage() {
                   </select>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Key</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Key</span>
                   <input
                     required
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#00C70D]"
                     placeholder="colaboradores"
                     value={submoduleForm.key}
                     onChange={(event) =>
@@ -569,15 +569,15 @@ export default function PlatformModulesPage() {
                       }))
                     }
                   />
-                  <p className="text-xs leading-5 text-[#74805f]">
+                  <p className="text-xs leading-5 text-[#A1A1A1]">
                     Clave tecnica del submodulo. Debe ser clara, estable y sin espacios.
                   </p>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Nombre</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span>
                   <input
                     required
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     placeholder="Colaboradores"
                     value={submoduleForm.name}
                     onChange={(event) =>
@@ -589,10 +589,10 @@ export default function PlatformModulesPage() {
                   />
                 </label>
                 <label className="space-y-2 md:col-span-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Route</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Route</span>
                   <input
                     required
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     placeholder="/rrhh/colaboradores"
                     value={submoduleForm.route}
                     onChange={(event) =>
@@ -602,14 +602,14 @@ export default function PlatformModulesPage() {
                       }))
                     }
                   />
-                  <p className="text-xs leading-5 text-[#74805f]">
+                  <p className="text-xs leading-5 text-[#A1A1A1]">
                     Ruta interna del frontend que abrira esa pantalla dentro del ERP.
                   </p>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Permission key</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Permission key</span>
                   <input
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     placeholder="organization.users.read"
                     value={submoduleForm.permissionKey}
                     onChange={(event) =>
@@ -619,16 +619,16 @@ export default function PlatformModulesPage() {
                       }))
                     }
                   />
-                  <p className="text-xs leading-5 text-[#74805f]">
+                  <p className="text-xs leading-5 text-[#A1A1A1]">
                     Permiso principal asociado al submodulo. Usa formato contexto.recurso.accion.
                   </p>
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Orden</span>
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Orden</span>
                   <input
                     type="number"
                     min="0"
-                    className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                    className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                     value={submoduleForm.sortOrder}
                     onChange={(event) =>
                       setSubmoduleForm((current) => ({
@@ -637,7 +637,7 @@ export default function PlatformModulesPage() {
                       }))
                     }
                   />
-                  <p className="text-xs leading-5 text-[#74805f]">
+                  <p className="text-xs leading-5 text-[#A1A1A1]">
                     Controla el orden dentro del panel lateral del modulo padre.
                   </p>
                 </label>
@@ -684,8 +684,8 @@ export default function PlatformModulesPage() {
                     label: "Modulo",
                     render: (row) => (
                       <div>
-                        <p className="font-semibold text-[#1b2111]">{row.name}</p>
-                        <p className="text-xs text-[#7a845f]">{row.key}</p>
+                        <p className="font-semibold text-[#0D0D0D]">{row.name}</p>
+                        <p className="text-xs text-[#A1A1A1]">{row.key}</p>
                       </div>
                     ),
                   },
@@ -744,8 +744,8 @@ export default function PlatformModulesPage() {
                     label: "Submodulo",
                     render: (row) => (
                       <div>
-                        <p className="font-semibold text-[#1b2111]">{row.name}</p>
-                        <p className="text-xs text-[#7a845f]">{row.key}</p>
+                        <p className="font-semibold text-[#0D0D0D]">{row.name}</p>
+                        <p className="text-xs text-[#A1A1A1]">{row.key}</p>
                       </div>
                     ),
                   },
@@ -826,22 +826,22 @@ export default function PlatformModulesPage() {
               className="grid gap-4 md:grid-cols-2"
               onSubmit={handleUpdateModule}
             >
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={moduleEditForm.name} onChange={(event) => setModuleEditForm((current) => current ? { ...current, name: event.target.value } : current)} required /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Icono</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={moduleEditForm.icon} onChange={(event) => setModuleEditForm((current) => current ? { ...current, icon: event.target.value } : current)} /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Audience</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={moduleEditForm.audience} onChange={(event) => setModuleEditForm((current) => current ? { ...current, audience: event.target.value as typeof moduleEditForm.audience } : current)}><option value="ORGANIZATION">Organization</option><option value="PLATFORM">Platform</option><option value="BOTH">Both</option></select></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Orden</span><input type="number" min="0" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={moduleEditForm.sortOrder} onChange={(event) => setModuleEditForm((current) => current ? { ...current, sortOrder: event.target.value } : current)} /><p className="text-xs leading-5 text-[#74805f]">Menor numero aparece primero en el sidebar. Ejemplo: Catalogo 20, Caja 30, Configuracion 90.</p></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={moduleEditForm.name} onChange={(event) => setModuleEditForm((current) => current ? { ...current, name: event.target.value } : current)} required /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Icono</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={moduleEditForm.icon} onChange={(event) => setModuleEditForm((current) => current ? { ...current, icon: event.target.value } : current)} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Audience</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={moduleEditForm.audience} onChange={(event) => setModuleEditForm((current) => current ? { ...current, audience: event.target.value as typeof moduleEditForm.audience } : current)}><option value="ORGANIZATION">Organization</option><option value="PLATFORM">Platform</option><option value="BOTH">Both</option></select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Orden</span><input type="number" min="0" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={moduleEditForm.sortOrder} onChange={(event) => setModuleEditForm((current) => current ? { ...current, sortOrder: event.target.value } : current)} /><p className="text-xs leading-5 text-[#A1A1A1]">Menor numero aparece primero en el sidebar. Ejemplo: Catalogo 20, Caja 30, Configuracion 90.</p></label>
             </form>
           ) : (
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-[0.9fr_1.1fr]">
                 <article className="rounded-[28px] border border-[#e7edd5] bg-white/90 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Identidad
                   </p>
                   <p className="mt-3 text-2xl font-semibold text-[#18200f]">
                     {selectedModule.name}
                   </p>
-                  <p className="mt-2 text-sm text-[#61704c]">{selectedModule.key}</p>
+                  <p className="mt-2 text-sm text-[#535353]">{selectedModule.key}</p>
                   <div className="mt-4">
                     <Tag tone={selectedModule.audience === "PLATFORM" ? "dark" : "accent"}>
                       {formatModuleAudience(selectedModule.audience)}
@@ -850,7 +850,7 @@ export default function PlatformModulesPage() {
                 </article>
 
                 <article className="rounded-[28px] border border-[#e7edd5] bg-[linear-gradient(135deg,#fcffe9_0%,#f6fadf_100%)] p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Submodulos
                   </p>
                   <div className="mt-4 grid gap-3">
@@ -867,7 +867,7 @@ export default function PlatformModulesPage() {
                         </div>
                       ))
                     ) : (
-                      <p className="text-sm text-[#53613d]">Este modulo aun no tiene submodulos.</p>
+                      <p className="text-sm text-[#535353]">Este modulo aun no tiene submodulos.</p>
                     )}
                   </div>
                 </article>
@@ -907,10 +907,10 @@ export default function PlatformModulesPage() {
             className="grid gap-4 md:grid-cols-2"
             onSubmit={handleUpdateSubmodule}
           >
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={submoduleEditForm.name} onChange={(event) => setSubmoduleEditForm((current) => current ? { ...current, name: event.target.value } : current)} required /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Orden</span><input type="number" min="0" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={submoduleEditForm.sortOrder} onChange={(event) => setSubmoduleEditForm((current) => current ? { ...current, sortOrder: event.target.value } : current)} /><p className="text-xs leading-5 text-[#74805f]">Menor numero aparece primero dentro de su modulo.</p></label>
-            <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Route</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={submoduleEditForm.route} onChange={(event) => setSubmoduleEditForm((current) => current ? { ...current, route: event.target.value } : current)} required /></label>
-            <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Permission key</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={submoduleEditForm.permissionKey} onChange={(event) => setSubmoduleEditForm((current) => current ? { ...current, permissionKey: event.target.value } : current)} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={submoduleEditForm.name} onChange={(event) => setSubmoduleEditForm((current) => current ? { ...current, name: event.target.value } : current)} required /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Orden</span><input type="number" min="0" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={submoduleEditForm.sortOrder} onChange={(event) => setSubmoduleEditForm((current) => current ? { ...current, sortOrder: event.target.value } : current)} /><p className="text-xs leading-5 text-[#A1A1A1]">Menor numero aparece primero dentro de su modulo.</p></label>
+            <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Route</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={submoduleEditForm.route} onChange={(event) => setSubmoduleEditForm((current) => current ? { ...current, route: event.target.value } : current)} required /></label>
+            <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Permission key</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={submoduleEditForm.permissionKey} onChange={(event) => setSubmoduleEditForm((current) => current ? { ...current, permissionKey: event.target.value } : current)} /></label>
           </form>
         ) : null}
       </AdminOverlayPanel>

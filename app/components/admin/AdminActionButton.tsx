@@ -46,23 +46,23 @@ export function AdminActionButton({
   const toneClass =
     tone === "primary"
       ? active
-        ? "border-[var(--kapos-charcoal)] bg-[var(--kapos-black)] text-white shadow-[0_20px_40px_rgba(12,13,15,0.28)]"
-        : "border-[var(--kapos-charcoal)] bg-[var(--kapos-black)] text-white shadow-[0_14px_28px_rgba(12,13,15,0.18)] hover:bg-[var(--kapos-charcoal)]"
+        ? "border-[var(--kapos-black)] bg-[var(--kapos-black)] text-white shadow-[0_20px_40px_rgba(13,13,13,0.28)]"
+        : "border-[var(--kapos-black)] bg-[var(--kapos-black)] text-white shadow-[0_14px_28px_rgba(13,13,13,0.18)] hover:bg-[var(--kapos-charcoal)]"
       : tone === "accent"
         ? active
-          ? "border-[var(--kapos-lime)] bg-[var(--kapos-lime)] text-[var(--kapos-text)] shadow-[0_18px_34px_rgba(184,242,12,0.24)]"
-          : "border-[var(--kapos-border-strong)] bg-[var(--kapos-lime-wash)] text-[var(--kapos-text)] shadow-[0_12px_24px_rgba(184,242,12,0.14)] hover:border-[var(--kapos-lime)] hover:bg-[var(--kapos-lime-soft)]"
+          ? "border-[var(--kapos-green)] bg-[var(--kapos-green)] text-white shadow-[0_18px_34px_rgba(0,199,13,0.28)]"
+          : "border-[color-mix(in_srgb,var(--kapos-green)_25%,white)] bg-[var(--kapos-green-wash)] text-[var(--kapos-green-dark)] shadow-[0_12px_24px_rgba(0,199,13,0.12)] hover:border-[var(--kapos-green)] hover:bg-[color-mix(in_srgb,var(--kapos-green)_18%,white)]"
         : tone === "danger"
           ? active
             ? "border-[var(--kapos-danger)] bg-[var(--kapos-danger)] text-white shadow-[0_18px_34px_rgba(211,95,72,0.24)]"
             : "border-[color-mix(in_srgb,var(--kapos-danger)_34%,white)] bg-[color-mix(in_srgb,var(--kapos-danger)_7%,white)] text-[var(--kapos-danger)] shadow-[0_12px_22px_rgba(211,95,72,0.08)] hover:border-[var(--kapos-danger)] hover:bg-[color-mix(in_srgb,var(--kapos-danger)_11%,white)]"
           : tone === "ghost"
             ? active
-              ? "border-[var(--kapos-border-strong)] bg-[var(--kapos-lime-wash)] text-[var(--kapos-text)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_24px_rgba(32,36,21,0.1)]"
+              ? "border-[color-mix(in_srgb,var(--kapos-green)_24%,white)] bg-[var(--kapos-green-wash)] text-[var(--kapos-green-dark)] shadow-[inset_0_1px_0_rgba(255,255,255,0.9),0_12px_24px_rgba(13,13,13,0.08)]"
               : "border-transparent bg-transparent text-[var(--kapos-text-soft)] hover:border-[var(--kapos-border)] hover:bg-white/85 hover:text-[var(--kapos-text)]"
             : active
-              ? "border-[var(--kapos-border-strong)] bg-[var(--kapos-card-alt)] text-[var(--kapos-text)] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_16px_28px_rgba(32,36,21,0.08)]"
-              : "border-[var(--kapos-border)] bg-[var(--kapos-card)] text-[var(--kapos-text-soft)] shadow-[0_12px_24px_rgba(32,36,21,0.05)] hover:border-[var(--kapos-border-strong)] hover:bg-[var(--kapos-lime-wash)] hover:text-[var(--kapos-text)]";
+              ? "border-[var(--kapos-black)] bg-[var(--kapos-card-alt)] text-[var(--kapos-black)] shadow-[inset_0_1px_0_rgba(255,255,255,0.95),0_16px_28px_rgba(13,13,13,0.08)]"
+              : "border-[var(--kapos-border)] bg-[var(--kapos-card)] text-[var(--kapos-text-soft)] shadow-[0_12px_24px_rgba(13,13,13,0.05)] hover:border-[color-mix(in_srgb,var(--kapos-green)_24%,white)] hover:bg-[var(--kapos-green-wash)] hover:text-[var(--kapos-text)]";
 
   const sizeClass =
     size === "sm"

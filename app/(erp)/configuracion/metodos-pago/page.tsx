@@ -11,7 +11,7 @@ import { createPaymentMethod, deletePaymentMethod, getPaymentMethods, updatePaym
 import type { PaymentMethodSummary } from "../../../types/erp";
 
 const inputClass =
-  "w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]";
+  "w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]";
 
 const paymentTypes: Array<PaymentMethodSummary["type"]> = [
   "CASH",
@@ -56,9 +56,6 @@ export default function MetodosPagoPage() {
   });
 
   const canCreate = effectivePermissionKeys.includes("settings.payment_methods.create");
-  const canUpdate = effectivePermissionKeys.includes("settings.payment_methods.update");
-  const canActivate = effectivePermissionKeys.includes("settings.payment_methods.activate");
-  const canDelete = effectivePermissionKeys.includes("settings.payment_methods.delete");
 
   async function resolveToken() {
     return accessToken ?? (await refreshSession({ silent: true }))?.accessToken ?? null;
@@ -200,7 +197,7 @@ export default function MetodosPagoPage() {
                 Crear metodo
               </AdminActionButton>
             ) : (
-              <WalletCards className="h-6 w-6 text-[#6d8a20]" />
+              <WalletCards className="h-6 w-6 text-[#00C70D]" />
             )}
           </div>
         }
@@ -217,10 +214,10 @@ export default function MetodosPagoPage() {
       {viewMode === "create" ? (
         <PanelCard title="Crear metodo de pago" description="Ejemplos recomendados para el piloto: efectivo, tarjeta, Yape, Plin y transferencia.">
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Codigo</span><input className={`${inputClass} lowercase`} placeholder="yape" value={form.code} onChange={(event) => setForm((current) => ({ ...current, code: event.target.value.toLowerCase() }))} required /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className={inputClass} placeholder="Yape" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo</span><select className={inputClass} value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as PaymentMethodSummary["type"] }))}>{paymentTypes.map((type) => <option key={type} value={type}>{paymentTypeLabel(type)}</option>)}</select></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Orden</span><input type="number" className={inputClass} value={form.sortOrder} onChange={(event) => setForm((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Codigo</span><input className={`${inputClass} lowercase`} placeholder="yape" value={form.code} onChange={(event) => setForm((current) => ({ ...current, code: event.target.value.toLowerCase() }))} required /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className={inputClass} placeholder="Yape" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Tipo</span><select className={inputClass} value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as PaymentMethodSummary["type"] }))}>{paymentTypes.map((type) => <option key={type} value={type}>{paymentTypeLabel(type)}</option>)}</select></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Orden</span><input type="number" className={inputClass} value={form.sortOrder} onChange={(event) => setForm((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
             <div className="flex justify-end"><AdminActionButton type="submit" tone="primary" icon={<PlusIcon />}>Crear metodo</AdminActionButton></div>
           </form>
         </PanelCard>
@@ -235,7 +232,7 @@ export default function MetodosPagoPage() {
             emptyTitle="Aun no hay metodos de pago"
             emptyDescription="Crea efectivo, tarjeta, Yape, Plin o transferencia para preparar caja."
             columns={[
-              { key: "name", label: "Metodo", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.name}</p><p className="text-xs text-[#7a845f]">{row.code}</p></div> },
+              { key: "name", label: "Metodo", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.name}</p><p className="text-xs text-[#A1A1A1]">{row.code}</p></div> },
               { key: "type", label: "Tipo", render: (row) => paymentTypeLabel(row.type) },
               { key: "order", label: "Orden", align: "center", render: (row) => row.sortOrder },
               { key: "status", label: "Estado", render: (row) => <Tag tone={row.enabled ? "accent" : "soft"}>{row.enabled ? "Activo" : "Inactivo"}</Tag> },
@@ -264,11 +261,11 @@ export default function MetodosPagoPage() {
         }
       >
         <form id="payment-method-edit-form" className="grid gap-4 md:grid-cols-2" onSubmit={handleUpdateMethod}>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Codigo</span><input className={`${inputClass} lowercase`} value={editForm.code} onChange={(event) => setEditForm((current) => ({ ...current, code: event.target.value.toLowerCase() }))} required /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className={inputClass} value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} required /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo</span><select className={inputClass} value={editForm.type} onChange={(event) => setEditForm((current) => ({ ...current, type: event.target.value as PaymentMethodSummary["type"] }))}>{paymentTypes.map((type) => <option key={type} value={type}>{paymentTypeLabel(type)}</option>)}</select></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Orden</span><input type="number" className={inputClass} value={editForm.sortOrder} onChange={(event) => setEditForm((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className={inputClass} value={editForm.enabled ? "ACTIVE" : "INACTIVE"} onChange={(event) => setEditForm((current) => ({ ...current, enabled: event.target.value === "ACTIVE" }))}><option value="ACTIVE">Activo</option><option value="INACTIVE">Inactivo</option></select></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Codigo</span><input className={`${inputClass} lowercase`} value={editForm.code} onChange={(event) => setEditForm((current) => ({ ...current, code: event.target.value.toLowerCase() }))} required /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className={inputClass} value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} required /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Tipo</span><select className={inputClass} value={editForm.type} onChange={(event) => setEditForm((current) => ({ ...current, type: event.target.value as PaymentMethodSummary["type"] }))}>{paymentTypes.map((type) => <option key={type} value={type}>{paymentTypeLabel(type)}</option>)}</select></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Orden</span><input type="number" className={inputClass} value={editForm.sortOrder} onChange={(event) => setEditForm((current) => ({ ...current, sortOrder: event.target.value }))} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Estado</span><select className={inputClass} value={editForm.enabled ? "ACTIVE" : "INACTIVE"} onChange={(event) => setEditForm((current) => ({ ...current, enabled: event.target.value === "ACTIVE" }))}><option value="ACTIVE">Activo</option><option value="INACTIVE">Inactivo</option></select></label>
         </form>
       </AdminOverlayPanel>
     </section>

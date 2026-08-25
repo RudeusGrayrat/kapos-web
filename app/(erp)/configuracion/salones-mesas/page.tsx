@@ -21,7 +21,7 @@ import {
 import type { BranchSummary, DiningAreaSummary } from "../../../types/erp";
 
 const inputClass =
-  "w-full rounded-[18px] border border-[#dfe7cf] bg-white px-4 py-3 text-sm text-[#1f2813] outline-none transition focus:border-[#a9cf24]";
+  "w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#00C70D]";
 
 export default function AreasMesasPage() {
   const {
@@ -238,19 +238,19 @@ export default function AreasMesasPage() {
         {!loading && areas.length === 0 ? <AdminMessage title="Preparando el área principal" description="Actualiza la página para comenzar a agregar mesas." /> : null}
         <div className="space-y-6">
           {areas.map((area) => (
-            <article key={area.id} className="rounded-[28px] border border-[#e5ead8] bg-[#fbfcf7] p-5">
+            <article key={area.id} className="rounded-[28px] border border-[#E4E4E4] bg-[#F8F8F8] p-5">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div className="flex items-center gap-3">
-                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#eff7d1] text-[#4b6517]"><MapPinned className="h-5 w-5" /></span>
-                  <div><h3 className="text-lg font-semibold text-[#1a210f]">{area.name}</h3><p className="text-sm text-[#6b745d]">{area.tables.length} mesas</p></div>
+                  <span className="grid h-11 w-11 place-items-center rounded-2xl bg-[#E8FCEB] text-[#4b6517]"><MapPinned className="h-5 w-5" /></span>
+                  <div><h3 className="text-lg font-semibold text-[#1a210f]">{area.name}</h3><p className="text-sm text-[#535353]">{area.tables.length} mesas</p></div>
                 </div>
                 <div className="flex items-center gap-2"><Tag tone={area.isActive ? "accent" : "soft"}>{area.isActive ? "Activo" : "Inactivo"}</Tag>{canUpdate ? <AdminActionButton size="sm" tone="ghost" onClick={() => void toggleArea(area)}>{area.isActive ? "Desactivar" : "Activar"}</AdminActionButton> : null}</div>
               </div>
               <div className="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
                 {area.tables.map((table) => (
-                  <div key={table.id} className={`rounded-[24px] border p-4 ${table.activeAccount ? "border-[#c7df72] bg-[#f7fcdF]" : "border-[#e5ead8] bg-white"}`}>
-                    <div className="flex items-start justify-between gap-3"><span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#f1f4ea] text-[#53623b]"><Armchair className="h-5 w-5" /></span><Tag tone={table.activeAccount ? "warn" : table.isActive ? "accent" : "soft"}>{table.activeAccount ? "Ocupada" : table.isActive ? "Libre" : "Inactiva"}</Tag></div>
-                    <p className="mt-4 text-lg font-semibold text-[#1b2111]">{table.name}</p>
+                  <div key={table.id} className={`rounded-[24px] border p-4 ${table.activeAccount ? "border-[#c7df72] bg-[#f7fcdF]" : "border-[#E4E4E4] bg-white"}`}>
+                    <div className="flex items-start justify-between gap-3"><span className="grid h-10 w-10 place-items-center rounded-2xl bg-[#f1f4ea] text-[#535353]"><Armchair className="h-5 w-5" /></span><Tag tone={table.activeAccount ? "warn" : table.isActive ? "accent" : "soft"}>{table.activeAccount ? "Ocupada" : table.isActive ? "Libre" : "Inactiva"}</Tag></div>
+                    <p className="mt-4 text-lg font-semibold text-[#0D0D0D]">{table.name}</p>
                     <div className="mt-1 flex items-center gap-3 text-xs text-[#70795f]"><span className="flex items-center gap-1"><Building2 className="h-3.5 w-3.5" />{table.code}</span><span className="flex items-center gap-1"><Users className="h-3.5 w-3.5" />{table.capacity}</span></div>
                     {table.activeAccount ? <p className="mt-3 text-sm font-semibold text-[#415515]">Saldo S/ {table.activeAccount.balance.toFixed(2)}</p> : null}
                     {canUpdate && !table.activeAccount ? <AdminActionButton className="mt-3" size="sm" tone="ghost" onClick={() => void toggleTable(table.id, table.isActive)}>{table.isActive ? "Desactivar" : "Activar"}</AdminActionButton> : null}

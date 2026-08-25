@@ -51,7 +51,7 @@ import type {
 } from "../../../types/erp";
 
 const inputClass =
-  "w-full rounded-[18px] border border-[#dfe7cf] bg-white px-4 py-3 text-sm text-[#1f2813] outline-none transition focus:border-[#a9cf24]";
+  "w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#00C70D]";
 
 const serviceLabels: Record<ServiceType, string> = {
   LOCAL: "En local",
@@ -566,8 +566,8 @@ export default function PosPage() {
           {lastBillingMessage ? <AdminMessage title="Comprobante listo" description={lastBillingMessage} tone="accent" /> : null}
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-sm font-black text-[#202415]">{lastClosedAccount.sale?.saleNumber ?? lastClosedAccount.accountNumber}</p>
-              <p className="mt-1 text-sm text-[#667055]">
+              <p className="text-sm font-black text-[#0D0D0D]">{lastClosedAccount.sale?.saleNumber ?? lastClosedAccount.accountNumber}</p>
+              <p className="mt-1 text-sm text-[#535353]">
                 {billingDocumentType === "TICKET"
                   ? "Ticket interno: no pasa por Nubefact ni SUNAT."
                   : "Boleta/factura: emite en Nubefact y abre el PDF fiscal."}
@@ -593,12 +593,12 @@ export default function PosPage() {
       <div className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
         <PanelCard title="Cuentas abiertas" description={`${accounts.length} operaciones sincronizadas`}>
           <div className="space-y-3">
-            {accounts.length === 0 ? <p className="py-8 text-center text-sm text-[#6b745d]">No hay cuentas abiertas.</p> : null}
+            {accounts.length === 0 ? <p className="py-8 text-center text-sm text-[#535353]">No hay cuentas abiertas.</p> : null}
             {accounts.map((account) => (
-              <button key={account.id} type="button" onClick={() => void openAccount(account.id)} className={`w-full rounded-[22px] border p-4 text-left transition ${selectedAccount?.id === account.id ? "border-[#aaca39] bg-[#f6fbdc]" : "border-[#e4ead6] bg-white hover:border-[#bfd481]"}`}>
-                <div className="flex items-center justify-between gap-2"><p className="font-semibold text-[#1b2111]">{accountLabel(account)}</p><Tag tone={account.status === "PARTIALLY_PAID" ? "warn" : "accent"}>{account.status === "PARTIALLY_PAID" ? "Parcial" : "Abierta"}</Tag></div>
-                <p className="mt-1 text-xs text-[#768063]">{account.accountNumber} · {serviceLabels[account.serviceType]}</p>
-                <div className="mt-4 flex items-end justify-between"><span className="text-xs text-[#6d765e]">Saldo</span><strong className="text-xl text-[#27350f]">S/ {account.balance.toFixed(2)}</strong></div>
+              <button key={account.id} type="button" onClick={() => void openAccount(account.id)} className={`w-full rounded-[22px] border p-4 text-left transition ${selectedAccount?.id === account.id ? "border-[#00C70D] bg-[#E8FCEB]" : "border-[#E4E4E4] bg-white hover:border-[#40D653]"}`}>
+                <div className="flex items-center justify-between gap-2"><p className="font-semibold text-[#0D0D0D]">{accountLabel(account)}</p><Tag tone={account.status === "PARTIALLY_PAID" ? "warn" : "accent"}>{account.status === "PARTIALLY_PAID" ? "Parcial" : "Abierta"}</Tag></div>
+                <p className="mt-1 text-xs text-[#535353]">{account.accountNumber} · {serviceLabels[account.serviceType]}</p>
+                <div className="mt-4 flex items-end justify-between"><span className="text-xs text-[#535353]">Saldo</span><strong className="text-xl text-[#27350f]">S/ {account.balance.toFixed(2)}</strong></div>
               </button>
             ))}
           </div>
@@ -609,7 +609,7 @@ export default function PosPage() {
             <form className="space-y-5" onSubmit={handleCreateAccount}>
               <div className="grid gap-3 sm:grid-cols-3">
                 {(["LOCAL", "DELIVERY", "TAKEAWAY"] as ServiceType[]).map((type) => (
-                  <button key={type} type="button" onClick={() => setServiceType(type)} className={`rounded-[24px] border p-5 text-left transition ${serviceType === type ? "border-[#a6ca32] bg-[#f3fad6]" : "border-[#e4ead6] bg-white"}`}><span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-[#4f651c]">{type === "LOCAL" ? <Utensils className="h-5 w-5" /> : type === "DELIVERY" ? <MapPin className="h-5 w-5" /> : <ShoppingBag className="h-5 w-5" />}</span><strong className="mt-4 block text-[#1d2611]">{serviceLabels[type]}</strong></button>
+                  <button key={type} type="button" onClick={() => setServiceType(type)} className={`rounded-[24px] border p-5 text-left transition ${serviceType === type ? "border-[#00C70D] bg-[#E8FCEB]" : "border-[#E4E4E4] bg-white"}`}><span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-[#00C70D]">{type === "LOCAL" ? <Utensils className="h-5 w-5" /> : type === "DELIVERY" ? <MapPin className="h-5 w-5" /> : <ShoppingBag className="h-5 w-5" />}</span><strong className="mt-4 block text-[#0D0D0D]">{serviceLabels[type]}</strong></button>
                 ))}
               </div>
               {serviceType === "LOCAL" ?
@@ -639,8 +639,8 @@ export default function PosPage() {
           <div className="space-y-6">
             <div className="grid gap-4 md:grid-cols-3">
               <div className="rounded-[28px] bg-[#151713] p-5 text-white"><p className="text-sm text-white/60">Cuenta</p><strong className="mt-3 block text-2xl">{accountLabel(selectedAccount)}</strong><p className="mt-2 text-xs text-white/55">{selectedAccount.accountNumber}</p></div>
-              <div className="rounded-[28px] border border-[#dce8b4] bg-[#f7fbdc] p-5"><p className="text-sm text-[#67734e]">Total acumulado</p><strong className="mt-3 block text-3xl text-[#26350d]">S/ {selectedAccount.total.toFixed(2)}</strong></div>
-              <div className="rounded-[28px] border border-[#eadfcb] bg-[#fff9ec] p-5"><p className="text-sm text-[#756b56]">Saldo pendiente</p><strong className="mt-3 block text-3xl text-[#654d20]">S/ {selectedAccount.balance.toFixed(2)}</strong></div>
+              <div className="rounded-[28px] border border-[#B8F5BC] bg-[#E8FCEB] p-5"><p className="text-sm text-[#535353]">Total acumulado</p><strong className="mt-3 block text-3xl text-[#00C70D]">S/ {selectedAccount.total.toFixed(2)}</strong></div>
+              <div className="rounded-[28px] border border-[#E4E4E4] bg-[#F8F8F8] p-5"><p className="text-sm text-[#535353]">Saldo pendiente</p><strong className="mt-3 block text-3xl text-[#00C70D]">S/ {selectedAccount.balance.toFixed(2)}</strong></div>
             </div>
 
             <PanelCard title="Herramientas de cuenta" description="Traslada la atención, anexa mesas o entrega una precuenta sin cerrar la venta.">
@@ -660,7 +660,7 @@ export default function PosPage() {
                 </div>
               ) : null}
               {tableAction ? (
-                <div className="mt-4 grid gap-3 rounded-[22px] border border-[#e0e8ce] bg-[#fafcf4] p-4 md:grid-cols-[minmax(0,1fr)_auto_auto]">
+                <div className="mt-4 grid gap-3 rounded-[22px] border border-[#e0e8ce] bg-[#F8F8F8] p-4 md:grid-cols-[minmax(0,1fr)_auto_auto]">
                   <select className={inputClass} value={targetTableId} onChange={(event) => setTargetTableId(event.target.value)}>
                     <option value="">Selecciona una mesa libre</option>
                     {availableTables.map((table) => <option key={table.id} value={table.id}>{table.areaName} · {table.name}</option>)}
@@ -678,7 +678,7 @@ export default function PosPage() {
                   <div key={item.id} className={`py-3 ${item.status === "CANCELLED" ? "opacity-55" : ""}`}>
                     <div className="flex items-center justify-between gap-4">
                       <div>
-                        <p className={`font-semibold text-[#1d2512] ${item.status === "CANCELLED" ? "line-through" : ""}`}>{item.quantity} × {item.productName}</p>
+                        <p className={`font-semibold text-[#0D0D0D] ${item.status === "CANCELLED" ? "line-through" : ""}`}>{item.quantity} × {item.productName}</p>
                         <p className="text-xs text-[#717b60]">{item.status === "CANCELLED" ? `Anulado: ${item.cancellationReason}` : item.note || (item.kitchenTicketId ? `Comanda #${item.kitchenTicket?.sequence ?? ""}` : "Pendiente de enviar")}</p>
                       </div>
                       <div className="flex items-center gap-3">
@@ -708,7 +708,7 @@ export default function PosPage() {
                 </select>
                 <small className="block leading-5 text-[#6b7558]">Este cliente acumula puntos. Si emites factura, los datos fiscales se llenan aparte.</small>
               </label>
-              <div className="mb-4 rounded-[24px] border border-[#e0e8ce] bg-[#fbfcf7] p-4">
+              <div className="mb-4 rounded-[24px] border border-[#e0e8ce] bg-[#F8F8F8] p-4">
                 <span className="text-sm font-semibold">Comprobante</span>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {(["TICKET", "BOLETA", "FACTURA"] as PosBillingDocumentType[]).map((type) => (
@@ -732,12 +732,12 @@ export default function PosPage() {
                 <AdminActionButton active={splitByItems} icon={<Split className="h-4 w-4" />} onClick={() => { setSplitByItems(true); setItemAllocations({}); setPaymentForm((current) => ({ ...current, amount: "0.00" })); }}>Dividir por productos</AdminActionButton>
               </div>
               {splitByItems ? (
-                <div className="mb-4 divide-y divide-[#e7ecd9] rounded-[22px] border border-[#e0e8ce] bg-[#fbfcf7] px-4">
+                <div className="mb-4 divide-y divide-[#e7ecd9] rounded-[22px] border border-[#e0e8ce] bg-[#F8F8F8] px-4">
                   {activeItems.filter((item) => item.remainingQuantity > 0).map((item) => (
                     <div key={item.id} className="grid items-center gap-3 py-3 md:grid-cols-[minmax(0,1fr)_120px_130px]">
-                      <div><p className="font-semibold text-[#202814]">{item.productName}</p><p className="text-xs text-[#737c62]">Pendiente {item.remainingQuantity} de {item.quantity}</p></div>
+                      <div><p className="font-semibold text-[#0D0D0D]">{item.productName}</p><p className="text-xs text-[#737c62]">Pendiente {item.remainingQuantity} de {item.quantity}</p></div>
                       <input className={inputClass} type="number" min="0" max={item.remainingQuantity} step="0.001" value={itemAllocations[item.id] ?? 0} onChange={(event) => updateItemAllocation(item.id, Math.min(item.remainingQuantity, Math.max(0, Number(event.target.value))))} />
-                      <strong className="text-right text-[#334414]">S/ {(((itemAllocations[item.id] ?? 0) * item.total) / item.quantity).toFixed(2)}</strong>
+                      <strong className="text-right text-[#00C70D]">S/ {(((itemAllocations[item.id] ?? 0) * item.total) / item.quantity).toFixed(2)}</strong>
                     </div>
                   ))}
                 </div>
@@ -746,7 +746,7 @@ export default function PosPage() {
             </PanelCard>
           </div>
         ) : (
-          <div className="grid min-h-[540px] place-items-center rounded-[36px] border border-dashed border-[#dce5c7] bg-[radial-gradient(circle_at_top,#f4fad9_0%,#fbfcf8_48%,#ffffff_100%)] p-8 text-center"><div className="max-w-md"><span className="mx-auto grid h-20 w-20 place-items-center rounded-[28px] bg-[#171917] text-[#c9ef4b]"><ReceiptText className="h-9 w-9" /></span><h2 className="mt-6 text-3xl font-semibold text-[#1a210f]">Selecciona una cuenta</h2><p className="mt-3 leading-7 text-[#626c52]">Retoma un pedido abierto o inicia uno nuevo. El catálogo solo aparece dentro de una operación, no como un carrito global.</p><div className="mt-6 flex justify-center gap-4 text-xs text-[#788168]"><span className="flex items-center gap-1"><Clock3 className="h-4 w-4" />Sincronización cada 5 s</span><span className="flex items-center gap-1"><CreditCard className="h-4 w-4" />Pagos parciales</span></div></div></div>
+          <div className="grid min-h-[540px] place-items-center rounded-[36px] border border-dashed border-[#dce5c7] bg-[radial-gradient(circle_at_top,#f4fad9_0%,#F8F8F8_48%,#ffffff_100%)] p-8 text-center"><div className="max-w-md"><span className="mx-auto grid h-20 w-20 place-items-center rounded-[28px] bg-[#171917] text-[#c9ef4b]"><ReceiptText className="h-9 w-9" /></span><h2 className="mt-6 text-3xl font-semibold text-[#1a210f]">Selecciona una cuenta</h2><p className="mt-3 leading-7 text-[#626c52]">Retoma un pedido abierto o inicia uno nuevo. El catálogo solo aparece dentro de una operación, no como un carrito global.</p><div className="mt-6 flex justify-center gap-4 text-xs text-[#788168]"><span className="flex items-center gap-1"><Clock3 className="h-4 w-4" />Sincronización cada 5 s</span><span className="flex items-center gap-1"><CreditCard className="h-4 w-4" />Pagos parciales</span></div></div></div>
         )}
       </div>
     </section>

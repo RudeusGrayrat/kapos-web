@@ -630,17 +630,17 @@ export default function PlatformUsersPage() {
           {viewMode === "create" ? (
             <form className="space-y-5" onSubmit={handleSubmit}>
               <div className="grid gap-4 md:grid-cols-2">
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Correo</span><input type="email" required className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} /></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Contrasena</span><input type="password" required className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} /></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombres</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.firstName} onChange={(event) => setForm((current) => ({ ...current, firstName: event.target.value }))} /></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Apellidos</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.lastName} onChange={(event) => setForm((current) => ({ ...current, lastName: event.target.value }))} /></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo documento</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.documentType} onChange={(event) => setForm((current) => ({ ...current, documentType: event.target.value as "DNI" | "RUC" | "CE" | "PASSPORT" }))}><option value="DNI">DNI</option><option value="RUC">RUC</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Numero documento</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.documentNumber} onChange={(event) => setForm((current) => ({ ...current, documentNumber: event.target.value }))} /></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Telefono</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} /></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as "ACTIVE" | "INVITED" | "SUSPENDED" | "DISABLED" }))}><option value="ACTIVE">Activo</option><option value="INVITED">Invitado</option><option value="SUSPENDED">Suspendido</option></select></label>
-                <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Rol de plataforma</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.platformRoleScopeKey} onChange={(event) => setForm((current) => ({ ...current, platformRoleScopeKey: event.target.value }))}><option value="">Sin acceso de plataforma</option>{platformRoles.map((role) => (<option key={role.id} value={role.scopeKey}>{role.name}</option>))}</select></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Organizacion</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.organizationId} onChange={(event) => setForm((current) => ({ ...current, organizationId: event.target.value }))}><option value="">Sin asignacion inicial</option>{organizations.map((organization) => (<option key={organization.id} value={organization.id}>{organization.tradeName ?? organization.legalName}</option>))}</select></label>
-                <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Rol en organizacion</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.organizationRoleScopeKey} onChange={(event) => setForm((current) => ({ ...current, organizationRoleScopeKey: event.target.value }))}><option value="">Sin rol inicial</option>{organizationRoles.map((role) => (<option key={role.id} value={role.scopeKey}>{role.name}</option>))}</select></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Correo</span><input type="email" required className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.email} onChange={(event) => setForm((current) => ({ ...current, email: event.target.value }))} /></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Contrasena</span><input type="password" required className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.password} onChange={(event) => setForm((current) => ({ ...current, password: event.target.value }))} /></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombres</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.firstName} onChange={(event) => setForm((current) => ({ ...current, firstName: event.target.value }))} /></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Apellidos</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.lastName} onChange={(event) => setForm((current) => ({ ...current, lastName: event.target.value }))} /></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Tipo documento</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.documentType} onChange={(event) => setForm((current) => ({ ...current, documentType: event.target.value as "DNI" | "RUC" | "CE" | "PASSPORT" }))}><option value="DNI">DNI</option><option value="RUC">RUC</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Numero documento</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.documentNumber} onChange={(event) => setForm((current) => ({ ...current, documentNumber: event.target.value }))} /></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Telefono</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.phone} onChange={(event) => setForm((current) => ({ ...current, phone: event.target.value }))} /></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Estado</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.status} onChange={(event) => setForm((current) => ({ ...current, status: event.target.value as "ACTIVE" | "INVITED" | "SUSPENDED" | "DISABLED" }))}><option value="ACTIVE">Activo</option><option value="INVITED">Invitado</option><option value="SUSPENDED">Suspendido</option></select></label>
+                <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Rol de plataforma</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.platformRoleScopeKey} onChange={(event) => setForm((current) => ({ ...current, platformRoleScopeKey: event.target.value }))}><option value="">Sin acceso de plataforma</option>{platformRoles.map((role) => (<option key={role.id} value={role.scopeKey}>{role.name}</option>))}</select></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Organizacion</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.organizationId} onChange={(event) => setForm((current) => ({ ...current, organizationId: event.target.value }))}><option value="">Sin asignacion inicial</option>{organizations.map((organization) => (<option key={organization.id} value={organization.id}>{organization.tradeName ?? organization.legalName}</option>))}</select></label>
+                <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Rol en organizacion</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.organizationRoleScopeKey} onChange={(event) => setForm((current) => ({ ...current, organizationRoleScopeKey: event.target.value }))}><option value="">Sin rol inicial</option>{organizationRoles.map((role) => (<option key={role.id} value={role.scopeKey}>{role.name}</option>))}</select></label>
               </div>
               {submitMessage ? <AdminMessage title="Listo" description={submitMessage} tone="accent" /> : null}
               <div className="flex justify-end"><AdminActionButton type="submit" disabled={isSubmitting} tone="primary" icon={<PlusIcon />}>{isSubmitting ? "Creando..." : "Guardar usuario global"}</AdminActionButton></div>
@@ -664,7 +664,7 @@ export default function PlatformUsersPage() {
                   label: "Identidad",
                   render: (user) => (
                     <div>
-                      <p className="font-semibold text-[#1b2111]">{user.name ?? "Sin nombre"}</p>
+                      <p className="font-semibold text-[#0D0D0D]">{user.name ?? "Sin nombre"}</p>
                       <p className="text-sm text-[#677254]">{[user.email, user.identifier].filter(Boolean).join(" · ") || "Sin identificador"}</p>
                     </div>
                   ),
@@ -759,16 +759,16 @@ export default function PlatformUsersPage() {
               className="grid gap-4 md:grid-cols-2"
               onSubmit={handleUpdateUser}
             >
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Correo</span><input type="email" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.email} onChange={(event) => setEditForm((current) => current ? { ...current, email: event.target.value } : current)} required /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.status} onChange={(event) => setEditForm((current) => current ? { ...current, status: event.target.value as typeof editForm.status } : current)}><option value="ACTIVE">Activo</option><option value="INVITED">Invitado</option><option value="SUSPENDED">Suspendido</option><option value="DISABLED">Deshabilitado</option></select></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombres</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.firstName} onChange={(event) => setEditForm((current) => current ? { ...current, firstName: event.target.value } : current)} /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Apellidos</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.lastName} onChange={(event) => setEditForm((current) => current ? { ...current, lastName: event.target.value } : current)} /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Tipo documento</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.documentType} onChange={(event) => setEditForm((current) => current ? { ...current, documentType: event.target.value as typeof editForm.documentType } : current)}><option value="DNI">DNI</option><option value="RUC">RUC</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Numero documento</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.documentNumber} onChange={(event) => setEditForm((current) => current ? { ...current, documentNumber: event.target.value } : current)} /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Telefono</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.phone} onChange={(event) => setEditForm((current) => current ? { ...current, phone: event.target.value } : current)} /></label>
-              <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Rol de plataforma</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.platformRoleScopeKey} onChange={(event) => setEditForm((current) => current ? { ...current, platformRoleScopeKey: event.target.value } : current)}><option value="">Sin acceso de plataforma</option>{platformRoles.map((role) => (<option key={role.id} value={role.scopeKey}>{role.name}</option>))}</select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Correo</span><input type="email" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.email} onChange={(event) => setEditForm((current) => current ? { ...current, email: event.target.value } : current)} required /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Estado</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.status} onChange={(event) => setEditForm((current) => current ? { ...current, status: event.target.value as typeof editForm.status } : current)}><option value="ACTIVE">Activo</option><option value="INVITED">Invitado</option><option value="SUSPENDED">Suspendido</option><option value="DISABLED">Deshabilitado</option></select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombres</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.firstName} onChange={(event) => setEditForm((current) => current ? { ...current, firstName: event.target.value } : current)} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Apellidos</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.lastName} onChange={(event) => setEditForm((current) => current ? { ...current, lastName: event.target.value } : current)} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Tipo documento</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.documentType} onChange={(event) => setEditForm((current) => current ? { ...current, documentType: event.target.value as typeof editForm.documentType } : current)}><option value="DNI">DNI</option><option value="RUC">RUC</option><option value="CE">CE</option><option value="PASSPORT">Pasaporte</option></select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Numero documento</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.documentNumber} onChange={(event) => setEditForm((current) => current ? { ...current, documentNumber: event.target.value } : current)} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Telefono</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.phone} onChange={(event) => setEditForm((current) => current ? { ...current, phone: event.target.value } : current)} /></label>
+              <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Rol de plataforma</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.platformRoleScopeKey} onChange={(event) => setEditForm((current) => current ? { ...current, platformRoleScopeKey: event.target.value } : current)}><option value="">Sin acceso de plataforma</option>{platformRoles.map((role) => (<option key={role.id} value={role.scopeKey}>{role.name}</option>))}</select></label>
               <div className="space-y-3 md:col-span-2">
-                <p className="text-sm font-semibold text-[#21300f]">Permisos de plataforma</p>
+                <p className="text-sm font-semibold text-[#0D0D0D]">Permisos de plataforma</p>
                 <p className="text-xs leading-6 text-[#667053]">
                   Estos botones ajustan permisos especificos encima del rol de plataforma. Activo significa permitido; al apagarlo queda denegado para este usuario.
                 </p>
@@ -808,7 +808,7 @@ export default function PlatformUsersPage() {
                 </div>
               </div>
               <div className="space-y-4 md:col-span-2">
-                <p className="text-sm font-semibold text-[#21300f]">Accesos por organizacion</p>
+                <p className="text-sm font-semibold text-[#0D0D0D]">Accesos por organizacion</p>
                 {selectedUser.memberships.length > 0 ? (
                   selectedUser.memberships.map((membership) => {
                     const membershipOverrides =
@@ -822,13 +822,13 @@ export default function PlatformUsersPage() {
                     );
 
                     return (
-                      <article key={membership.id} className="rounded-[24px] border border-[#edf1e4] min-h-[800px] bg-[#fbfcf8] p-4">
+                      <article key={membership.id} className="rounded-[24px] border border-[#E4E4E4] min-h-[800px] bg-[#F8F8F8] p-4">
                         <div className="flex flex-wrap items-center justify-between gap-3">
                           <div>
-                            <p className="font-semibold text-[#1b2111]">
+                            <p className="font-semibold text-[#0D0D0D]">
                               {membership.organizationName}
                             </p>
-                            <p className="mt-1 text-xs uppercase tracking-[0.16em] text-[#7a845f]">
+                            <p className="mt-1 text-xs uppercase tracking-[0.16em] text-[#A1A1A1]">
                               {(membership.roleNames.length > 0
                                 ? membership.roleNames
                                 : membership.roleKeys
@@ -867,30 +867,30 @@ export default function PlatformUsersPage() {
               className="grid gap-4 md:grid-cols-2"
               onSubmit={handleAssignMembership}
             >
-              <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#21300f]">Organizacion</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={membershipForm.organizationId} onChange={(event) => { const organizationId = event.target.value; setMembershipForm((current) => current ? { ...current, organizationId, roleScopeKey: "" } : current); void loadMembershipRoleOptions(organizationId); }} required><option value="">Selecciona una organizacion</option>{organizations.map((organization) => (<option key={organization.id} value={organization.id}>{organization.tradeName ?? organization.legalName}</option>))}</select></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Rol</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={membershipForm.roleScopeKey} onChange={(event) => setMembershipForm((current) => current ? { ...current, roleScopeKey: event.target.value } : current)}><option value="">Sin rol inicial</option>{membershipRoleOptions.map((role) => (<option key={role.id} value={role.scopeKey}>{role.isSystem === false ? "Personalizado - " : ""}{role.name}</option>))}</select></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado membership</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={membershipForm.status} onChange={(event) => setMembershipForm((current) => current ? { ...current, status: event.target.value as typeof membershipForm.status } : current)}><option value="ACTIVE">Activa</option><option value="INVITED">Invitada</option><option value="SUSPENDED">Suspendida</option><option value="INACTIVE">Inactiva</option><option value="TERMINATED">Terminada</option></select></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Cargo</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={membershipForm.title} onChange={(event) => setMembershipForm((current) => current ? { ...current, title: event.target.value } : current)} /></label>
-              <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Codigo interno</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={membershipForm.employeeCode} onChange={(event) => setMembershipForm((current) => current ? { ...current, employeeCode: event.target.value } : current)} /></label>
+              <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Organizacion</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={membershipForm.organizationId} onChange={(event) => { const organizationId = event.target.value; setMembershipForm((current) => current ? { ...current, organizationId, roleScopeKey: "" } : current); void loadMembershipRoleOptions(organizationId); }} required><option value="">Selecciona una organizacion</option>{organizations.map((organization) => (<option key={organization.id} value={organization.id}>{organization.tradeName ?? organization.legalName}</option>))}</select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Rol</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={membershipForm.roleScopeKey} onChange={(event) => setMembershipForm((current) => current ? { ...current, roleScopeKey: event.target.value } : current)}><option value="">Sin rol inicial</option>{membershipRoleOptions.map((role) => (<option key={role.id} value={role.scopeKey}>{role.isSystem === false ? "Personalizado - " : ""}{role.name}</option>))}</select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Estado membership</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={membershipForm.status} onChange={(event) => setMembershipForm((current) => current ? { ...current, status: event.target.value as typeof membershipForm.status } : current)}><option value="ACTIVE">Activa</option><option value="INVITED">Invitada</option><option value="SUSPENDED">Suspendida</option><option value="INACTIVE">Inactiva</option><option value="TERMINATED">Terminada</option></select></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Cargo</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={membershipForm.title} onChange={(event) => setMembershipForm((current) => current ? { ...current, title: event.target.value } : current)} /></label>
+              <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Codigo interno</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={membershipForm.employeeCode} onChange={(event) => setMembershipForm((current) => current ? { ...current, employeeCode: event.target.value } : current)} /></label>
             </form>
           ) : (
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <article className="rounded-[28px] border border-[#e7edd5] bg-white/90 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Identidad
                   </p>
                   <p className="mt-3 text-2xl font-semibold text-[#18200f]">
                     {selectedUser.name ?? "Sin nombre"}
                   </p>
-                  <p className="mt-2 text-sm text-[#61704c]">
+                  <p className="mt-2 text-sm text-[#535353]">
                     {[selectedUser.email, selectedUser.identifier].filter(Boolean).join(" · ") ||
                       "Sin identificador"}
                   </p>
                 </article>
 
                 <article className="rounded-[28px] border border-[#e7edd5] bg-[linear-gradient(135deg,#fcffe9_0%,#f6fadf_100%)] p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Alcance
                   </p>
                   <div className="mt-4 flex flex-wrap gap-2">
@@ -912,7 +912,7 @@ export default function PlatformUsersPage() {
                 </article>
               </div>
 
-              <article className="rounded-[26px] border border-[#edf1e4] bg-[#fbfcf8] p-5">
+              <article className="rounded-[26px] border border-[#E4E4E4] bg-[#F8F8F8] p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8a9668]">
                   Organizaciones vinculadas
                 </p>
@@ -943,7 +943,7 @@ export default function PlatformUsersPage() {
                             </Tag>
                           ))}
                         </div>
-                        <p className="mt-3 text-sm text-[#61704c]">
+                        <p className="mt-3 text-sm text-[#535353]">
                           {membership.permissionKeys.length} permisos efectivos en esta organizacion.
                         </p>
                         <div className="mt-3 flex max-h-28 flex-wrap gap-2 overflow-y-auto pr-1">
@@ -956,14 +956,14 @@ export default function PlatformUsersPage() {
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-[#61704c]">
+                    <p className="text-sm text-[#535353]">
                       Sin relaciones activas por ahora.
                     </p>
                   )}
                 </div>
               </article>
 
-              <article className="rounded-[26px] border border-[#edf1e4] bg-white p-5">
+              <article className="rounded-[26px] border border-[#E4E4E4] bg-white p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8a9668]">
                   Plataforma Kapos
                 </p>
@@ -977,12 +977,12 @@ export default function PlatformUsersPage() {
                     </Tag>
                   ))}
                   {selectedUser.platformRoleScopeKeys.length === 0 ? (
-                    <p className="text-sm text-[#61704c]">
+                    <p className="text-sm text-[#535353]">
                       Este usuario no tiene acceso de plataforma.
                     </p>
                   ) : null}
                 </div>
-                <p className="mt-4 text-sm text-[#61704c]">
+                <p className="mt-4 text-sm text-[#535353]">
                   {selectedUser.platformPermissionKeys.length} permisos de plataforma.{" "}
                   {selectedUser.effectivePermissionKeys.length} permisos efectivos en total.
                 </p>

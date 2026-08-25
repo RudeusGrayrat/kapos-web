@@ -18,7 +18,7 @@ import {
 import type { BillingProviderConfigSummary } from "../../../types/erp";
 
 const inputClass =
-  "w-full rounded-[18px] border border-[#dfe7cf] bg-white px-4 py-3 text-sm text-[#1f2813] outline-none transition focus:border-[#a9cf24]";
+  "w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#00C70D]";
 
 const emptyProvider: BillingProviderConfigSummary & { token: string } = {
   provider: "NUBEFACT_PSE",
@@ -163,7 +163,7 @@ export default function ProveedoresFiscalesPage() {
         eyebrow="Finanzas"
         title="Proveedores fiscales"
         description="Administra la integración fiscal sin amarrar el ERP a un proveedor específico."
-        action={!provider.configured && canCreateProvider ? <AdminActionButton tone="primary" icon={<Settings2 className="h-4 w-4" />} onClick={openCreateProvider}>Crear proveedor</AdminActionButton> : <PlugZap className="h-6 w-6 text-[#6d8a20]" />}
+        action={!provider.configured && canCreateProvider ? <AdminActionButton tone="primary" icon={<Settings2 className="h-4 w-4" />} onClick={openCreateProvider}>Crear proveedor</AdminActionButton> : <PlugZap className="h-6 w-6 text-[#00C70D]" />}
         stats={[
           { label: "Estado", value: providerStatus, hint: "Controla si se puede emitir electrónicamente.", tone: provider.enabled ? "accent" : "dark" },
           { label: "Ambiente", value: provider.environment === "TEST" ? "Prueba" : "Producción", hint: "Separado de series y comprobantes." },
@@ -179,7 +179,7 @@ export default function ProveedoresFiscalesPage() {
         description="Hoy puede ser Nubefact/PSE; mañana puede ser SUNAT directo o un servicio propio sin cambiar la arquitectura del módulo."
         action={<Tag tone={provider.enabled ? "accent" : "warn"}>{providerStatus}</Tag>}
       >
-        <div className="rounded-[20px] border border-[#e6ebd9] bg-[#fbfcf7] p-5">
+        <div className="rounded-[20px] border border-[#e6ebd9] bg-[#F8F8F8] p-5">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#839052]">Proveedor</p>

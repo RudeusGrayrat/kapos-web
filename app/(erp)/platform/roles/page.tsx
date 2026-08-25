@@ -317,8 +317,8 @@ export default function PlatformRolesPage() {
                 label: "Rol",
                 render: (role) => (
                   <div>
-                    <p className="font-semibold text-[#1b2111]">{role.name}</p>
-                    <p className="text-xs text-[#7a845f]">{role.key}</p>
+                    <p className="font-semibold text-[#0D0D0D]">{role.name}</p>
+                    <p className="text-xs text-[#A1A1A1]">{role.key}</p>
                   </div>
                 ),
               },
@@ -359,9 +359,9 @@ export default function PlatformRolesPage() {
         <div className="grid gap-5 xl:grid-cols-[0.8fr_1.2fr]">
           <form className="space-y-4" onSubmit={handleCreateOrganizationRole}>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Organizacion</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Organizacion</span>
               <select
-                className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 value={selectedOrganizationId}
                 onChange={(event) => void loadOrganizationRoles(event.target.value)}
               >
@@ -374,9 +374,9 @@ export default function PlatformRolesPage() {
               </select>
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Key del rol</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Key del rol</span>
               <input
-                className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 placeholder="cashier.with_discounts"
                 value={organizationRoleForm.key}
                 onChange={(event) =>
@@ -389,9 +389,9 @@ export default function PlatformRolesPage() {
               />
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Nombre</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span>
               <input
-                className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 placeholder="Cajero con descuentos"
                 value={organizationRoleForm.name}
                 onChange={(event) =>
@@ -404,9 +404,9 @@ export default function PlatformRolesPage() {
               />
             </label>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Descripcion</span>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span>
               <input
-                className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]"
+                className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
                 placeholder="Puede operar POS y aplicar descuentos autorizados."
                 value={organizationRoleForm.description}
                 onChange={(event) =>
@@ -423,8 +423,8 @@ export default function PlatformRolesPage() {
                   modulePermissions.some((permission) => permission.audience !== "PLATFORM"),
                 )
                 .map(([moduleKey, modulePermissions]) => (
-                  <article key={moduleKey} className="rounded-[22px] border border-[#edf1e4] bg-[#fbfcf8] p-3">
-                    <p className="font-semibold text-[#1b2111]">
+                  <article key={moduleKey} className="rounded-[22px] border border-[#E4E4E4] bg-[#F8F8F8] p-3">
+                    <p className="font-semibold text-[#0D0D0D]">
                       {humanizeCatalogKey(moduleKey)}
                     </p>
                     <div className="mt-3 flex flex-wrap gap-2">
@@ -472,11 +472,11 @@ export default function PlatformRolesPage() {
           <div className="space-y-3">
             {organizationRoles.length > 0 ? (
               organizationRoles.map((role) => (
-                <article key={role.id} className="rounded-[24px] border border-[#edf1e4] bg-white px-4 py-4">
+                <article key={role.id} className="rounded-[24px] border border-[#E4E4E4] bg-white px-4 py-4">
                   <div className="flex items-center justify-between gap-3">
                     <div>
-                      <p className="font-semibold text-[#1b2111]">{role.name}</p>
-                      <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[#7a845f]">
+                      <p className="font-semibold text-[#0D0D0D]">{role.name}</p>
+                      <p className="mt-1 text-xs uppercase tracking-[0.14em] text-[#A1A1A1]">
                         {role.scopeKey}
                       </p>
                     </div>
@@ -541,22 +541,22 @@ export default function PlatformRolesPage() {
             >
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Nombre</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.name} onChange={(event) => setEditForm((current) => current ? { ...current, name: event.target.value } : current)} required />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.name} onChange={(event) => setEditForm((current) => current ? { ...current, name: event.target.value } : current)} required />
                 </label>
                 <label className="space-y-2">
-                  <span className="text-sm font-semibold text-[#21300f]">Descripcion</span>
-                  <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.description} onChange={(event) => setEditForm((current) => current ? { ...current, description: event.target.value } : current)} />
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.description} onChange={(event) => setEditForm((current) => current ? { ...current, description: event.target.value } : current)} />
                 </label>
               </div>
 
               <div className="space-y-3">
-                <p className="text-sm font-semibold text-[#21300f]">Permisos activos</p>
+                <p className="text-sm font-semibold text-[#0D0D0D]">Permisos activos</p>
                 <div className="space-y-4">
                   {Object.entries(groupedPermissions).map(([moduleKey, modulePermissions]) => (
-                    <article key={moduleKey} className="rounded-[24px] border border-[#edf1e4] bg-[#fbfcf8] p-4">
+                    <article key={moduleKey} className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
                       <div className="flex items-center gap-2">
-                        <p className="font-semibold text-[#1b2111]">
+                        <p className="font-semibold text-[#0D0D0D]">
                           {humanizeCatalogKey(moduleKey)}
                         </p>
                         <Tag tone="soft">{modulePermissions.length} permisos</Tag>
@@ -598,18 +598,18 @@ export default function PlatformRolesPage() {
             <div className="space-y-4">
               <div className="grid gap-4 md:grid-cols-2">
                 <article className="rounded-[28px] border border-[#e7edd5] bg-white/90 p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Rol
                   </p>
                   <p className="mt-3 text-2xl font-semibold text-[#18200f]">
                     {selectedRole.name}
                   </p>
-                  <p className="mt-2 text-sm text-[#61704c]">
+                  <p className="mt-2 text-sm text-[#535353]">
                     {selectedRole.description ?? "Sin descripcion"}
                   </p>
                 </article>
                 <article className="rounded-[28px] border border-[#e7edd5] bg-[linear-gradient(135deg,#fcffe9_0%,#f6fadf_100%)] p-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#8ba23f]">
+                  <p className="text-xs font-semibold uppercase tracking-[0.26em] text-[#00C70D]">
                     Contexto
                   </p>
                   <div className="mt-4">
@@ -617,13 +617,13 @@ export default function PlatformRolesPage() {
                       {formatRoleContext(selectedRole.context)}
                     </Tag>
                   </div>
-                  <p className="mt-4 text-sm leading-7 text-[#53613d]">
+                  <p className="mt-4 text-sm leading-7 text-[#535353]">
                     {selectedRole.permissionCount} permisos y {selectedRole.memberCount} miembros asociados.
                   </p>
                 </article>
               </div>
 
-              <article className="rounded-[26px] border border-[#edf1e4] bg-[#fbfcf8] p-5">
+              <article className="rounded-[26px] border border-[#E4E4E4] bg-[#F8F8F8] p-5">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8a9668]">
                   Permisos ligados
                 </p>
@@ -635,7 +635,7 @@ export default function PlatformRolesPage() {
                       </Tag>
                     ))
                   ) : (
-                    <p className="text-sm text-[#61704c]">Este rol no tiene permisos ligados todavia.</p>
+                    <p className="text-sm text-[#535353]">Este rol no tiene permisos ligados todavia.</p>
                   )}
                 </div>
               </article>

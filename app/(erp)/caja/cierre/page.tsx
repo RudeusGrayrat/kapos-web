@@ -132,24 +132,24 @@ export default function CajaCierrePage() {
         <PanelCard title="Cerrar caja" description="Este cierre bloquea nuevos movimientos en la sesion.">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <label className="space-y-2">
-              <span className="text-sm font-semibold text-[#21300f]">Caja abierta</span>
-              <select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={selectedSessionId} onChange={(event) => handleSelectSession(event.target.value)} required>
+              <span className="text-sm font-semibold text-[#0D0D0D]">Caja abierta</span>
+              <select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={selectedSessionId} onChange={(event) => handleSelectSession(event.target.value)} required>
                 <option value="">Selecciona caja</option>
                 {openSessions.map((session) => <option key={session.id} value={session.id}>{session.cashRegister?.name} - {session.branch?.name}</option>)}
               </select>
             </label>
             <div className="grid gap-3 sm:grid-cols-2">
-              <div className="rounded-[24px] border border-[#edf1e4] bg-[#fbfcf8] p-4">
+              <div className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-[#7a8b45]">Esperado</p>
                 <p className="mt-2 text-2xl font-black text-[#10140b]">S/ {expectedAmount.toFixed(2)}</p>
               </div>
-              <div className="rounded-[24px] border border-[#edf1e4] bg-[#fbfcf8] p-4">
+              <div className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
                 <p className="text-xs uppercase tracking-[0.2em] text-[#7a8b45]">Diferencia</p>
                 <p className="mt-2 text-2xl font-black text-[#10140b]">S/ {differenceAmount.toFixed(2)}</p>
               </div>
             </div>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Efectivo contado</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.countedAmount} onChange={(event) => setForm((current) => ({ ...current, countedAmount: event.target.value }))} /></label>
-            <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nota de cierre</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={form.closingNote} onChange={(event) => setForm((current) => ({ ...current, closingNote: event.target.value }))} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Efectivo contado</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.countedAmount} onChange={(event) => setForm((current) => ({ ...current, countedAmount: event.target.value }))} /></label>
+            <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nota de cierre</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.closingNote} onChange={(event) => setForm((current) => ({ ...current, closingNote: event.target.value }))} /></label>
             <div className="flex justify-end"><AdminActionButton type="submit" tone="primary" icon={<PlusIcon />} disabled={!selectedSession}>Cerrar caja</AdminActionButton></div>
           </form>
         </PanelCard>
@@ -164,7 +164,7 @@ export default function CajaCierrePage() {
             emptyTitle="Aun no hay cierres"
             emptyDescription="Cuando cierres una caja, aparecera aqui."
             columns={[
-              { key: "cash", label: "Caja", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.cashRegister?.name}</p><p className="text-xs text-[#7a845f]">{row.branch?.name}</p></div> },
+              { key: "cash", label: "Caja", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.cashRegister?.name}</p><p className="text-xs text-[#A1A1A1]">{row.branch?.name}</p></div> },
               { key: "expected", label: "Esperado", align: "right", render: (row) => `S/ ${(row.expectedAmount ?? 0).toFixed(2)}` },
               { key: "counted", label: "Contado", align: "right", render: (row) => `S/ ${(row.countedAmount ?? 0).toFixed(2)}` },
               { key: "diff", label: "Diferencia", render: (row) => <Tag tone={(row.differenceAmount ?? 0) === 0 ? "accent" : "warn"}>S/ {(row.differenceAmount ?? 0).toFixed(2)}</Tag> },

@@ -137,8 +137,8 @@ export default function ConfigSucursalesPage() {
               ["phone", "Telefono", "+51 999 999 999"],
             ].map(([key, label, placeholder]) => (
               <label key={key} className="space-y-2">
-                <span className="text-sm font-semibold text-[#21300f]">{label}</span>
-                <input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" placeholder={placeholder} value={form[key as keyof typeof form]} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} required={key === "name"} />
+                <span className="text-sm font-semibold text-[#0D0D0D]">{label}</span>
+                <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder={placeholder} value={form[key as keyof typeof form]} onChange={(event) => setForm((current) => ({ ...current, [key]: event.target.value }))} required={key === "name"} />
               </label>
             ))}
             <div className="flex justify-end">
@@ -157,7 +157,7 @@ export default function ConfigSucursalesPage() {
             emptyTitle="Aun no hay sucursales"
             emptyDescription="Crea la primera sede para poder manejar stock y caja."
             columns={[
-              { key: "name", label: "Sucursal", render: (row) => <div><p className="font-semibold text-[#1b2111]">{row.name}</p><p className="text-xs text-[#7a845f]">{row.code ?? "sin codigo"}</p></div> },
+              { key: "name", label: "Sucursal", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.name}</p><p className="text-xs text-[#A1A1A1]">{row.code ?? "sin codigo"}</p></div> },
               { key: "address", label: "Direccion", render: (row) => row.address ?? "Sin direccion" },
               { key: "phone", label: "Telefono", render: (row) => row.phone ?? "Sin telefono" },
               { key: "status", label: "Estado", render: (row) => <Tag tone={row.status === "ACTIVE" ? "accent" : "soft"}>{row.status}</Tag> },
@@ -185,11 +185,11 @@ export default function ConfigSucursalesPage() {
         }
       >
         <form id="branch-edit-form" className="grid gap-4 md:grid-cols-2" onSubmit={handleUpdateBranch}>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Codigo</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.code} onChange={(event) => setEditForm((current) => ({ ...current, code: event.target.value }))} /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Nombre</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} required /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Direccion</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.address} onChange={(event) => setEditForm((current) => ({ ...current, address: event.target.value }))} /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Telefono</span><input className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.phone} onChange={(event) => setEditForm((current) => ({ ...current, phone: event.target.value }))} /></label>
-          <label className="space-y-2"><span className="text-sm font-semibold text-[#21300f]">Estado</span><select className="w-full rounded-[20px] border border-[#e2e8d0] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#a9cf24]" value={editForm.status} onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value as BranchSummary["status"] }))}><option value="ACTIVE">Activa</option><option value="INACTIVE">Inactiva</option><option value="CLOSED">Cerrada</option></select></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Codigo</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.code} onChange={(event) => setEditForm((current) => ({ ...current, code: event.target.value }))} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} required /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Direccion</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.address} onChange={(event) => setEditForm((current) => ({ ...current, address: event.target.value }))} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Telefono</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.phone} onChange={(event) => setEditForm((current) => ({ ...current, phone: event.target.value }))} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Estado</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.status} onChange={(event) => setEditForm((current) => ({ ...current, status: event.target.value as BranchSummary["status"] }))}><option value="ACTIVE">Activa</option><option value="INACTIVE">Inactiva</option><option value="CLOSED">Cerrada</option></select></label>
         </form>
       </AdminOverlayPanel>
     </section>
