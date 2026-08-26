@@ -205,7 +205,9 @@ export default function FacturacionPage() {
         eyebrow="Auditoria fiscal"
         title={documentName(detailDocument)}
         description="Detalle operativo del comprobante y respuesta guardada del proveedor fiscal."
-        footer={<div className="flex justify-end"><AdminActionButton onClick={() => setDetailDocument(null)}>Cerrar</AdminActionButton></div>}
+        footer={<div className="flex justify-end">
+          <AdminActionButton onClick={() => setDetailDocument(null)}>Cerrar</AdminActionButton>
+        </div>}
       >
         <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-[24px] border border-[var(--kapos-border)] bg-[var(--kapos-card-alt)] p-5">

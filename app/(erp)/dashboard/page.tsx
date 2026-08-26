@@ -28,7 +28,7 @@ import {
   X,
   Zap,
 } from "lucide-react";
-import { AdminActionButton } from "../../components/admin/AdminActionButton";
+import { AdminActionButton, PlusIcon } from "../../components/admin/AdminActionButton";
 import {
   AdminMessage,
   AdminPageHeader,
@@ -152,39 +152,39 @@ export default function DashboardPage() {
 
   const effectiveLayoutItems = dashboard
     ? normalizeDraftLayoutItems({
-        dashboard,
-        widgetKeys: isConfigOpen
-          ? selectedWidgetKeys
-          : dashboard.preferences.selectedWidgetKeys,
-        shortcutKeys: isConfigOpen
-          ? selectedShortcutKeys
-          : dashboard.preferences.selectedShortcutKeys,
-        currentLayoutItems: isConfigOpen
-          ? draftLayoutItems
-          : dashboard.preferences.layoutItems,
-      })
+      dashboard,
+      widgetKeys: isConfigOpen
+        ? selectedWidgetKeys
+        : dashboard.preferences.selectedWidgetKeys,
+      shortcutKeys: isConfigOpen
+        ? selectedShortcutKeys
+        : dashboard.preferences.selectedShortcutKeys,
+      currentLayoutItems: isConfigOpen
+        ? draftLayoutItems
+        : dashboard.preferences.layoutItems,
+    })
     : [];
   const homeItems = dashboard
     ? buildHomeItems({
-        dashboard,
-        layoutItems: effectiveLayoutItems,
-        widgetKeys: isConfigOpen
-          ? selectedWidgetKeys
-          : dashboard.preferences.selectedWidgetKeys,
-        shortcutKeys: isConfigOpen
-          ? selectedShortcutKeys
-          : dashboard.preferences.selectedShortcutKeys,
-        allowDraftWidgets: isConfigOpen,
-      })
+      dashboard,
+      layoutItems: effectiveLayoutItems,
+      widgetKeys: isConfigOpen
+        ? selectedWidgetKeys
+        : dashboard.preferences.selectedWidgetKeys,
+      shortcutKeys: isConfigOpen
+        ? selectedShortcutKeys
+        : dashboard.preferences.selectedShortcutKeys,
+      allowDraftWidgets: isConfigOpen,
+    })
     : [];
   const isPlatformDashboard = dashboard?.context.scope === "PLATFORM";
   const hasAnyContext = Boolean(activeOrganizationId || platformContext);
   const selectedCellCount = dashboard
     ? calculateSelectedCellCount({
-        widgetKeys: selectedWidgetKeys,
-        shortcutKeys: selectedShortcutKeys,
-        dashboard,
-      })
+      widgetKeys: selectedWidgetKeys,
+      shortcutKeys: selectedShortcutKeys,
+      dashboard,
+    })
     : 0;
 
   function toggleWidget(widgetKey: string) {
@@ -192,7 +192,7 @@ export default function DashboardPage() {
       dashboard &&
       !selectedWidgetKeys.includes(widgetKey) &&
       selectedCellCount + getWidgetDefinitionCells(dashboard, widgetKey) >
-        dashboardGrid.capacity
+      dashboardGrid.capacity
     ) {
       showError("Tu dashboard esta lleno. Quita algo antes de agregar otro widget.", "Sin espacio");
       return;
@@ -331,6 +331,7 @@ export default function DashboardPage() {
             </select>
             <AdminActionButton
               tone="primary"
+              icon={<PlusIcon />}
               onClick={() => {
                 if (dashboard) {
                   setSelectedWidgetKeys(dashboard.preferences.selectedWidgetKeys);
@@ -340,14 +341,13 @@ export default function DashboardPage() {
                 setIsConfigOpen(true);
               }}
             >
-              <Plus className="h-4 w-4" />
               Configurar
             </AdminActionButton>
             <AdminActionButton
               tone="secondary"
+              icon={<RefreshCcw />}
               onClick={() => void loadDashboard()}
             >
-              <RefreshCcw className="h-4 w-4" />
               Actualizar
             </AdminActionButton>
           </div>
@@ -473,11 +473,10 @@ function DashboardHomeItem({
 
   return (
     <div
-      className={`relative min-w-0 transition ${
-        isEditing
-          ? "cursor-grab rounded-[28px] ring-2 ring-[var(--kapos-green)]/20 hover:ring-[var(--kapos-green)]/45 active:cursor-grabbing"
-          : ""
-      } ${isDragging ? "scale-[0.98] opacity-60" : ""}`}
+      className={`relative min-w-0 transition ${isEditing
+        ? "cursor-grab rounded-[28px] ring-2 ring-[var(--kapos-green)]/20 hover:ring-[var(--kapos-green)]/45 active:cursor-grabbing"
+        : ""
+        } ${isDragging ? "scale-[0.98] opacity-60" : ""}`}
       style={style}
       draggable={isEditing}
       onDragStart={onDragStart}
@@ -636,18 +635,16 @@ function ConfigOption({
     <button
       type="button"
       onClick={onClick}
-      className={`flex min-h-20 items-center gap-3 rounded-[20px] border px-4 py-3 text-left transition ${
-        isSelected
-          ? "border-[var(--kapos-green)] bg-[var(--kapos-green-wash)]"
-          : "border-[var(--kapos-border)] bg-white hover:border-[var(--kapos-green)]"
-      }`}
+      className={`flex min-h-20 items-center gap-3 rounded-[20px] border px-4 py-3 text-left transition ${isSelected
+        ? "border-[var(--kapos-green)] bg-[var(--kapos-green-wash)]"
+        : "border-[var(--kapos-border)] bg-white hover:border-[var(--kapos-green)]"
+        }`}
     >
       <span
-        className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${
-          isSelected
-            ? "bg-[var(--kapos-green)] text-white"
-            : "bg-[var(--kapos-card-alt)] text-transparent"
-        }`}
+        className={`grid h-8 w-8 shrink-0 place-items-center rounded-full ${isSelected
+          ? "bg-[var(--kapos-green)] text-white"
+          : "bg-[var(--kapos-card-alt)] text-transparent"
+          }`}
       >
         <Check className="h-4 w-4" />
       </span>
@@ -721,20 +718,18 @@ function MetricWidget({ widget }: { widget: DashboardMetricWidget }) {
     >
       <div className="flex items-start justify-between gap-4">
         <span
-          className={`grid h-9 w-9 place-items-center rounded-[14px] ${
-            moduleIconClass[widget.moduleKey] ??
+          className={`grid h-9 w-9 place-items-center rounded-[14px] ${moduleIconClass[widget.moduleKey] ??
             "bg-[var(--kapos-green-wash)] text-[var(--kapos-green-dark)]"
-          }`}
+            }`}
         >
           {iconForModule(widget.moduleKey)}
         </span>
         {widget.trend !== undefined && widget.trend !== null ? (
           <span
-            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${
-              widget.trend >= 0
-                ? "bg-[color-mix(in_srgb,var(--kapos-green)_13%,white)] text-[var(--kapos-green-dark)]"
-                : "bg-[color-mix(in_srgb,#ef4444_12%,white)] text-[#dc2626]"
-            }`}
+            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${widget.trend >= 0
+              ? "bg-[color-mix(in_srgb,var(--kapos-green)_13%,white)] text-[var(--kapos-green-dark)]"
+              : "bg-[color-mix(in_srgb,#ef4444_12%,white)] text-[#dc2626]"
+              }`}
           >
             {widget.trend >= 0 ? (
               <TrendingUp className="h-3.5 w-3.5" />
@@ -747,23 +742,20 @@ function MetricWidget({ widget }: { widget: DashboardMetricWidget }) {
       </div>
       <div>
         <p
-          className={`truncate text-xs font-medium ${
-            isDark ? "text-white/68" : "text-[var(--kapos-text-soft)]"
-          }`}
+          className={`truncate text-xs font-medium ${isDark ? "text-white/68" : "text-[var(--kapos-text-soft)]"
+            }`}
         >
           {widget.title}
         </p>
         <strong
-          className={`mt-1 block truncate text-2xl font-semibold tracking-normal ${
-            isDark ? "text-white" : "text-[var(--kapos-text)]"
-          }`}
+          className={`mt-1 block truncate text-2xl font-semibold tracking-normal ${isDark ? "text-white" : "text-[var(--kapos-text)]"
+            }`}
         >
           {widget.value}
         </strong>
         <p
-          className={`mt-1 line-clamp-2 text-xs leading-5 ${
-            isDark ? "text-white/62" : "text-[var(--kapos-text-soft)]"
-          }`}
+          className={`mt-1 line-clamp-2 text-xs leading-5 ${isDark ? "text-white/62" : "text-[var(--kapos-text-soft)]"
+            }`}
         >
           {widget.hint}
         </p>
@@ -902,9 +894,8 @@ function ListWidget({ widget }: { widget: DashboardListWidget }) {
                 ) : null}
               </div>
               <span
-                className={`shrink-0 text-sm font-semibold ${
-                  toneTextClass[item.tone ?? widget.tone]
-                }`}
+                className={`shrink-0 text-sm font-semibold ${toneTextClass[item.tone ?? widget.tone]
+                  }`}
               >
                 {item.value}
               </span>
@@ -1012,11 +1003,11 @@ function buildHomeItems(input: {
       const definition = availableWidgets.get(layout.key);
       return definition && allowDraftWidgets
         ? ({
-            layout,
-            kind: "draftWidget",
-            title: definition.title,
-            description: definition.description,
-          } satisfies DashboardHomeItem)
+          layout,
+          kind: "draftWidget",
+          title: definition.title,
+          description: definition.description,
+        } satisfies DashboardHomeItem)
         : null;
     })
     .filter((item): item is DashboardHomeItem => Boolean(item));
