@@ -7,6 +7,8 @@ type AdminImageFieldProps = {
   label: string;
   value: string;
   onChange: (value: string) => void;
+  onUpload?: (file: File) => Promise<{ value: string; detail?: string }>;
+  previewSrc?: string | null;
   description?: string;
   placeholder?: string;
   accept?: string;
@@ -22,7 +24,7 @@ type ProcessedImage = {
   detail: string;
 };
 
-const defaultAccept = "image/png,image/jpeg,image/webp,image/svg+xml";
+const defaultAccept = "image/png,image/jpeg,image/webp,image/avif";
 const defaultMaxBytes = 150 * 1024;
 const defaultMaxWidth = 1200;
 const defaultMaxHeight = 600;
@@ -31,6 +33,8 @@ export function AdminImageField({
   label,
   value,
   onChange,
+  onUpload,
+  previewSrc,
   description,
   placeholder = "https://... o data:image/...",
   accept = defaultAccept,
@@ -44,11 +48,14 @@ export function AdminImageField({
   const [isProcessing, setIsProcessing] = useState(false);
   const [zoom, setZoom] = useState(1);
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const imageSrc = previewSrc ?? value;
 
   const helperText = useMemo(() => {
     const size = formatBytes(maxBytes);
-    return `PNG, JPG, WEBP o SVG. Maximo recomendado: ${size}. Si el raster pesa mas, Kapos intentara optimizarlo.`;
-  }, [maxBytes]);
+    return onUpload
+      ? `PNG, JPG, WEBP o AVIF. Maximo permitido: ${size}. El archivo quedara disponible para tickets, reportes y catalogos.`
+      : `PNG, JPG, WEBP o AVIF. Maximo recomendado: ${size}. Si pesa mas, Kapos intentara optimizarlo.`;
+  }, [maxBytes, onUpload]);
 
   async function handleFileChange(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
@@ -62,9 +69,15 @@ export function AdminImageField({
 
     setIsProcessing(true);
     try {
-      const result = await processImage(file, { maxBytes, maxWidth, maxHeight });
-      onChange(result.dataUrl);
-      onInfo?.(result.detail);
+      if (onUpload) {
+        const result = await onUpload(file);
+        onChange(result.value);
+        onInfo?.(result.detail ?? "Imagen subida correctamente. Guarda para confirmar el cambio.");
+      } else {
+        const result = await processImage(file, { maxBytes, maxWidth, maxHeight });
+        onChange(result.dataUrl);
+        onInfo?.(result.detail);
+      }
     } catch (error) {
       onError?.(error instanceof Error ? error.message : "No se pudo procesar la imagen.");
     } finally {
@@ -73,8 +86,8 @@ export function AdminImageField({
   }
 
   function openImage() {
-    if (!value) return;
-    window.open(value, "_blank", "noopener,noreferrer");
+    if (!imageSrc) return;
+    window.open(imageSrc, "_blank", "noopener,noreferrer");
   }
 
   return (
@@ -82,9 +95,9 @@ export function AdminImageField({
       <div className="grid gap-5 lg:grid-cols-[260px_1fr] lg:items-start">
         <div className="space-y-3">
           <div className="flex min-h-40 items-center justify-center overflow-hidden rounded-[24px] border border-[#A1A1A1] bg-white p-4">
-            {value ? (
+            {imageSrc ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={value} alt={label} className="max-h-32 max-w-full object-contain" />
+              <img src={imageSrc} alt={label} className="max-h-32 max-w-full object-contain" />
             ) : (
               <div className="grid place-items-center gap-2 text-center text-sm text-[#A1A1A1]">
                 <ImagePlus className="size-8" />
@@ -176,7 +189,7 @@ export function AdminImageField({
             </div>
             <div className="flex max-h-[60vh] items-center justify-center overflow-auto rounded-[26px] border border-[#A1A1A1] bg-white p-8">
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={value} alt={label} style={{ transform: `scale(${zoom})` }} className="max-h-[46vh] max-w-full object-contain transition-transform" />
+              <img src={imageSrc} alt={label} style={{ transform: `scale(${zoom})` }} className="max-h-[46vh] max-w-full object-contain transition-transform" />
             </div>
             <div className="mt-4 flex flex-wrap items-center gap-3">
               <span className="text-xs font-black text-[#535353]">Zoom</span>
@@ -209,17 +222,6 @@ async function processImage(
   file: File,
   options: { maxBytes: number; maxWidth: number; maxHeight: number },
 ): Promise<ProcessedImage> {
-  if (file.type === "image/svg+xml") {
-    if (file.size > options.maxBytes) {
-      throw new Error(`El SVG pesa ${formatBytes(file.size)}. Usa un archivo menor a ${formatBytes(options.maxBytes)} o pega una URL.`);
-    }
-
-    return {
-      dataUrl: await readFileAsDataUrl(file),
-      detail: `SVG cargado correctamente (${formatBytes(file.size)}). Guarda para confirmar el cambio.`,
-    };
-  }
-
   const originalDataUrl = await readFileAsDataUrl(file);
   if (file.size <= options.maxBytes) {
     return {

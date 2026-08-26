@@ -4,10 +4,12 @@ import { useState } from "react";
 import { AdminActionButton, ArrowLeftIcon, PencilIcon, PlusIcon, TrashIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
 import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
+import { AdminImageField } from "../../../components/admin/AdminImageField";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import { useAuth } from "../../../context/auth-context";
 import { useToast } from "../../../context/toast-context";
-import { createProduct, getOrganizationProfile, getProductCategories, getProducts, updateProduct } from "../../../lib/erp-api";
+import { resolveApiAssetUrl } from "../../../lib/api";
+import { createProduct, getOrganizationProfile, getProductCategories, getProducts, updateProduct, uploadProductCreateImage, uploadProductUpdateImage } from "../../../lib/erp-api";
 import type { ProductCategorySummary, ProductSummary } from "../../../types/erp";
 
 const DEFAULT_TAX_RATE = 18;
@@ -35,6 +37,7 @@ export default function CatalogoProductosPage() {
     type: "PRODUCT" as ProductSummary["type"],
     trackStock: true,
     availableForPos: true,
+    imageUrl: "",
   });
   const [selectedProduct, setSelectedProduct] = useState<ProductSummary | null>(null);
   const [editForm, setEditForm] = useState({
@@ -49,6 +52,7 @@ export default function CatalogoProductosPage() {
     status: "ACTIVE" as ProductSummary["status"],
     trackStock: true,
     availableForPos: true,
+    imageUrl: "",
   });
 
   async function resolveToken() {
@@ -157,6 +161,7 @@ export default function CatalogoProductosPage() {
           type: form.type,
           trackStock: form.trackStock,
           availableForPos: form.availableForPos,
+          imageUrl: form.imageUrl || undefined,
         },
       });
       setForm({
@@ -170,6 +175,7 @@ export default function CatalogoProductosPage() {
         type: "PRODUCT",
         trackStock: true,
         availableForPos: true,
+        imageUrl: "",
       });
       setReloadVersion((current) => current + 1);
       setViewMode("table");
@@ -199,7 +205,46 @@ export default function CatalogoProductosPage() {
       status: product.status,
       trackStock: product.trackStock,
       availableForPos: product.availableForPos,
+      imageUrl: product.imageUrl ?? "",
     });
+  }
+
+  async function uploadCreateImage(file: File) {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId) {
+      throw new Error("No hay organizacion activa.");
+    }
+
+    const asset = await uploadProductCreateImage({
+      accessToken: token,
+      organizationId: activeOrganizationId,
+      file,
+    });
+
+    toast.showSuccess("Imagen subida al catalogo.", "Imagen lista");
+    return {
+      value: asset.url,
+      detail: `Imagen guardada como ${asset.path}. Guarda el producto para asociarla.`,
+    };
+  }
+
+  async function uploadEditImage(file: File) {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId) {
+      throw new Error("No hay organizacion activa.");
+    }
+
+    const asset = await uploadProductUpdateImage({
+      accessToken: token,
+      organizationId: activeOrganizationId,
+      file,
+    });
+
+    toast.showSuccess("Imagen subida al catalogo.", "Imagen lista");
+    return {
+      value: asset.url,
+      detail: `Imagen guardada como ${asset.path}. Guarda los cambios para asociarla.`,
+    };
   }
 
   async function handleUpdateProduct(event: React.FormEvent<HTMLFormElement>) {
@@ -224,6 +269,7 @@ export default function CatalogoProductosPage() {
           status: editForm.status,
           trackStock: editForm.trackStock,
           availableForPos: editForm.availableForPos,
+          imageUrl: editForm.imageUrl || undefined,
         },
       });
       setSelectedProduct(null);
@@ -296,6 +342,19 @@ export default function CatalogoProductosPage() {
             <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.name} onChange={(event) => setForm((current) => ({ ...current, name: event.target.value }))} required /></label>
             <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">SKU</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.sku} onChange={(event) => setForm((current) => ({ ...current, sku: event.target.value }))} /></label>
             <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.description} onChange={(event) => setForm((current) => ({ ...current, description: event.target.value }))} /></label>
+            <AdminImageField
+              label="Imagen del producto"
+              value={form.imageUrl}
+              previewSrc={resolveApiAssetUrl(form.imageUrl)}
+              description="Se usara para catalogo, POS y pantallas donde el equipo necesite reconocer el producto rapido."
+              maxBytes={5 * 1024 * 1024}
+              maxWidth={1600}
+              maxHeight={1600}
+              onUpload={uploadCreateImage}
+              onChange={(imageUrl) => setForm((current) => ({ ...current, imageUrl }))}
+              onError={(message) => toast.showError(message, "Imagen no valida")}
+              onInfo={(message) => toast.showInfo(message, "Imagen preparada")}
+            />
             <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Categoria</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.categoryId} onChange={(event) => setForm((current) => ({ ...current, categoryId: event.target.value }))}><option value="">Sin categoria</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
             <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Tipo</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.type} onChange={(event) => setForm((current) => ({ ...current, type: event.target.value as ProductSummary["type"] }))}>{["PRODUCT", "SERVICE", "INGREDIENT", "COMBO"].map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
             <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Precio de venta</span><input type="number" step="0.01" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.price} onChange={(event) => updateCreatePrice(event.target.value)} /></label>
@@ -336,7 +395,7 @@ export default function CatalogoProductosPage() {
             emptyTitle="Aun no hay productos"
             emptyDescription="Crea productos para empezar a preparar POS e inventario."
             columns={[
-              { key: "name", label: "Producto", render: (row) => <div><p className="font-semibold text-[#0D0D0D]">{row.name}</p><p className="text-xs text-[#A1A1A1]">{row.sku ?? "sin sku"}</p></div> },
+              { key: "name", label: "Producto", render: (row) => <div className="flex items-center gap-3"><div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[16px] border border-[#E4E4E4] bg-[#F8F8F8]">{row.imageUrl ? <img src={resolveApiAssetUrl(row.imageUrl)} alt="" className="h-full w-full object-cover" /> : <span className="text-xs font-black text-[#A1A1A1]">{row.name.slice(0, 2).toUpperCase()}</span>}</div><div><p className="font-semibold text-[#0D0D0D]">{row.name}</p><p className="text-xs text-[#A1A1A1]">{row.sku ?? "sin sku"}</p></div></div> },
               { key: "category", label: "Categoria", render: (row) => row.category?.name ?? "Sin categoria" },
               { key: "type", label: "Tipo", render: (row) => row.type },
               { key: "price", label: "Precio", align: "right", render: (row) => `S/ ${row.price.toFixed(2)}` },
@@ -368,6 +427,21 @@ export default function CatalogoProductosPage() {
           <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Nombre</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.name} onChange={(event) => setEditForm((current) => ({ ...current, name: event.target.value }))} required /></label>
           <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">SKU</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.sku} onChange={(event) => setEditForm((current) => ({ ...current, sku: event.target.value }))} /></label>
           <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span><input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.description} onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))} /></label>
+          <div className="md:col-span-2">
+            <AdminImageField
+              label="Imagen del producto"
+              value={editForm.imageUrl}
+              previewSrc={resolveApiAssetUrl(editForm.imageUrl)}
+              description="Se usara para catalogo, POS y pantallas donde el equipo necesite reconocer el producto rapido."
+              maxBytes={5 * 1024 * 1024}
+              maxWidth={1600}
+              maxHeight={1600}
+              onUpload={uploadEditImage}
+              onChange={(imageUrl) => setEditForm((current) => ({ ...current, imageUrl }))}
+              onError={(message) => toast.showError(message, "Imagen no valida")}
+              onInfo={(message) => toast.showInfo(message, "Imagen preparada")}
+            />
+          </div>
           <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Categoria</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.categoryId} onChange={(event) => setEditForm((current) => ({ ...current, categoryId: event.target.value }))}><option value="">Sin categoria</option>{categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}</select></label>
           <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Tipo</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.type} onChange={(event) => setEditForm((current) => ({ ...current, type: event.target.value as ProductSummary["type"] }))}>{["PRODUCT", "SERVICE", "INGREDIENT", "COMBO"].map((type) => <option key={type} value={type}>{type}</option>)}</select></label>
           <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Precio de venta</span><input type="number" min="0" step="0.01" className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.price} onChange={(event) => updateEditPrice(event.target.value)} /></label>

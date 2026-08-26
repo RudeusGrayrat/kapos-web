@@ -30,8 +30,10 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const headers = new Headers(options.headers);
   const hasBody = options.body !== undefined;
+  const isFormData =
+    typeof FormData !== "undefined" && options.body instanceof FormData;
 
-  if (hasBody && !headers.has("Content-Type")) {
+  if (hasBody && !isFormData && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
 
@@ -43,7 +45,11 @@ export async function apiRequest<T>(
     method: options.method ?? (hasBody ? "POST" : "GET"),
     headers,
     credentials: "include",
-    body: hasBody ? JSON.stringify(options.body) : undefined,
+    body: hasBody
+      ? isFormData
+        ? (options.body as BodyInit)
+        : JSON.stringify(options.body)
+      : undefined,
     cache: "no-store",
     signal: options.signal,
   });
@@ -63,6 +69,24 @@ export async function apiRequest<T>(
 
 export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
+}
+
+export function resolveApiAssetUrl(value: string | null | undefined): string {
+  if (!value) return "";
+  if (
+    value.startsWith("http://") ||
+    value.startsWith("https://") ||
+    value.startsWith("data:") ||
+    value.startsWith("blob:")
+  ) {
+    return value;
+  }
+
+  if (value.startsWith("/")) {
+    return `${getApiBaseUrl().replace(/\/api\/?$/, "")}${value}`;
+  }
+
+  return value;
 }
 
 function getApiBaseUrl(): string {

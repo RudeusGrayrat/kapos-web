@@ -121,7 +121,7 @@ export default function PerfilPage() {
         <AdminMessage title="No pudimos guardar" description={error} tone="warn" />
       ) : null}
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(340px,0.95fr)]">
+      <div className="grid gap-6">
         <PanelCard
           title="Datos personales"
           description="Estos datos identifican al usuario en accesos, reportes internos y trazabilidad operativa."
@@ -255,7 +255,7 @@ export default function PerfilPage() {
         </div>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+      <div className="grid gap-6">
         <PanelCard
           title="Organizaciones"
           description="Selecciona el contexto en el que trabajas dentro del ERP."

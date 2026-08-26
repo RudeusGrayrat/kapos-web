@@ -66,6 +66,14 @@ export type ProductSummary = {
   stockItems: ProductStockSummary[];
 };
 
+export type UploadedAssetSummary = {
+  path: string;
+  url: string;
+  originalName: string;
+  mimeType: string;
+  size: number;
+};
+
 export type ProductStockSummary = {
   id: string;
   productId: string;
@@ -481,6 +489,15 @@ export type DashboardWidgetDefinition = {
   defaultSize: "sm" | "md" | "lg";
 };
 
+export type DashboardLayoutItem = {
+  key: string;
+  type: "widget" | "shortcut";
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
 export type DashboardMetricWidget = {
   key: string;
   type: "metric";
@@ -547,7 +564,13 @@ export type DashboardSummary = {
     moduleKeys: string[];
     permissionCount: number;
   };
+  preferences: {
+    selectedWidgetKeys: string[];
+    selectedShortcutKeys: string[];
+    layoutItems: DashboardLayoutItem[];
+  };
   availableWidgets: DashboardWidgetDefinition[];
+  availableShortcuts: DashboardShortcut[];
   widgets: DashboardWidget[];
   shortcuts: DashboardShortcut[];
   notifications: DashboardNotification[];

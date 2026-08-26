@@ -14,6 +14,7 @@ import type {
   ProductCategorySummary,
   ProductStockSummary,
   ProductSummary,
+  UploadedAssetSummary,
   CustomerSummary,
   DiningAreaSummary,
   DiningTableSummary,
@@ -61,6 +62,29 @@ export function getDashboard(input: {
   );
 }
 
+export function updateDashboardPreferences(input: {
+  accessToken: string;
+  organizationId?: string | null;
+  body: {
+    selectedWidgetKeys?: string[];
+    selectedShortcutKeys?: string[];
+    layoutItems?: DashboardSummary["preferences"]["layoutItems"];
+  };
+}) {
+  return apiRequest<{
+    selectedWidgetKeys: string[];
+    selectedShortcutKeys: string[];
+    layoutItems: DashboardSummary["preferences"]["layoutItems"];
+  }>("/erp/dashboard/preferences", {
+    method: "PATCH",
+    accessToken: input.accessToken,
+    headers: input.organizationId
+      ? organizationHeaders(input.organizationId)
+      : undefined,
+    body: input.body,
+  });
+}
+
 export function getOrganizationProfile(input: OrganizationRequestInput) {
   return apiRequest<OrganizationProfile>("/erp/settings/organization", {
     accessToken: input.accessToken,
@@ -76,6 +100,20 @@ export function updateOrganizationProfile(
     accessToken: input.accessToken,
     headers: organizationHeaders(input.organizationId),
     body: input.body,
+  });
+}
+
+export function uploadOrganizationLogo(
+  input: OrganizationRequestInput & { file: File },
+) {
+  const body = new FormData();
+  body.set("file", input.file);
+
+  return apiRequest<UploadedAssetSummary>("/erp/uploads/organization/logo", {
+    method: "POST",
+    accessToken: input.accessToken,
+    headers: organizationHeaders(input.organizationId),
+    body,
   });
 }
 
@@ -216,6 +254,23 @@ export function createProduct(
   });
 }
 
+export function uploadProductCreateImage(
+  input: OrganizationRequestInput & { file: File },
+) {
+  const body = new FormData();
+  body.set("file", input.file);
+
+  return apiRequest<UploadedAssetSummary>(
+    "/erp/uploads/products/create-image",
+    {
+      method: "POST",
+      accessToken: input.accessToken,
+      headers: organizationHeaders(input.organizationId),
+      body,
+    },
+  );
+}
+
 export function updateProduct(
   input: OrganizationRequestInput & { productId: string; body: Partial<ProductSummary> },
 ) {
@@ -225,6 +280,23 @@ export function updateProduct(
     headers: organizationHeaders(input.organizationId),
     body: input.body,
   });
+}
+
+export function uploadProductUpdateImage(
+  input: OrganizationRequestInput & { file: File },
+) {
+  const body = new FormData();
+  body.set("file", input.file);
+
+  return apiRequest<UploadedAssetSummary>(
+    "/erp/uploads/products/update-image",
+    {
+      method: "POST",
+      accessToken: input.accessToken,
+      headers: organizationHeaders(input.organizationId),
+      body,
+    },
+  );
 }
 
 export function getStock(input: OrganizationRequestInput) {

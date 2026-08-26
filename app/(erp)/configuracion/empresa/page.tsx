@@ -6,8 +6,8 @@ import { AdminMessage, AdminModuleHeader, PanelCard } from "../../../components/
 import { AdminImageField } from "../../../components/admin/AdminImageField";
 import { useAuth } from "../../../context/auth-context";
 import { useToast } from "../../../context/toast-context";
-import { getOrganizationProfile, updateOrganizationProfile } from "../../../lib/erp-api";
-import { isApiError } from "../../../lib/api";
+import { getOrganizationProfile, updateOrganizationProfile, uploadOrganizationLogo } from "../../../lib/erp-api";
+import { isApiError, resolveApiAssetUrl } from "../../../lib/api";
 import type { OrganizationProfile } from "../../../types/erp";
 
 const currencyOptions = [
@@ -114,6 +114,25 @@ export default function ConfigEmpresaPage() {
     }
   }
 
+  async function uploadLogo(file: File) {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId) {
+      throw new Error("No hay organizacion activa.");
+    }
+
+    const asset = await uploadOrganizationLogo({
+      accessToken: token,
+      organizationId: activeOrganizationId,
+      file,
+    });
+
+    toast.showSuccess("Logo subido a la carpeta de la empresa.", "Logo listo");
+    return {
+      value: asset.url,
+      detail: `Logo guardado como ${asset.path}. Guarda empresa para confirmar el cambio.`,
+    };
+  }
+
   if (!activeOrganizationId) {
     return <AdminMessage title="Sin organizacion activa" description="Selecciona o asigna una organizacion antes de configurar empresa." tone="warn" />;
   }
@@ -182,10 +201,12 @@ export default function ConfigEmpresaPage() {
             <AdminImageField
               label="Logo de empresa"
               value={form.logoUrl}
+              previewSrc={resolveApiAssetUrl(form.logoUrl)}
               description="Se usa como identidad visual de la organizacion en el ERP y queda preparado para tickets, comprobantes, reportes y documentos internos."
-              maxBytes={150 * 1024}
+              maxBytes={5 * 1024 * 1024}
               maxWidth={1200}
               maxHeight={600}
+              onUpload={uploadLogo}
               onChange={(logoUrl) => {
                 setForm((current) => ({ ...current, logoUrl }));
                 setError(null);
