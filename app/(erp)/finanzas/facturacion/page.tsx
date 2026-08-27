@@ -8,7 +8,9 @@ import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../compon
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import { useAuth } from "../../../context/auth-context";
+import { useToast } from "../../../context/toast-context";
 import { getBillingDocuments, issueBillingDocument } from "../../../lib/erp-api";
+import { printBillingDocumentTicket } from "../../../lib/receipt-printing";
 import type { BillingDocumentStatus, BillingDocumentSummary } from "../../../types/erp";
 
 const inputClass =
@@ -33,6 +35,7 @@ function statusTone(status: BillingDocumentStatus): "soft" | "accent" | "dark" |
 
 export default function FacturacionPage() {
   const { accessToken, activeOrganizationId, effectivePermissionKeys, refreshSession } = useAuth();
+  const toast = useToast();
   const [statusFilter, setStatusFilter] = useState<"" | BillingDocumentStatus>("");
   const [documentTotal, setDocumentTotal] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
@@ -40,8 +43,6 @@ export default function FacturacionPage() {
   const [detailDocument, setDetailDocument] = useState<BillingDocumentSummary | null>(null);
   const [issueType, setIssueType] = useState<"BOLETA" | "FACTURA">("BOLETA");
   const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
 
   async function resolveToken() {
     return accessToken ?? (await refreshSession({ silent: true }))?.accessToken ?? null;
@@ -64,15 +65,12 @@ export default function FacturacionPage() {
   function openIssue(document: BillingDocumentSummary) {
     setSelectedDocument(document);
     setIssueType(document.type === "FACTURA" ? "FACTURA" : "BOLETA");
-    setError(null);
   }
 
   async function confirmIssue() {
     const token = await resolveToken();
     if (!token || !activeOrganizationId || !selectedDocument) return;
     setBusy(true);
-    setError(null);
-    setSuccess(null);
     try {
       const issued = await issueBillingDocument({
         accessToken: token,
@@ -82,10 +80,10 @@ export default function FacturacionPage() {
       });
       setSelectedDocument(null);
       setReloadKey((current) => current + 1);
-      setSuccess(`Comprobante ${issued.series}-${issued.number} emitido correctamente.`);
+      toast.showSuccess(`Comprobante ${issued.series}-${issued.number} emitido correctamente.`, "Comprobante emitido");
       if (issued.pdfUrl) window.open(issued.pdfUrl, "_blank", "noopener,noreferrer");
     } catch (issueError) {
-      setError(issueError instanceof Error ? issueError.message : "No se pudo emitir el comprobante.");
+      toast.showError(issueError, "No se pudo emitir");
       setReloadKey((current) => current + 1);
     } finally {
       setBusy(false);
@@ -111,12 +109,12 @@ export default function FacturacionPage() {
 
   function printBillingPdf(document: BillingDocumentSummary) {
     if (!document.pdfUrl) {
-      setError("Este comprobante no tiene PDF disponible para imprimir.");
+      toast.showError("Este comprobante no tiene PDF disponible para imprimir.", "Sin PDF");
       return;
     }
     const printWindow = window.open(document.pdfUrl, "_blank", "width=520,height=760");
     if (!printWindow) {
-      setError("El navegador bloqueó la ventana de impresión. Permite ventanas emergentes para Kapos.");
+      toast.showError("Permite ventanas emergentes para Kapos.", "Impresion bloqueada");
       return;
     }
     printWindow.focus();
@@ -124,7 +122,7 @@ export default function FacturacionPage() {
       try {
         printWindow.print();
       } catch {
-        setError("Se abrió el PDF, pero el navegador no permitió lanzar la impresión automática.");
+        toast.showError("Se abrio el PDF, pero el navegador no permitio lanzar la impresion automatica.", "Impresion bloqueada");
       }
     }, 1200);
   }
@@ -142,9 +140,6 @@ export default function FacturacionPage() {
           { label: "Origen", value: "Web y Mobile", hint: "Ambos puntos de venta alimentan esta bandeja." },
         ]}
       />
-
-      {error ? <AdminMessage title="No se pudo completar la operación" description={error} tone="warn" /> : null}
-      {success ? <AdminMessage title="Operación completada" description={success} tone="accent" /> : null}
 
       <PanelCard
         title="Comprobantes"
@@ -181,6 +176,7 @@ export default function FacturacionPage() {
             { label: "Emitir o reintentar", permission: "billing.documents.issue", icon: <SparkIcon />, tone: "accent", visible: (row) => row.status === "PENDING" || row.status === "FAILED", onClick: openIssue },
             { label: "Abrir PDF", icon: <ExternalLink className="h-4 w-4" />, visible: (row) => Boolean(row.pdfUrl), onClick: (row) => { if (row.pdfUrl) window.open(row.pdfUrl, "_blank", "noopener,noreferrer"); } },
             { label: "Imprimir PDF", permission: "billing.documents.print", icon: <Printer className="h-4 w-4" />, visible: (row) => Boolean(row.pdfUrl), onClick: printBillingPdf },
+            { label: "Imprimir ticket", permission: "billing.documents.print", icon: <Printer className="h-4 w-4" />, visible: (row) => row.type === "TICKET", onClick: printBillingDocumentTicket },
           ]}
         />
       </PanelCard>
@@ -239,6 +235,7 @@ export default function FacturacionPage() {
         <div className="flex flex-wrap gap-3">
           {detailDocument?.pdfUrl ? <Link href={detailDocument.pdfUrl} target="_blank" rel="noreferrer"><AdminActionButton icon={<ExternalLink className="h-4 w-4" />} tone="accent">PDF</AdminActionButton></Link> : null}
           {detailDocument?.pdfUrl ? <AdminActionButton icon={<Printer className="h-4 w-4" />} onClick={() => printBillingPdf(detailDocument)}>Imprimir</AdminActionButton> : null}
+          {detailDocument?.type === "TICKET" ? <AdminActionButton icon={<Printer className="h-4 w-4" />} onClick={() => printBillingDocumentTicket(detailDocument)}>Imprimir ticket</AdminActionButton> : null}
           {detailDocument?.xmlUrl ? <Link href={detailDocument.xmlUrl} target="_blank" rel="noreferrer"><AdminActionButton icon={<ExternalLink className="h-4 w-4" />}>XML</AdminActionButton></Link> : null}
           {detailDocument?.cdrUrl ? <Link href={detailDocument.cdrUrl} target="_blank" rel="noreferrer"><AdminActionButton icon={<ExternalLink className="h-4 w-4" />}>CDR</AdminActionButton></Link> : null}
         </div>

@@ -463,6 +463,12 @@ export type BillingDocumentSummary = {
     total: number;
     soldAt: string;
     status: string;
+    items?: Array<{
+      id: string;
+      productName: string;
+      quantity: number;
+      total: number;
+    }>;
     branch: { id: string; name: string };
     customerProfile: {
       id: string;

@@ -5,6 +5,7 @@ import { ChefHat, CheckCheck, Clock3, Flame, RefreshCw } from "lucide-react";
 import { AdminActionButton } from "../../../components/admin/AdminActionButton";
 import { AdminMessage, AdminModuleHeader, Tag } from "../../../components/admin/AdminBlocks";
 import { useAuth } from "../../../context/auth-context";
+import { useToast } from "../../../context/toast-context";
 import { getBranches, getKitchenTickets, updateKitchenTicket } from "../../../lib/erp-api";
 import type { BranchSummary, KitchenTicketStatus, KitchenTicketSummary } from "../../../types/erp";
 
@@ -25,11 +26,16 @@ const nextAction: Partial<Record<KitchenTicketStatus, { status: KitchenTicketSta
 
 function elapsedLabel(value: string) {
   const minutes = Math.max(0, Math.floor((Date.now() - new Date(value).getTime()) / 60000));
-  return minutes < 1 ? "Ahora" : `Hace ${minutes} min`;
+  if (minutes < 1) return "ahora";
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h`;
+  return `${Math.floor(hours / 24)}d`;
 }
 
 export default function KitchenPage() {
   const { accessToken, activeOrganizationId, refreshSession } = useAuth();
+  const toast = useToast();
   const [branches, setBranches] = useState<BranchSummary[]>([]);
   const [branchId, setBranchId] = useState("");
   const [tickets, setTickets] = useState<KitchenTicketSummary[]>([]);
@@ -96,7 +102,7 @@ export default function KitchenPage() {
       });
       await loadTickets();
     } catch (updateError) {
-      setError(updateError instanceof Error ? updateError.message : "No se pudo actualizar la comanda.");
+      toast.showError(updateError, "No se pudo actualizar");
     } finally {
       setBusyId(null);
     }

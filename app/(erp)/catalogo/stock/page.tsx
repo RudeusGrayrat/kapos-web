@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AdminActionButton, ArrowLeftIcon, PencilIcon, PlusIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable, createLocalAdminTableFetch } from "../../../components/admin/AdminDataTable";
-import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
+import { AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { useAuth } from "../../../context/auth-context";
 import { useToast } from "../../../context/toast-context";
 import { getBranches, getProducts, getStock, upsertStock } from "../../../lib/erp-api";
@@ -17,7 +17,6 @@ export default function CatalogoStockPage() {
   const [branches, setBranches] = useState<BranchSummary[]>([]);
   const [reloadVersion, setReloadVersion] = useState(0);
   const reloadKey = `${activeOrganizationId ?? "none"}:${reloadVersion}`;
-  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "create">("table");
   const [form, setForm] = useState({ productId: "", branchId: "", quantity: "0", minQuantity: "0" });
 
@@ -46,7 +45,6 @@ export default function CatalogoStockPage() {
     event.preventDefault();
     const token = await resolveToken();
     if (!token || !activeOrganizationId) return;
-    setError(null);
     try {
       await upsertStock({
         accessToken: token,
@@ -64,7 +62,6 @@ export default function CatalogoStockPage() {
       toast.showSuccess("El stock fue actualizado correctamente.", "Stock actualizado");
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "No se pudo actualizar el stock.";
-      setError(message);
       toast.showError(message, "No pudimos actualizar stock");
     }
   }
@@ -103,7 +100,6 @@ export default function CatalogoStockPage() {
           { label: "Sin stock", value: String(stock.filter((item) => item.status === "OUT").length), hint: "No disponibles." },
         ]}
       />
-      {error ? <AdminMessage title="No pudimos actualizar stock" description={error} tone="warn" /> : null}
       {viewMode === "create" ? (
         <PanelCard title="Actualizar stock" description="Stock inicial manual para dejar listo el POS.">
           <form className="space-y-4" onSubmit={handleSubmit}>

@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { AdminActionButton, ArrowLeftIcon, PencilIcon, PlusIcon, TrashIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
-import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
+import { AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { AdminImageField } from "../../../components/admin/AdminImageField";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import { useAuth } from "../../../context/auth-context";
@@ -22,7 +22,6 @@ export default function CatalogoProductosPage() {
   const [reloadVersion, setReloadVersion] = useState(0);
   const reloadKey = `${activeOrganizationId ?? "none"}:${reloadVersion}`;
   const [defaultTaxRate, setDefaultTaxRate] = useState(DEFAULT_TAX_RATE);
-  const [error, setError] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<"table" | "create">("table");
   const [autoCost, setAutoCost] = useState(true);
   const [autoEditCost, setAutoEditCost] = useState(true);
@@ -145,7 +144,6 @@ export default function CatalogoProductosPage() {
     event.preventDefault();
     const token = await resolveToken();
     if (!token || !activeOrganizationId) return;
-    setError(null);
     try {
       await createProduct({
         accessToken: token,
@@ -182,7 +180,6 @@ export default function CatalogoProductosPage() {
       toast.showSuccess("El producto fue creado correctamente.", "Producto creado");
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "No se pudo crear el producto.";
-      setError(message);
       toast.showError(message, "No se pudo crear");
     }
   }
@@ -251,7 +248,6 @@ export default function CatalogoProductosPage() {
     event.preventDefault();
     const token = await resolveToken();
     if (!token || !activeOrganizationId || !selectedProduct) return;
-    setError(null);
     try {
       await updateProduct({
         accessToken: token,
@@ -277,7 +273,6 @@ export default function CatalogoProductosPage() {
       toast.showSuccess("Los cambios del producto fueron guardados.", "Producto actualizado");
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "No se pudo editar el producto.";
-      setError(message);
       toast.showError(message, "No se pudo editar");
     }
   }
@@ -285,7 +280,6 @@ export default function CatalogoProductosPage() {
   async function toggleProductStatus(product: ProductSummary) {
     const token = await resolveToken();
     if (!token || !activeOrganizationId) return;
-    setError(null);
     try {
       await updateProduct({
         accessToken: token,
@@ -297,7 +291,6 @@ export default function CatalogoProductosPage() {
       toast.showSuccess("El estado del producto fue actualizado.", "Estado actualizado");
     } catch (submitError) {
       const message = submitError instanceof Error ? submitError.message : "No se pudo cambiar el estado del producto.";
-      setError(message);
       toast.showError(message, "No se pudo actualizar");
     }
   }
@@ -335,7 +328,6 @@ export default function CatalogoProductosPage() {
           { label: "Para POS", value: String(products.filter((product) => product.availableForPos).length), hint: "Visibles para vender." },
         ]}
       />
-      {error ? <AdminMessage title="No pudimos crear el producto" description={error} tone="warn" /> : null}
       {viewMode === "create" ? (
         <PanelCard title="Crear producto" description="Alta rapida. Variantes y modificadores vendran en el siguiente bloque.">
           <form className="space-y-4" onSubmit={handleSubmit}>

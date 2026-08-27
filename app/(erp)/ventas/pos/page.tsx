@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ChefHat,
   Clock3,
@@ -19,6 +19,7 @@ import {
 import { AdminActionButton, PlusIcon } from "../../../components/admin/AdminActionButton";
 import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { useAuth } from "../../../context/auth-context";
+import { useToast } from "../../../context/toast-context";
 import {
   addOpenAccountItems,
   cancelOpenAccountItem,
@@ -40,6 +41,7 @@ import {
   sendOpenAccountToKitchen,
   updateOpenAccount,
 } from "../../../lib/erp-api";
+import { printOpenAccountInternalTicket, printOpenAccountPrebill } from "../../../lib/receipt-printing";
 import type {
   BranchSummary,
   CustomerSummary,
@@ -69,42 +71,13 @@ function customerOptionLabel(customer: CustomerSummary) {
   return [customer.user.firstName, customer.user.lastName].filter(Boolean).join(" ") || customer.user.documentNumber || customer.user.phone || customer.user.email || "Cliente";
 }
 
-function escapeHtml(value: string) {
-  return value.replace(/[&<>"]/g, (character) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-  })[character] ?? character);
-}
-
-function printPrebill(account: OpenAccountSummary, targetWindow?: Window | null) {
-  const printWindow = targetWindow ?? window.open("", "_blank", "width=440,height=720");
-  if (!printWindow) throw new Error("El navegador bloqueó la ventana de impresión.");
-  const rows = (account.items ?? [])
-    .filter((item) => item.status === "ACTIVE")
-    .map((item) => `<tr><td>${item.quantity} × ${escapeHtml(item.productName)}</td><td>S/ ${item.total.toFixed(2)}</td></tr>`)
-    .join("");
-  printWindow.document.write(`<!doctype html><html><head><title>Precuenta ${escapeHtml(account.accountNumber)}</title><style>body{font-family:Arial,sans-serif;max-width:360px;margin:24px auto;color:#151713}h1{text-align:center;letter-spacing:.08em}p{text-align:center;color:#666}table{width:100%;border-collapse:collapse;margin:24px 0}td{padding:9px 0;border-bottom:1px dashed #bbb}td:last-child{text-align:right}.total{font-size:22px;font-weight:700;display:flex;justify-content:space-between}.note{margin-top:28px;border:1px solid #222;padding:10px;font-size:11px;font-weight:700}</style></head><body><h1>KAPOS</h1><p>PRECUENTA · ${escapeHtml(account.accountNumber)}<br>${escapeHtml(accountLabel(account))}<br>${new Date().toLocaleString("es-PE")}</p><table>${rows}</table><div class="total"><span>Total</span><span>S/ ${account.total.toFixed(2)}</span></div><div class="total"><span>Pagado</span><span>S/ ${account.paidTotal.toFixed(2)}</span></div><div class="total"><span>Pendiente</span><span>S/ ${account.balance.toFixed(2)}</span></div><div class="note">DOCUMENTO OPERATIVO · NO ES COMPROBANTE DE PAGO</div><script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}</script></body></html>`);
-  printWindow.document.close();
-}
-
-function printInternalTicket(account: OpenAccountSummary, targetWindow?: Window | null) {
-  const printWindow = targetWindow ?? window.open("", "_blank", "width=440,height=720");
-  if (!printWindow) throw new Error("El navegador bloqueó la ventana de impresión.");
-  const rows = (account.items ?? [])
-    .filter((item) => item.status === "ACTIVE")
-    .map((item) => `<tr><td>${item.quantity} × ${escapeHtml(item.productName)}</td><td>S/ ${item.total.toFixed(2)}</td></tr>`)
-    .join("");
-  const payments = (account.payments ?? [])
-    .map((payment) => `<tr><td>${escapeHtml(payment.paymentMethod?.name ?? "Pago")}</td><td>S/ ${payment.amount.toFixed(2)}</td></tr>`)
-    .join("");
-  printWindow.document.write(`<!doctype html><html><head><title>Ticket ${escapeHtml(account.sale?.saleNumber ?? account.accountNumber)}</title><style>body{font-family:Arial,sans-serif;max-width:360px;margin:24px auto;color:#151713}h1{text-align:center;letter-spacing:.08em}.center{text-align:center;color:#666}table{width:100%;border-collapse:collapse;margin:18px 0}td{padding:8px 0;border-bottom:1px dashed #bbb}td:last-child{text-align:right}.total{font-size:22px;font-weight:700;display:flex;justify-content:space-between}.note{margin-top:22px;border:1px solid #222;padding:10px;font-size:11px;font-weight:700;text-align:center}</style></head><body><h1>KAPOS</h1><p class="center">TICKET INTERNO<br>${escapeHtml(account.sale?.saleNumber ?? account.accountNumber)}<br>${escapeHtml(accountLabel(account))}<br>${new Date().toLocaleString("es-PE")}</p><table>${rows}</table><div class="total"><span>Total</span><span>S/ ${account.total.toFixed(2)}</span></div><h3>Pagos</h3><table>${payments}</table><div class="note">NO ES COMPROBANTE ELECTRONICO SUNAT</div><script>window.onload=()=>{window.print();window.onafterprint=()=>window.close();}</script></body></html>`);
-  printWindow.document.close();
+function productOptionLabel(product: ProductSummary) {
+  return `${product.name} - S/ ${product.price.toFixed(2)}`;
 }
 
 export default function PosPage() {
   const { accessToken, activeOrganizationId, effectivePermissionKeys, refreshSession } = useAuth();
+  const toast = useToast();
   const [branches, setBranches] = useState<BranchSummary[]>([]);
   const [branchId, setBranchId] = useState("");
   const [areas, setAreas] = useState<DiningAreaSummary[]>([]);
@@ -126,6 +99,8 @@ export default function PosPage() {
     note: "",
   });
   const [itemForm, setItemForm] = useState({ productId: "", quantity: "1", note: "" });
+  const [productQuery, setProductQuery] = useState("");
+  const [showProductOptions, setShowProductOptions] = useState(false);
   const [paymentForm, setPaymentForm] = useState({ paymentMethodId: "", amount: "" });
   const [paymentCustomerProfileId, setPaymentCustomerProfileId] = useState("");
   const [billingDocumentType, setBillingDocumentType] = useState<PosBillingDocumentType>("TICKET");
@@ -162,13 +137,15 @@ export default function PosPage() {
       getOpenCashSession({ accessToken: token, organizationId: activeOrganizationId, branchId: nextBranchId }),
       getCustomers({ accessToken: token, organizationId: activeOrganizationId, page: 1, limit: 100 }),
     ]);
+    const posProducts = productResponse.data.filter((product) => product.status === "ACTIVE" && product.availableForPos);
     setAreas(nextAreas);
     setAccounts(nextAccounts);
-    setProducts(productResponse.data.filter((product) => product.status === "ACTIVE" && product.availableForPos));
+    setProducts(posProducts);
     setPaymentMethods(methods.filter((method) => method.enabled));
     setCashSessionId(openSession?.branchId === nextBranchId ? openSession.id : null);
     setCustomers(customerResponse.data);
-    setItemForm((current) => ({ ...current, productId: current.productId || productResponse.data[0]?.id || "" }));
+    setItemForm((current) => ({ ...current, productId: current.productId || posProducts[0]?.id || "" }));
+    setProductQuery((current) => current || (posProducts[0] ? productOptionLabel(posProducts[0]) : ""));
     setPaymentForm((current) => ({ ...current, paymentMethodId: current.paymentMethodId || methods.find((method) => method.enabled)?.id || "" }));
   }
 
@@ -180,6 +157,8 @@ export default function PosPage() {
     if (selectedAccount && rows.some((account) => account.id === selectedAccount.id)) {
       const detail = await getOpenAccount({ accessToken: token, organizationId: activeOrganizationId, accountId: selectedAccount.id });
       setSelectedAccount(detail);
+      const selectedProduct = products.find((product) => product.id === itemForm.productId);
+      setProductQuery(selectedProduct ? productOptionLabel(selectedProduct) : "");
       if (!splitByItems) setPaymentForm((current) => ({ ...current, amount: detail.balance.toFixed(2) }));
     } else if (selectedAccount) {
       setSelectedAccount(null);
@@ -275,7 +254,7 @@ export default function PosPage() {
       setNewAccount({ diningTableId: "", customerName: "", customerPhone: "", deliveryAddress: "", deliveryReference: "", customerProfileId: "", guestCount: "2", note: "" });
       await Promise.all([refreshAccounts(), refreshDiningAreas()]);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "No se pudo iniciar el pedido.");
+      toast.showError(submitError, "No se pudo iniciar");
     } finally {
       setBusy(false);
     }
@@ -302,7 +281,7 @@ export default function PosPage() {
       setPaymentForm((current) => ({ ...current, amount: account.balance.toFixed(2) }));
       await refreshAccounts();
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "No se pudo agregar el producto.");
+      toast.showError(submitError, "No se pudo agregar");
     } finally {
       setBusy(false);
     }
@@ -322,7 +301,7 @@ export default function PosPage() {
       setSelectedAccount(account);
       await refreshAccounts();
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "No se pudo enviar la comanda.");
+      toast.showError(submitError, "No se pudo enviar");
     } finally {
       setBusy(false);
     }
@@ -348,7 +327,7 @@ export default function PosPage() {
       setTargetTableId("");
       await Promise.all([refreshAccounts(), refreshDiningAreas()]);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "No se pudo actualizar la mesa.");
+      toast.showError(submitError, "No se pudo actualizar");
     } finally {
       setBusy(false);
     }
@@ -370,7 +349,7 @@ export default function PosPage() {
       setSelectedAccount(account);
       await Promise.all([refreshAccounts(), refreshDiningAreas()]);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "No se pudo liberar la mesa.");
+      toast.showError(submitError, "No se pudo liberar");
     } finally {
       setBusy(false);
     }
@@ -379,7 +358,7 @@ export default function PosPage() {
   async function handlePrebill() {
     const prebillWindow = window.open("", "_blank", "width=440,height=720");
     if (!prebillWindow) {
-      setError("El navegador bloqueó la ventana de impresión.");
+      toast.showError("El navegador bloqueo la ventana de impresion.", "Impresion bloqueada");
       return;
     }
     const token = await resolveToken();
@@ -397,11 +376,11 @@ export default function PosPage() {
         expectedVersion: selectedAccount.version,
       });
       setSelectedAccount(account);
-      printPrebill(account, prebillWindow);
+      printOpenAccountPrebill(account, accountLabel(account), prebillWindow);
       await refreshAccounts();
     } catch (submitError) {
       prebillWindow.close();
-      setError(submitError instanceof Error ? submitError.message : "No se pudo generar la precuenta.");
+      toast.showError(submitError, "No se pudo imprimir");
     } finally {
       setBusy(false);
     }
@@ -426,7 +405,7 @@ export default function PosPage() {
       setPaymentForm((current) => ({ ...current, amount: account.balance.toFixed(2) }));
       await refreshAccounts();
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "No se pudo anular el producto.");
+      toast.showError(submitError, "No se pudo anular");
     } finally {
       setBusy(false);
     }
@@ -450,7 +429,7 @@ export default function PosPage() {
     const token = await resolveToken();
     if (!token || !activeOrganizationId || !selectedAccount || !cashSessionId) return;
     if (billingDocumentType === "FACTURA" && (!/^\d{11}$/.test(billingRecipient.documentNumber.trim()) || !billingRecipient.name.trim())) {
-      setError("Para emitir factura ingresa RUC de 11 digitos y razon social.");
+      toast.showError("Para emitir factura ingresa RUC de 11 digitos y razon social.", "Datos incompletos");
       return;
     }
     setBusy(true);
@@ -504,13 +483,24 @@ export default function PosPage() {
       setItemAllocations({});
       await Promise.all([refreshAccounts(), refreshDiningAreas()]);
     } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : "No se pudo registrar el pago.");
+      toast.showError(submitError, "No se pudo cobrar");
     } finally {
       setBusy(false);
     }
   }
 
   const availableTables = areas.flatMap((area) => area.tables.filter((table) => table.isActive && !table.activeAccount).map((table) => ({ ...table, areaName: area.name })));
+  const filteredProductOptions = useMemo(() => {
+    const search = productQuery.trim().toLowerCase();
+    return products
+      .filter((product) => {
+        if (!search) return true;
+        return [product.name, product.sku, product.category?.name]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(search));
+      })
+      .slice(0, 10);
+  }, [productQuery, products]);
   const pendingKitchenItems = selectedAccount?.items?.filter((item) => item.status === "ACTIVE" && !item.kitchenTicketId).length ?? 0;
   const activeItems = selectedAccount?.items?.filter((item) => item.status === "ACTIVE") ?? [];
   const canMoveTables = effectivePermissionKeys.includes("sales.orders.move_table");
@@ -520,9 +510,9 @@ export default function PosPage() {
   async function handlePrintInternalTicket() {
     if (!lastClosedAccount) return;
     try {
-      printInternalTicket(lastClosedAccount);
+      printOpenAccountInternalTicket(lastClosedAccount, accountLabel(lastClosedAccount));
     } catch (printError) {
-      setError(printError instanceof Error ? printError.message : "No se pudo imprimir el ticket.");
+      toast.showError(printError, "No se pudo imprimir");
     }
   }
 
@@ -539,9 +529,10 @@ export default function PosPage() {
         documentType: billingDocumentType,
       });
       setLastBillingMessage(`${billingDocumentType === "FACTURA" ? "Factura" : "Boleta"} ${document.series}-${document.number} emitida.`);
+      toast.showSuccess(`${billingDocumentType === "FACTURA" ? "Factura" : "Boleta"} ${document.series}-${document.number} emitida.`, "Comprobante emitido");
       if (document.pdfUrl) window.open(document.pdfUrl, "_blank", "noopener,noreferrer");
     } catch (issueError) {
-      setError(issueError instanceof Error ? issueError.message : "No se pudo emitir el comprobante.");
+      toast.showError(issueError, "No se pudo emitir");
     } finally {
       setBusy(false);
     }
@@ -672,7 +663,50 @@ export default function PosPage() {
             </PanelCard>
 
             <PanelCard title="Agregar productos" description="Cada observación viaja con el ítem hacia cocina.">
-              <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_120px_minmax(0,1fr)_auto]" onSubmit={handleAddItem}><select className={inputClass} value={itemForm.productId} onChange={(event) => setItemForm((current) => ({ ...current, productId: event.target.value }))} required>{products.map((product) => <option key={product.id} value={product.id}>{product.name} · S/ {product.price.toFixed(2)}</option>)}</select><input className={inputClass} type="number" min="1" step="1" value={itemForm.quantity} onChange={(event) => setItemForm((current) => ({ ...current, quantity: event.target.value.replace(/\D/g, "") || "1" }))} /><input className={inputClass} placeholder="Ej. sin cebolla" value={itemForm.note} onChange={(event) => setItemForm((current) => ({ ...current, note: event.target.value }))} /><AdminActionButton type="submit" tone="accent" icon={<PackagePlus className="h-4 w-4" />} disabled={busy}>Agregar</AdminActionButton></form>
+              <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_120px_minmax(0,1fr)_auto]" onSubmit={handleAddItem}>
+                <div className="relative">
+                  <input
+                    className={inputClass}
+                    placeholder="Buscar producto, SKU o categoría"
+                    value={productQuery}
+                    onBlur={() => window.setTimeout(() => setShowProductOptions(false), 120)}
+                    onChange={(event) => {
+                      setProductQuery(event.target.value);
+                      setShowProductOptions(true);
+                      setItemForm((current) => ({ ...current, productId: "" }));
+                    }}
+                    onFocus={() => setShowProductOptions(true)}
+                  />
+                  {showProductOptions ? (
+                    <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-80 overflow-auto rounded-[22px] border border-[#DDF3D5] bg-white p-2 shadow-[0_24px_60px_rgba(20,28,14,0.16)]">
+                      {filteredProductOptions.length ? filteredProductOptions.map((product) => (
+                        <button
+                          key={product.id}
+                          type="button"
+                          className="flex w-full items-center justify-between gap-3 rounded-[16px] px-3 py-3 text-left transition hover:bg-[#E8FCEB]"
+                          onMouseDown={(event) => event.preventDefault()}
+                          onClick={() => {
+                            setItemForm((current) => ({ ...current, productId: product.id }));
+                            setProductQuery(productOptionLabel(product));
+                            setShowProductOptions(false);
+                          }}
+                        >
+                          <span>
+                            <span className="block text-sm font-black text-[#0D0D0D]">{product.name}</span>
+                            <span className="block text-xs text-[#535353]">{product.sku ?? product.category?.name ?? "Producto"}</span>
+                          </span>
+                          <strong className="shrink-0 text-sm text-[#00A70B]">S/ {product.price.toFixed(2)}</strong>
+                        </button>
+                      )) : (
+                        <p className="px-3 py-5 text-center text-sm text-[#535353]">No encontramos productos.</p>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+                <input className={inputClass} type="number" min="1" step="1" value={itemForm.quantity} onChange={(event) => setItemForm((current) => ({ ...current, quantity: event.target.value.replace(/\D/g, "") || "1" }))} />
+                <input className={inputClass} placeholder="Ej. sin cebolla" value={itemForm.note} onChange={(event) => setItemForm((current) => ({ ...current, note: event.target.value }))} />
+                <AdminActionButton type="submit" tone="accent" icon={<PackagePlus className="h-4 w-4" />} disabled={busy || !itemForm.productId}>Agregar</AdminActionButton>
+              </form>
               <div className="mt-5 divide-y divide-[#edf0e6]">
                 {selectedAccount.items?.map((item) => (
                   <div key={item.id} className={`py-3 ${item.status === "CANCELLED" ? "opacity-55" : ""}`}>
