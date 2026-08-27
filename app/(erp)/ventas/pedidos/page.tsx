@@ -1,68 +1,178 @@
 "use client";
 
-import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
-import { Bike, Clock3, Search, ShoppingBag, Utensils } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import {
+  ChefHat,
+  Clock3,
+  CreditCard,
+  Link2,
+  MapPin,
+  PackagePlus,
+  Printer,
+  ReceiptText,
+  ShoppingBag,
+  Split,
+  Trash2,
+  Undo2,
+  Utensils,
+} from "lucide-react";
 import { AdminActionButton, PlusIcon } from "../../../components/admin/AdminActionButton";
 import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { useAuth } from "../../../context/auth-context";
-import { getBranches, getOpenAccounts } from "../../../lib/erp-api";
-import type { BranchSummary, OpenAccountSummary, ServiceType } from "../../../types/erp";
+import { useToast } from "../../../context/toast-context";
+import {
+  addOpenAccountItems,
+  cancelOpenAccountItem,
+  createOpenAccount,
+  generateOpenAccountPrebill,
+  getBranches,
+  getCustomers,
+  getDiningAreas,
+  getOpenAccount,
+  getOpenAccounts,
+  getOpenCashSession,
+  getPaymentMethods,
+  getProducts,
+  issueSaleBillingDocument,
+  joinOpenAccountTable,
+  moveOpenAccountTable,
+  recordOpenAccountPayment,
+  releaseOpenAccountTable,
+  sendOpenAccountToKitchen,
+  updateOpenAccount,
+} from "../../../lib/erp-api";
+import { printOpenAccountInternalTicket, printOpenAccountPrebill } from "../../../lib/receipt-printing";
+import type {
+  BranchSummary,
+  CustomerSummary,
+  DiningAreaSummary,
+  OpenAccountSummary,
+  PaymentMethodSummary,
+  ProductSummary,
+  ServiceType,
+} from "../../../types/erp";
 
-type Filter = "ALL" | ServiceType | "PARTIAL";
+const inputClass =
+  "w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#00C70D]";
 
-const filters: Array<{ key: Filter; label: string }> = [
-  { key: "ALL", label: "Todos" },
-  { key: "LOCAL", label: "Local" },
-  { key: "DELIVERY", label: "Delivery" },
-  { key: "TAKEAWAY", label: "Para llevar" },
-  { key: "PARTIAL", label: "Parciales" },
-];
+const serviceLabels: Record<ServiceType, string> = {
+  LOCAL: "En local",
+  DELIVERY: "Delivery",
+  TAKEAWAY: "Para llevar",
+};
+
+type OrderBillingDocumentType = "TICKET" | "BOLETA" | "FACTURA";
+
+function accountLabel(account: OpenAccountSummary) {
+  return account.diningTable?.name ?? account.customerName ?? serviceLabels[account.serviceType];
+}
+
+function customerOptionLabel(customer: CustomerSummary) {
+  return [customer.user.firstName, customer.user.lastName].filter(Boolean).join(" ") || customer.user.documentNumber || customer.user.phone || customer.user.email || "Cliente";
+}
+
+function productOptionLabel(product: ProductSummary) {
+  return `${product.name} - S/ ${product.price.toFixed(2)}`;
+}
 
 export default function VentasPedidosPage() {
-  const { accessToken, activeOrganizationId, refreshSession } = useAuth();
+  const { accessToken, activeOrganizationId, effectivePermissionKeys, refreshSession } = useAuth();
+  const toast = useToast();
   const [branches, setBranches] = useState<BranchSummary[]>([]);
   const [branchId, setBranchId] = useState("");
+  const [areas, setAreas] = useState<DiningAreaSummary[]>([]);
   const [accounts, setAccounts] = useState<OpenAccountSummary[]>([]);
-  const [filter, setFilter] = useState<Filter>("ALL");
-  const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [selectedAccount, setSelectedAccount] = useState<OpenAccountSummary | null>(null);
+  const [products, setProducts] = useState<ProductSummary[]>([]);
+  const [paymentMethods, setPaymentMethods] = useState<PaymentMethodSummary[]>([]);
+  const [customers, setCustomers] = useState<CustomerSummary[]>([]);
+  const [cashSessionId, setCashSessionId] = useState<string | null>(null);
+  const [serviceType, setServiceType] = useState<ServiceType>("LOCAL");
+  const [newAccount, setNewAccount] = useState({
+    diningTableId: "",
+    customerName: "",
+    customerPhone: "",
+    deliveryAddress: "",
+    deliveryReference: "",
+    customerProfileId: "",
+    guestCount: "2",
+    note: "",
+  });
+  const [itemForm, setItemForm] = useState({ productId: "", quantity: "1", note: "" });
+  const [productQuery, setProductQuery] = useState("");
+  const [showProductOptions, setShowProductOptions] = useState(false);
+  const [paymentForm, setPaymentForm] = useState({ paymentMethodId: "", amount: "" });
+  const [paymentCustomerProfileId, setPaymentCustomerProfileId] = useState("");
+  const [billingDocumentType, setBillingDocumentType] = useState<OrderBillingDocumentType>("TICKET");
+  const [billingRecipient, setBillingRecipient] = useState({
+    documentNumber: "",
+    name: "",
+    address: "",
+    email: "",
+  });
+  const [tableAction, setTableAction] = useState<"MOVE" | "JOIN" | null>(null);
+  const [targetTableId, setTargetTableId] = useState("");
+  const [splitByItems, setSplitByItems] = useState(false);
+  const [itemAllocations, setItemAllocations] = useState<Record<string, number>>({});
+  const [cancelItemId, setCancelItemId] = useState<string | null>(null);
+  const [cancelReason, setCancelReason] = useState("");
+  const [lastClosedAccount, setLastClosedAccount] = useState<OpenAccountSummary | null>(null);
+  const [lastBillingMessage, setLastBillingMessage] = useState<string | null>(null);
+  const [showCreate, setShowCreate] = useState(false);
+  const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const latestRequestRef = useRef(0);
 
   async function resolveToken() {
     return accessToken ?? (await refreshSession({ silent: true }))?.accessToken ?? null;
   }
 
-  async function loadAccounts(nextBranchId = branchId, nextFilter = filter, nextSearch = search, options?: { silent?: boolean }) {
+  async function loadBranchContext(nextBranchId = branchId) {
     const token = await resolveToken();
-    if (!token || !activeOrganizationId || !nextBranchId) {
-      if (!options?.silent) setLoading(false);
-      return;
+    if (!token || !activeOrganizationId || !nextBranchId) return;
+    const [nextAreas, nextAccounts, productResponse, methods, openSession, customerResponse] = await Promise.all([
+      getDiningAreas({ accessToken: token, organizationId: activeOrganizationId, branchId: nextBranchId }),
+      getOpenAccounts({ accessToken: token, organizationId: activeOrganizationId, branchId: nextBranchId }),
+      getProducts({ accessToken: token, organizationId: activeOrganizationId, page: 1, limit: 100 }),
+      getPaymentMethods({ accessToken: token, organizationId: activeOrganizationId }),
+      getOpenCashSession({ accessToken: token, organizationId: activeOrganizationId, branchId: nextBranchId }),
+      getCustomers({ accessToken: token, organizationId: activeOrganizationId, page: 1, limit: 100 }),
+    ]);
+    const orderProducts = productResponse.data.filter((product) => product.status === "ACTIVE" && product.availableForPos);
+    setAreas(nextAreas);
+    setAccounts(nextAccounts);
+    setProducts(orderProducts);
+    setPaymentMethods(methods.filter((method) => method.enabled));
+    setCashSessionId(openSession?.branchId === nextBranchId ? openSession.id : null);
+    setCustomers(customerResponse.data);
+    setItemForm((current) => ({ ...current, productId: current.productId || orderProducts[0]?.id || "" }));
+    setProductQuery((current) => current || (orderProducts[0] ? productOptionLabel(orderProducts[0]) : ""));
+    setPaymentForm((current) => ({ ...current, paymentMethodId: current.paymentMethodId || methods.find((method) => method.enabled)?.id || "" }));
+  }
+
+  async function refreshAccounts(nextBranchId = branchId) {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !nextBranchId) return;
+    const rows = await getOpenAccounts({ accessToken: token, organizationId: activeOrganizationId, branchId: nextBranchId });
+    setAccounts(rows);
+    if (selectedAccount && rows.some((account) => account.id === selectedAccount.id)) {
+      const detail = await getOpenAccount({ accessToken: token, organizationId: activeOrganizationId, accountId: selectedAccount.id });
+      setSelectedAccount(detail);
+      const selectedProduct = products.find((product) => product.id === itemForm.productId);
+      setProductQuery(selectedProduct ? productOptionLabel(selectedProduct) : "");
+      if (!splitByItems) setPaymentForm((current) => ({ ...current, amount: detail.balance.toFixed(2) }));
+    } else if (selectedAccount) {
+      setSelectedAccount(null);
     }
-    const requestId = latestRequestRef.current + 1;
-    latestRequestRef.current = requestId;
-    if (!options?.silent) setLoading(true);
-    try {
-      const rows = await getOpenAccounts({
-        accessToken: token,
-        organizationId: activeOrganizationId,
-        branchId: nextBranchId,
-        status: nextFilter === "PARTIAL" ? "PARTIALLY_PAID" : undefined,
-        serviceType: ["LOCAL", "DELIVERY", "TAKEAWAY"].includes(nextFilter)
-          ? (nextFilter as ServiceType)
-          : undefined,
-        search: nextSearch,
-      });
-      if (requestId !== latestRequestRef.current) return;
-      setAccounts(rows);
-      setError(null);
-    } catch (loadError) {
-      if (requestId !== latestRequestRef.current) return;
-      setError(loadError instanceof Error ? loadError.message : "No se pudieron cargar las cuentas.");
-    } finally {
-      if (requestId === latestRequestRef.current && !options?.silent) setLoading(false);
-    }
+  }
+
+  async function refreshDiningAreas(nextBranchId = branchId) {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !nextBranchId) return;
+    setAreas(await getDiningAreas({
+      accessToken: token,
+      organizationId: activeOrganizationId,
+      branchId: nextBranchId,
+    }));
   }
 
   useEffect(() => {
@@ -77,10 +187,9 @@ export default function VentasPedidosPage() {
         const nextBranchId = active[0]?.id ?? "";
         setBranches(active);
         setBranchId(nextBranchId);
-        if (nextBranchId) await loadAccounts(nextBranchId);
-        else setLoading(false);
+        if (nextBranchId) await loadBranchContext(nextBranchId);
       } catch (loadError) {
-        if (mounted) setError(loadError instanceof Error ? loadError.message : "No se cargaron las sucursales.");
+        if (mounted) setError(loadError instanceof Error ? loadError.message : "No se pudo iniciar pedidos.");
       }
     })();
     return () => { mounted = false; };
@@ -89,52 +198,591 @@ export default function VentasPedidosPage() {
 
   useEffect(() => {
     if (!branchId) return;
-    const delay = window.setTimeout(() => void loadAccounts(), 250);
-    return () => window.clearTimeout(delay);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [branchId, filter, search]);
-
-  useEffect(() => {
-    if (!branchId) return;
-    const timer = window.setInterval(() => void loadAccounts(branchId, filter, search, { silent: true }), 5000);
+    const timer = window.setInterval(() => void refreshAccounts(), 5000);
     return () => window.clearInterval(timer);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [branchId, filter, search]);
+  }, [branchId, selectedAccount?.id, splitByItems]);
 
-  const total = accounts.reduce((sum, account) => sum + account.total, 0);
-  const pending = accounts.reduce((sum, account) => sum + account.balance, 0);
+  async function openAccount(accountId: string) {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId) return;
+    try {
+      const detail = await getOpenAccount({ accessToken: token, organizationId: activeOrganizationId, accountId });
+      setLastClosedAccount(null);
+      setLastBillingMessage(null);
+      setSelectedAccount(detail);
+      setPaymentCustomerProfileId(detail.customerProfileId ?? "");
+      setPaymentForm((current) => ({ ...current, amount: detail.balance.toFixed(2) }));
+      setSplitByItems(false);
+      setItemAllocations({});
+      setTableAction(null);
+      setCancelItemId(null);
+      setShowCreate(false);
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "No se pudo abrir la cuenta.");
+    }
+  }
+
+  async function handleCreateAccount(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !branchId) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const account = await createOpenAccount({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        body: {
+          branchId,
+          serviceType,
+          customerProfileId: newAccount.customerProfileId || undefined,
+          diningTableId: serviceType === "LOCAL" ? newAccount.diningTableId : undefined,
+          guestCount: serviceType === "LOCAL" ? Number(newAccount.guestCount) : undefined,
+          customerName: serviceType === "DELIVERY" ? newAccount.customerName : undefined,
+          customerPhone: serviceType === "DELIVERY" ? newAccount.customerPhone : undefined,
+          deliveryAddress: serviceType === "DELIVERY" ? newAccount.deliveryAddress : undefined,
+          deliveryReference: serviceType === "DELIVERY" ? newAccount.deliveryReference : undefined,
+          note: newAccount.note || undefined,
+        },
+      });
+      setSelectedAccount(account);
+      setLastClosedAccount(null);
+      setLastBillingMessage(null);
+      setPaymentCustomerProfileId(account.customerProfileId ?? "");
+      setShowCreate(false);
+      setNewAccount({ diningTableId: "", customerName: "", customerPhone: "", deliveryAddress: "", deliveryReference: "", customerProfileId: "", guestCount: "2", note: "" });
+      await Promise.all([refreshAccounts(), refreshDiningAreas()]);
+    } catch (submitError) {
+      toast.showError(submitError, "No se pudo iniciar");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleAddItem(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !selectedAccount || !itemForm.productId) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const account = await addOpenAccountItems({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        accountId: selectedAccount.id,
+        body: {
+          expectedVersion: selectedAccount.version,
+          items: [{ productId: itemForm.productId, quantity: Number(itemForm.quantity), note: itemForm.note || undefined }],
+        },
+      });
+      setSelectedAccount(account);
+      setItemForm((current) => ({ ...current, quantity: "1", note: "" }));
+      setPaymentForm((current) => ({ ...current, amount: account.balance.toFixed(2) }));
+      await refreshAccounts();
+    } catch (submitError) {
+      toast.showError(submitError, "No se pudo agregar");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleKitchen() {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !selectedAccount) return;
+    setBusy(true);
+    try {
+      const account = await sendOpenAccountToKitchen({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        accountId: selectedAccount.id,
+        body: { expectedVersion: selectedAccount.version },
+      });
+      setSelectedAccount(account);
+      await refreshAccounts();
+    } catch (submitError) {
+      toast.showError(submitError, "No se pudo enviar");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleTableAction() {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !selectedAccount || !tableAction || !targetTableId) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const input = {
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        accountId: selectedAccount.id,
+        body: { expectedVersion: selectedAccount.version, diningTableId: targetTableId },
+      };
+      const account = tableAction === "MOVE"
+        ? await moveOpenAccountTable(input)
+        : await joinOpenAccountTable(input);
+      setSelectedAccount(account);
+      setTableAction(null);
+      setTargetTableId("");
+      await Promise.all([refreshAccounts(), refreshDiningAreas()]);
+    } catch (submitError) {
+      toast.showError(submitError, "No se pudo actualizar");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleReleaseTable(tableId: string) {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !selectedAccount) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const account = await releaseOpenAccountTable({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        accountId: selectedAccount.id,
+        tableId,
+        expectedVersion: selectedAccount.version,
+      });
+      setSelectedAccount(account);
+      await Promise.all([refreshAccounts(), refreshDiningAreas()]);
+    } catch (submitError) {
+      toast.showError(submitError, "No se pudo liberar");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handlePrebill() {
+    const prebillWindow = window.open("", "_blank", "width=440,height=720");
+    if (!prebillWindow) {
+      toast.showError("El navegador bloqueo la ventana de impresion.", "Impresion bloqueada");
+      return;
+    }
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !selectedAccount) {
+      prebillWindow.close();
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const account = await generateOpenAccountPrebill({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        accountId: selectedAccount.id,
+        expectedVersion: selectedAccount.version,
+      });
+      setSelectedAccount(account);
+      printOpenAccountPrebill(account, accountLabel(account), prebillWindow);
+      await refreshAccounts();
+    } catch (submitError) {
+      prebillWindow.close();
+      toast.showError(submitError, "No se pudo imprimir");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleCancelItem(itemId: string) {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !selectedAccount || !cancelReason.trim()) return;
+    setBusy(true);
+    setError(null);
+    try {
+      const account = await cancelOpenAccountItem({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        accountId: selectedAccount.id,
+        itemId,
+        body: { expectedVersion: selectedAccount.version, reason: cancelReason.trim() },
+      });
+      setSelectedAccount(account);
+      setCancelItemId(null);
+      setCancelReason("");
+      setPaymentForm((current) => ({ ...current, amount: account.balance.toFixed(2) }));
+      await refreshAccounts();
+    } catch (submitError) {
+      toast.showError(submitError, "No se pudo anular");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function updateItemAllocation(itemId: string, quantity: number) {
+    if (!selectedAccount) return;
+    const next = { ...itemAllocations };
+    if (quantity > 0) next[itemId] = quantity;
+    else delete next[itemId];
+    const amount = (selectedAccount.items ?? []).reduce((total, item) => {
+      const selectedQuantity = next[item.id] ?? 0;
+      return total + (item.total / item.quantity) * selectedQuantity;
+    }, 0);
+    setItemAllocations(next);
+    setPaymentForm((current) => ({ ...current, amount: amount.toFixed(2) }));
+  }
+
+  async function handlePayment(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !selectedAccount || !cashSessionId) return;
+    if (billingDocumentType === "FACTURA" && (!/^\d{11}$/.test(billingRecipient.documentNumber.trim()) || !billingRecipient.name.trim())) {
+      toast.showError("Para emitir factura ingresa RUC de 11 digitos y razon social.", "Datos incompletos");
+      return;
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      let paymentAccount = selectedAccount;
+      if ((selectedAccount.customerProfileId ?? "") !== paymentCustomerProfileId) {
+        paymentAccount = await updateOpenAccount({
+          accessToken: token,
+          organizationId: activeOrganizationId,
+          accountId: selectedAccount.id,
+          body: {
+            expectedVersion: selectedAccount.version,
+            customerProfileId: paymentCustomerProfileId || null,
+          },
+        });
+      }
+      const account = await recordOpenAccountPayment({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        accountId: paymentAccount.id,
+        body: {
+          expectedVersion: paymentAccount.version,
+          idempotencyKey: crypto.randomUUID(),
+          cashSessionId,
+          paymentMethodId: paymentForm.paymentMethodId || undefined,
+          amount: Number(paymentForm.amount),
+          billingDocumentType,
+          billingRecipient: billingDocumentType === "FACTURA"
+            ? {
+                documentType: "RUC",
+                documentNumber: billingRecipient.documentNumber.trim(),
+                name: billingRecipient.name.trim(),
+                address: billingRecipient.address.trim() || undefined,
+                email: billingRecipient.email.trim() || undefined,
+              }
+            : undefined,
+          allocations: splitByItems
+            ? Object.entries(itemAllocations).map(([itemId, quantity]) => ({ itemId, quantity }))
+            : undefined,
+        },
+      });
+      if (account.status === "CLOSED") {
+        setLastClosedAccount(account);
+        setLastBillingMessage(null);
+        setSelectedAccount(null);
+      } else {
+        setSelectedAccount(account);
+      }
+      setSplitByItems(false);
+      setItemAllocations({});
+      await Promise.all([refreshAccounts(), refreshDiningAreas()]);
+    } catch (submitError) {
+      toast.showError(submitError, "No se pudo cobrar");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const availableTables = areas.flatMap((area) => area.tables.filter((table) => table.isActive && !table.activeAccount).map((table) => ({ ...table, areaName: area.name })));
+  const filteredProductOptions = useMemo(() => {
+    const search = productQuery.trim().toLowerCase();
+    return products
+      .filter((product) => {
+        if (!search) return true;
+        return [product.name, product.sku, product.category?.name]
+          .filter(Boolean)
+          .some((value) => String(value).toLowerCase().includes(search));
+      })
+      .slice(0, 10);
+  }, [productQuery, products]);
+  const pendingKitchenItems = selectedAccount?.items?.filter((item) => item.status === "ACTIVE" && !item.kitchenTicketId).length ?? 0;
+  const activeItems = selectedAccount?.items?.filter((item) => item.status === "ACTIVE") ?? [];
+  const canMoveTables = effectivePermissionKeys.includes("sales.orders.move_table");
+  const canGeneratePrebill = effectivePermissionKeys.includes("sales.orders.prebill");
+  const canCancelItems = effectivePermissionKeys.includes("sales.orders.cancel_item");
+
+  async function handlePrintInternalTicket() {
+    if (!lastClosedAccount) return;
+    try {
+      printOpenAccountInternalTicket(lastClosedAccount, accountLabel(lastClosedAccount));
+    } catch (printError) {
+      toast.showError(printError, "No se pudo imprimir");
+    }
+  }
+
+  async function handleIssueLastClosedAccount() {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !lastClosedAccount?.sale?.id || billingDocumentType === "TICKET") return;
+    setBusy(true);
+    setError(null);
+    try {
+      const document = await issueSaleBillingDocument({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        saleId: lastClosedAccount.sale.id,
+        documentType: billingDocumentType,
+      });
+      setLastBillingMessage(`${billingDocumentType === "FACTURA" ? "Factura" : "Boleta"} ${document.series}-${document.number} emitida.`);
+      toast.showSuccess(`${billingDocumentType === "FACTURA" ? "Factura" : "Boleta"} ${document.series}-${document.number} emitida.`, "Comprobante emitido");
+      if (document.pdfUrl) window.open(document.pdfUrl, "_blank", "noopener,noreferrer");
+    } catch (issueError) {
+      toast.showError(issueError, "No se pudo emitir");
+    } finally {
+      setBusy(false);
+    }
+  }
 
   return (
-    <section className="space-y-8">
+    <section className="space-y-7">
       <AdminModuleHeader
         eyebrow="Ventas"
-        title="Cuentas abiertas"
-        description="Consulta pedidos de todos los canales. Los filtros y el buscador consultan directamente la información real de la sucursal."
-        action={<div className="flex gap-3"><select className="rounded-full border border-[#E4E4E4] bg-white px-5 py-3 text-sm" value={branchId} onChange={(event) => setBranchId(event.target.value)}>{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select><Link href="/ventas/pos"><AdminActionButton tone="primary" icon={<PlusIcon />}>Ir al POS</AdminActionButton></Link></div>}
-        stats={[
-          { label: "Cuentas visibles", value: String(accounts.length), hint: "Según filtro y búsqueda actual.", tone: "dark" },
-          { label: "Consumo acumulado", value: `S/ ${total.toFixed(2)}`, hint: "Total de las cuentas mostradas.", tone: "accent" },
-          { label: "Saldo pendiente", value: `S/ ${pending.toFixed(2)}`, hint: "Pendiente de cobro." },
-        ]}
+        title="Operación en vivo"
+        description="Abre pedidos, acumula consumos, envía comandas y cobra la misma cuenta que verá el equipo Izipay."
+        action={<div className="flex flex-wrap gap-3"><select className={`${inputClass} min-w-56`} value={branchId} onChange={(event) => { setBranchId(event.target.value); setSelectedAccount(null); void loadBranchContext(event.target.value); }}>{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select><AdminActionButton tone="primary" icon={<PlusIcon />} onClick={() => { setShowCreate(true); setSelectedAccount(null); }}>Iniciar pedido</AdminActionButton></div>}
       />
 
-      {error ? <AdminMessage title="No se pudieron consultar los pedidos" description={error} tone="warn" /> : null}
+      {error ? <AdminMessage title="La operación necesita atención" description={error} tone="warn" /> : null}
+      {!cashSessionId ? <AdminMessage title="Caja cerrada" description="Puedes preparar pedidos, pero debes abrir una caja en esta sucursal antes de cobrar." tone="warn" /> : null}
+      {lastClosedAccount ? (
+        <PanelCard
+          title="Pago registrado"
+          description={`Cuenta ${accountLabel(lastClosedAccount)} cerrada por S/ ${lastClosedAccount.total.toFixed(2)}. Puedes imprimir sin ir a Finanzas.`}
+        >
+          {lastBillingMessage ? <AdminMessage title="Comprobante listo" description={lastBillingMessage} tone="accent" /> : null}
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <p className="text-sm font-black text-[#0D0D0D]">{lastClosedAccount.sale?.saleNumber ?? lastClosedAccount.accountNumber}</p>
+              <p className="mt-1 text-sm text-[#535353]">
+                {billingDocumentType === "TICKET"
+                  ? "Ticket interno: no pasa por Nubefact ni SUNAT."
+                  : "Boleta/factura: emite en Nubefact y abre el PDF fiscal."}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <AdminActionButton icon={<Printer className="h-4 w-4" />} onClick={() => void handlePrintInternalTicket()}>
+                Imprimir ticket
+              </AdminActionButton>
+              {billingDocumentType !== "TICKET" ? (
+                <AdminActionButton tone="primary" icon={<ReceiptText className="h-4 w-4" />} disabled={busy || !lastClosedAccount.sale?.id} onClick={() => void handleIssueLastClosedAccount()}>
+                  Emitir y abrir PDF
+                </AdminActionButton>
+              ) : null}
+              <AdminActionButton tone="ghost" onClick={() => setLastClosedAccount(null)}>
+                Cerrar panel
+              </AdminActionButton>
+            </div>
+          </div>
+        </PanelCard>
+      ) : null}
 
-      <PanelCard title="Operación actual" description="Se actualiza automáticamente cada cinco segundos.">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex flex-wrap gap-2">{filters.map((item) => <button key={item.key} type="button" onClick={() => setFilter(item.key)} className={`rounded-full border px-4 py-2 text-sm font-semibold transition ${filter === item.key ? "border-[#1a1d14] bg-[#171717] text-white" : "border-[#e1e7d3] bg-white text-[#566347]"}`}>{item.label}</button>)}</div>
-          <label className="relative min-w-72"><Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#A1A1A1]" /><input className="w-full rounded-full border border-[#E4E4E4] bg-white py-3 pl-11 pr-4 text-sm outline-none focus:border-[#00C70D]" placeholder="Mesa, cuenta, cliente o teléfono" value={search} onChange={(event) => setSearch(event.target.value)} /></label>
-        </div>
+      <div className="grid gap-6 xl:grid-cols-[340px_minmax(0,1fr)]">
+        <PanelCard title="Cuentas abiertas" description={`${accounts.length} operaciones sincronizadas`}>
+          <div className="space-y-3">
+            {accounts.length === 0 ? <p className="py-8 text-center text-sm text-[#535353]">No hay cuentas abiertas.</p> : null}
+            {accounts.map((account) => (
+              <button key={account.id} type="button" onClick={() => void openAccount(account.id)} className={`w-full rounded-[22px] border p-4 text-left transition ${selectedAccount?.id === account.id ? "border-[#00C70D] bg-[#E8FCEB]" : "border-[#E4E4E4] bg-white hover:border-[#40D653]"}`}>
+                <div className="flex items-center justify-between gap-2"><p className="font-semibold text-[#0D0D0D]">{accountLabel(account)}</p><Tag tone={account.status === "PARTIALLY_PAID" ? "warn" : "accent"}>{account.status === "PARTIALLY_PAID" ? "Parcial" : "Abierta"}</Tag></div>
+                <p className="mt-1 text-xs text-[#535353]">{account.accountNumber} · {serviceLabels[account.serviceType]}</p>
+                <div className="mt-4 flex items-end justify-between"><span className="text-xs text-[#535353]">Saldo</span><strong className="text-xl text-[#27350f]">S/ {account.balance.toFixed(2)}</strong></div>
+              </button>
+            ))}
+          </div>
+        </PanelCard>
 
-        {loading && accounts.length === 0 ? <p className="py-12 text-center text-sm text-[#70795f]">Actualizando cuentas...</p> : null}
-        {!loading && accounts.length === 0 ? <div className="mt-6"><AdminMessage title="No encontramos cuentas" description="Prueba otro filtro o inicia un pedido desde el POS." /></div> : null}
-        <div className="mt-6 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {accounts.map((account) => {
-            const Icon = account.serviceType === "LOCAL" ? Utensils : account.serviceType === "DELIVERY" ? Bike : ShoppingBag;
-            return <article key={account.id} className="rounded-[28px] border border-[#E4E4E4] bg-white p-5 shadow-[0_16px_34px_rgba(34,44,18,0.05)]"><div className="flex items-start justify-between gap-3"><span className="grid h-12 w-12 place-items-center rounded-[18px] bg-[#E8FCEB] text-[#00C70D]"><Icon className="h-5 w-5" /></span><Tag tone={account.status === "PARTIALLY_PAID" ? "warn" : "accent"}>{account.status === "PARTIALLY_PAID" ? "Pago parcial" : "Cuenta abierta"}</Tag></div><h3 className="mt-5 text-xl font-semibold text-[#1a210f]">{account.diningTable?.name ?? account.customerName ?? (account.serviceType === "TAKEAWAY" ? "Para llevar" : "Delivery")}</h3><p className="mt-1 text-xs text-[#A1A1A1]">{account.accountNumber} · {account._count?.items ?? 0} ítems</p><div className="mt-5 grid grid-cols-2 gap-3"><div className="rounded-2xl bg-[#F8F8F8] p-3"><p className="text-xs text-[#758064]">Total</p><strong className="mt-1 block">S/ {account.total.toFixed(2)}</strong></div><div className="rounded-2xl bg-[#F8F8F8] p-3"><p className="text-xs text-[#535353]">Saldo</p><strong className="mt-1 block text-[#00C70D]">S/ {account.balance.toFixed(2)}</strong></div></div><p className="mt-4 flex items-center gap-2 text-xs text-[#535353]"><Clock3 className="h-4 w-4" />Actualizada {new Date(account.updatedAt).toLocaleTimeString("es-PE", { hour: "2-digit", minute: "2-digit" })}</p></article>;
-          })}
-        </div>
-      </PanelCard>
+        {showCreate ? (
+          <PanelCard title="Iniciar pedido" description="Los datos de delivery aparecen únicamente cuando corresponde.">
+            <form className="space-y-5" onSubmit={handleCreateAccount}>
+              <div className="grid gap-3 sm:grid-cols-3">
+                {(["LOCAL", "DELIVERY", "TAKEAWAY"] as ServiceType[]).map((type) => (
+                  <button key={type} type="button" onClick={() => setServiceType(type)} className={`rounded-[24px] border p-5 text-left transition ${serviceType === type ? "border-[#00C70D] bg-[#E8FCEB]" : "border-[#E4E4E4] bg-white"}`}><span className="grid h-10 w-10 place-items-center rounded-2xl bg-white text-[#00C70D]">{type === "LOCAL" ? <Utensils className="h-5 w-5" /> : type === "DELIVERY" ? <MapPin className="h-5 w-5" /> : <ShoppingBag className="h-5 w-5" />}</span><strong className="mt-4 block text-[#0D0D0D]">{serviceLabels[type]}</strong></button>
+                ))}
+              </div>
+              {serviceType === "LOCAL" ?
+                <div className="grid gap-4 md:grid-cols-2"><label className="space-y-2"><span className="text-sm font-semibold">Mesa</span><select className={inputClass} value={newAccount.diningTableId} onChange={(event) => setNewAccount((current) => ({ ...current, diningTableId: event.target.value }))} required><option value="">Selecciona una mesa libre</option>{availableTables.map((table) => <option key={table.id} value={table.id}>{table.areaName} · {table.name}</option>)}</select></label><label className="space-y-2"><span className="text-sm font-semibold">Comensales</span><input className={inputClass} type="number" min="1" value={newAccount.guestCount} onChange={(event) => setNewAccount((current) => ({ ...current, guestCount: event.target.value }))} /></label>
+                </div> : null}
+              {serviceType === "DELIVERY" ?
+                <div className="grid gap-4 md:grid-cols-2"><input className={inputClass} placeholder="Nombre del cliente" value={newAccount.customerName} onChange={(event) => setNewAccount((current) => ({ ...current, customerName: event.target.value }))} required /><input className={inputClass} placeholder="Teléfono" value={newAccount.customerPhone} onChange={(event) => setNewAccount((current) => ({ ...current, customerPhone: event.target.value }))} /><input className={`${inputClass} md:col-span-2`} placeholder="Dirección de entrega" value={newAccount.deliveryAddress} onChange={(event) => setNewAccount((current) => ({ ...current, deliveryAddress: event.target.value }))} required /><input className={`${inputClass} md:col-span-2`} placeholder="Referencia (opcional)" value={newAccount.deliveryReference} onChange={(event) => setNewAccount((current) => ({ ...current, deliveryReference: event.target.value }))} />
+                </div> : null}
+              <div className=" flex flex-col gap-2">
+                <label className="space-y-3">
+                  <span className="text-sm font-semibold">Cliente para puntos (opcional)</span>
+                  <select className={inputClass} value={newAccount.customerProfileId} onChange={(event) => setNewAccount((current) => ({ ...current, customerProfileId: event.target.value }))}>
+                    <option value="">Venta sin cliente identificado</option>{customers.map((customer) => <option key={customer.id} value={customer.id}>{customerOptionLabel(customer)}</option>)}
+                  </select>
+                </label>
+                <textarea className={inputClass} placeholder="Observación general (opcional)" value={newAccount.note} onChange={(event) => setNewAccount((current) => ({ ...current, note: event.target.value }))} />
+              </div>
+              <div className="flex justify-end gap-3">
+                <AdminActionButton tone="ghost" onClick={() => setShowCreate(false)}>Cancelar
+                </AdminActionButton>
+                <AdminActionButton type="submit" tone="primary" disabled={busy}>Abrir cuenta
+                </AdminActionButton>
+              </div>
+            </form>
+          </PanelCard>
+        ) : selectedAccount ? (
+          <div className="space-y-6">
+            <div className="grid gap-4 md:grid-cols-3">
+              <div className="rounded-[28px] bg-[#151713] p-5 text-white"><p className="text-sm text-white/60">Cuenta</p><strong className="mt-3 block text-2xl">{accountLabel(selectedAccount)}</strong><p className="mt-2 text-xs text-white/55">{selectedAccount.accountNumber}</p></div>
+              <div className="rounded-[28px] border border-[#B8F5BC] bg-[#E8FCEB] p-5"><p className="text-sm text-[#535353]">Total acumulado</p><strong className="mt-3 block text-3xl text-[#00C70D]">S/ {selectedAccount.total.toFixed(2)}</strong></div>
+              <div className="rounded-[28px] border border-[#E4E4E4] bg-[#F8F8F8] p-5"><p className="text-sm text-[#535353]">Saldo pendiente</p><strong className="mt-3 block text-3xl text-[#00C70D]">S/ {selectedAccount.balance.toFixed(2)}</strong></div>
+            </div>
+
+            <PanelCard title="Herramientas de cuenta" description="Traslada la atención, anexa mesas o entrega una precuenta sin cerrar la venta.">
+              <div className="flex flex-wrap gap-3">
+                {selectedAccount.serviceType === "LOCAL" && canMoveTables ? <AdminActionButton icon={<Undo2 className="h-4 w-4" />} onClick={() => setTableAction("MOVE")}>Cambiar mesa</AdminActionButton> : null}
+                {selectedAccount.serviceType === "LOCAL" && canMoveTables ? <AdminActionButton icon={<Link2 className="h-4 w-4" />} onClick={() => setTableAction("JOIN")}>Unir mesa libre</AdminActionButton> : null}
+                {canGeneratePrebill ? <AdminActionButton tone="accent" icon={<Printer className="h-4 w-4" />} disabled={busy || activeItems.length === 0} onClick={() => void handlePrebill()}>Precuenta</AdminActionButton> : null}
+              </div>
+              {selectedAccount.tableLinks?.length ? (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Tag tone="accent">Principal: {selectedAccount.diningTable?.name}</Tag>
+                  {selectedAccount.tableLinks.map((link) => (
+                    <button key={link.id} type="button" className="rounded-full border border-[#dbe6bf] bg-white px-3 py-1 text-xs font-semibold text-[#4d5b30]" onClick={() => void handleReleaseTable(link.diningTableId)}>
+                      {link.diningTable.name} · liberar
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+              {tableAction ? (
+                <div className="mt-4 grid gap-3 rounded-[22px] border border-[#e0e8ce] bg-[#F8F8F8] p-4 md:grid-cols-[minmax(0,1fr)_auto_auto]">
+                  <select className={inputClass} value={targetTableId} onChange={(event) => setTargetTableId(event.target.value)}>
+                    <option value="">Selecciona una mesa libre</option>
+                    {availableTables.map((table) => <option key={table.id} value={table.id}>{table.areaName} · {table.name}</option>)}
+                  </select>
+                  <AdminActionButton tone="primary" disabled={busy || !targetTableId} onClick={() => void handleTableAction()}>{tableAction === "MOVE" ? "Trasladar cuenta" : "Anexar mesa"}</AdminActionButton>
+                  <AdminActionButton tone="ghost" onClick={() => { setTableAction(null); setTargetTableId(""); }}>Cancelar</AdminActionButton>
+                </div>
+              ) : null}
+            </PanelCard>
+
+            <PanelCard title="Agregar productos" description="Cada observación viaja con el ítem hacia cocina.">
+              <form className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_120px_minmax(0,1fr)_auto]" onSubmit={handleAddItem}>
+                <div className="relative">
+                  <input
+                    className={inputClass}
+                    placeholder="Buscar producto, SKU o categoría"
+                    value={productQuery}
+                    onBlur={() => window.setTimeout(() => setShowProductOptions(false), 120)}
+                    onChange={(event) => {
+                      setProductQuery(event.target.value);
+                      setShowProductOptions(true);
+                      setItemForm((current) => ({ ...current, productId: "" }));
+                    }}
+                    onFocus={() => setShowProductOptions(true)}
+                  />
+                  {showProductOptions ? (
+                    <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-80 overflow-auto rounded-[22px] border border-[#DDF3D5] bg-white p-2 shadow-[0_24px_60px_rgba(20,28,14,0.16)]">
+                      {filteredProductOptions.length ? filteredProductOptions.map((product) => (
+                        <button
+                          key={product.id}
+                          type="button"
+                          className="flex w-full items-center justify-between gap-3 rounded-[16px] px-3 py-3 text-left transition hover:bg-[#E8FCEB]"
+                          onMouseDown={(event) => event.preventDefault()}
+                          onClick={() => {
+                            setItemForm((current) => ({ ...current, productId: product.id }));
+                            setProductQuery(productOptionLabel(product));
+                            setShowProductOptions(false);
+                          }}
+                        >
+                          <span>
+                            <span className="block text-sm font-black text-[#0D0D0D]">{product.name}</span>
+                            <span className="block text-xs text-[#535353]">{product.sku ?? product.category?.name ?? "Producto"}</span>
+                          </span>
+                          <strong className="shrink-0 text-sm text-[#00A70B]">S/ {product.price.toFixed(2)}</strong>
+                        </button>
+                      )) : (
+                        <p className="px-3 py-5 text-center text-sm text-[#535353]">No encontramos productos.</p>
+                      )}
+                    </div>
+                  ) : null}
+                </div>
+                <input className={inputClass} type="number" min="1" step="1" value={itemForm.quantity} onChange={(event) => setItemForm((current) => ({ ...current, quantity: event.target.value.replace(/\D/g, "") || "1" }))} />
+                <input className={inputClass} placeholder="Ej. sin cebolla" value={itemForm.note} onChange={(event) => setItemForm((current) => ({ ...current, note: event.target.value }))} />
+                <AdminActionButton type="submit" tone="accent" icon={<PackagePlus className="h-4 w-4" />} disabled={busy || !itemForm.productId}>Agregar</AdminActionButton>
+              </form>
+              <div className="mt-5 divide-y divide-[#edf0e6]">
+                {selectedAccount.items?.map((item) => (
+                  <div key={item.id} className={`py-3 ${item.status === "CANCELLED" ? "opacity-55" : ""}`}>
+                    <div className="flex items-center justify-between gap-4">
+                      <div>
+                        <p className={`font-semibold text-[#0D0D0D] ${item.status === "CANCELLED" ? "line-through" : ""}`}>{item.quantity} × {item.productName}</p>
+                        <p className="text-xs text-[#717b60]">{item.status === "CANCELLED" ? `Anulado: ${item.cancellationReason}` : item.note || (item.kitchenTicketId ? `Comanda #${item.kitchenTicket?.sequence ?? ""}` : "Pendiente de enviar")}</p>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <strong>S/ {item.total.toFixed(2)}</strong>
+                        {item.status === "ACTIVE" && canCancelItems ? <AdminActionButton size="icon" tone="danger" aria-label={`Anular ${item.productName}`} icon={<Trash2 className="h-4 w-4" />} onClick={() => { setCancelItemId(item.id); setCancelReason(""); }} /> : null}
+                      </div>
+                    </div>
+                    {cancelItemId === item.id ? (
+                      <div className="mt-3 grid gap-3 rounded-2xl bg-[#fff4f1] p-3 md:grid-cols-[minmax(0,1fr)_auto_auto]">
+                        <input className={inputClass} placeholder="Motivo obligatorio de anulación" value={cancelReason} onChange={(event) => setCancelReason(event.target.value)} />
+                        <AdminActionButton tone="danger" disabled={busy || !cancelReason.trim()} onClick={() => void handleCancelItem(item.id)}>Confirmar anulación</AdminActionButton>
+                        <AdminActionButton tone="ghost" onClick={() => { setCancelItemId(null); setCancelReason(""); }}>Volver</AdminActionButton>
+                      </div>
+                    ) : null}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-5 flex justify-end"><AdminActionButton tone="primary" icon={<ChefHat className="h-4 w-4" />} onClick={() => void handleKitchen()} disabled={busy || pendingKitchenItems === 0}>Enviar {pendingKitchenItems} a cocina</AdminActionButton></div>
+            </PanelCard>
+
+            <PanelCard title="Cobrar cuenta" description="Cobra un monto libre o selecciona exactamente qué productos paga cada persona.">
+              <label className="mb-4 block space-y-2">
+                <span className="text-sm font-semibold">Cliente para puntos</span>
+                <select className={inputClass} value={paymentCustomerProfileId} onChange={(event) => setPaymentCustomerProfileId(event.target.value)}>
+                  <option value="">Cliente final / Clientes varios</option>
+                  {customers.map((customer) => <option key={customer.id} value={customer.id}>{customerOptionLabel(customer)}</option>)}
+                </select>
+                <small className="block leading-5 text-[#6b7558]">Este cliente acumula puntos. Si emites factura, los datos fiscales se llenan aparte.</small>
+              </label>
+              <div className="mb-4 rounded-[24px] border border-[#e0e8ce] bg-[#F8F8F8] p-4">
+                <span className="text-sm font-semibold">Comprobante</span>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {(["TICKET", "BOLETA", "FACTURA"] as OrderBillingDocumentType[]).map((type) => (
+                    <AdminActionButton key={type} active={billingDocumentType === type} onClick={() => setBillingDocumentType(type)}>
+                      {type === "TICKET" ? "Ticket" : type === "BOLETA" ? "Boleta" : "Factura"}
+                    </AdminActionButton>
+                  ))}
+                </div>
+                {billingDocumentType === "FACTURA" ? (
+                  <div className="mt-4 grid gap-3 md:grid-cols-2">
+                    <input className={inputClass} placeholder="RUC de 11 digitos" value={billingRecipient.documentNumber} onChange={(event) => setBillingRecipient((current) => ({ ...current, documentNumber: event.target.value.replace(/\D/g, "").slice(0, 11) }))} required />
+                    <input className={inputClass} placeholder="Razon social" value={billingRecipient.name} onChange={(event) => setBillingRecipient((current) => ({ ...current, name: event.target.value }))} required />
+                    <input className={`${inputClass} md:col-span-2`} placeholder="Direccion fiscal (opcional)" value={billingRecipient.address} onChange={(event) => setBillingRecipient((current) => ({ ...current, address: event.target.value }))} />
+                    <input className={`${inputClass} md:col-span-2`} placeholder="Correo para envio (opcional)" value={billingRecipient.email} onChange={(event) => setBillingRecipient((current) => ({ ...current, email: event.target.value }))} />
+                    <p className="md:col-span-2 text-xs leading-5 text-[#6b7558]">La factura usara estos datos. El cliente seleccionado arriba solo sirve para puntos e historial.</p>
+                  </div>
+                ) : null}
+              </div>
+              <div className="mb-4 flex flex-wrap gap-2">
+                <AdminActionButton active={!splitByItems} onClick={() => { setSplitByItems(false); setItemAllocations({}); setPaymentForm((current) => ({ ...current, amount: selectedAccount.balance.toFixed(2) })); }}>Monto libre</AdminActionButton>
+                <AdminActionButton active={splitByItems} icon={<Split className="h-4 w-4" />} onClick={() => { setSplitByItems(true); setItemAllocations({}); setPaymentForm((current) => ({ ...current, amount: "0.00" })); }}>Dividir por productos</AdminActionButton>
+              </div>
+              {splitByItems ? (
+                <div className="mb-4 divide-y divide-[#e7ecd9] rounded-[22px] border border-[#e0e8ce] bg-[#F8F8F8] px-4">
+                  {activeItems.filter((item) => item.remainingQuantity > 0).map((item) => (
+                    <div key={item.id} className="grid items-center gap-3 py-3 md:grid-cols-[minmax(0,1fr)_120px_130px]">
+                      <div><p className="font-semibold text-[#0D0D0D]">{item.productName}</p><p className="text-xs text-[#737c62]">Pendiente {item.remainingQuantity} de {item.quantity}</p></div>
+                      <input className={inputClass} type="number" min="0" max={item.remainingQuantity} step="0.001" value={itemAllocations[item.id] ?? 0} onChange={(event) => updateItemAllocation(item.id, Math.min(item.remainingQuantity, Math.max(0, Number(event.target.value))))} />
+                      <strong className="text-right text-[#00C70D]">S/ {(((itemAllocations[item.id] ?? 0) * item.total) / item.quantity).toFixed(2)}</strong>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+              <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_auto]" onSubmit={handlePayment}><select className={inputClass} value={paymentForm.paymentMethodId} onChange={(event) => setPaymentForm((current) => ({ ...current, paymentMethodId: event.target.value }))}>{paymentMethods.map((method) => <option key={method.id} value={method.id}>{method.name}</option>)}</select><input className={inputClass} type="number" min="0.01" max={selectedAccount.balance} step="0.01" value={paymentForm.amount} readOnly={splitByItems} onChange={(event) => setPaymentForm((current) => ({ ...current, amount: event.target.value }))} required /><AdminActionButton type="submit" tone="primary" icon={<CreditCard className="h-4 w-4" />} disabled={busy || !cashSessionId || Number(paymentForm.amount) <= 0}>Registrar pago</AdminActionButton></form>
+            </PanelCard>
+          </div>
+        ) : (
+          <div className="grid min-h-[540px] place-items-center rounded-[36px] border border-dashed border-[#dce5c7] bg-[radial-gradient(circle_at_top,#f4fad9_0%,#F8F8F8_48%,#ffffff_100%)] p-8 text-center"><div className="max-w-md"><span className="mx-auto grid h-20 w-20 place-items-center rounded-[28px] bg-[#171917] text-[#c9ef4b]"><ReceiptText className="h-9 w-9" /></span><h2 className="mt-6 text-3xl font-semibold text-[#1a210f]">Selecciona una cuenta</h2><p className="mt-3 leading-7 text-[#626c52]">Retoma un pedido abierto o inicia uno nuevo. El catálogo solo aparece dentro de una operación, no como un carrito global.</p><div className="mt-6 flex justify-center gap-4 text-xs text-[#788168]"><span className="flex items-center gap-1"><Clock3 className="h-4 w-4" />Sincronización cada 5 s</span><span className="flex items-center gap-1"><CreditCard className="h-4 w-4" />Pagos parciales</span></div></div></div>
+        )}
+      </div>
     </section>
   );
 }

@@ -161,7 +161,7 @@ export default function CatalogoCategoriasPage() {
       <AdminModuleHeader
         eyebrow="Catalogo"
         title="Categorias"
-        description="Orden visual y operativo para productos, POS y reportes."
+        description="Orden visual y operativo para productos, pedidos y reportes."
         action={
           <div className="flex gap-3">
             {viewMode === "create" ? (

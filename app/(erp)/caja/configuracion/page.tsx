@@ -55,7 +55,7 @@ export default function MetodosPagoPage() {
     enabled: true,
   });
 
-  const canCreate = effectivePermissionKeys.includes("settings.payment_methods.create");
+  const canCreate = effectivePermissionKeys.includes("cash.payment_methods.create");
 
   async function resolveToken() {
     return accessToken ?? (await refreshSession({ silent: true }))?.accessToken ?? null;
@@ -182,9 +182,9 @@ export default function MetodosPagoPage() {
   return (
     <section className="space-y-8">
       <AdminModuleHeader
-        eyebrow="Configuracion"
-        title="Metodos de pago"
-        description="Configura las formas de cobro que caja y POS podran usar: efectivo, Yape, Plin, tarjeta, transferencia o credito."
+        eyebrow="Caja"
+        title="Configuración de caja"
+        description="Configura las formas de cobro que caja y pedidos podran usar: efectivo, Yape, Plin, tarjeta, transferencia o credito."
         action={
           <div className="flex gap-3">
             {viewMode === "create" ? (
@@ -204,7 +204,7 @@ export default function MetodosPagoPage() {
         stats={[
           { label: "Metodos", value: String(methods.length), hint: "Formas de pago configuradas.", tone: "dark" },
           { label: "Activos", value: String(methods.filter((method) => method.enabled).length), hint: "Disponibles para vender.", tone: "accent" },
-          { label: "Uso", value: "Caja y POS", hint: "Se seleccionan al registrar cobros." },
+          { label: "Uso", value: "Caja y pedidos", hint: "Se seleccionan al registrar cobros." },
         ]}
       />
 
@@ -222,7 +222,7 @@ export default function MetodosPagoPage() {
           </form>
         </PanelCard>
       ) : (
-        <PanelCard title="Lista de metodos de pago" description="Esta lista alimenta caja, POS restaurante y cobros de ventas rapidas.">
+        <PanelCard title="Lista de metodos de pago" description="Esta lista alimenta caja, pedidos y cobros de ventas rapidas.">
           <AdminDataTable
             fetchData={fetchPaymentMethods}
             reloadKey={`${activeOrganizationId ?? ""}-${reloadKey}`}
@@ -238,10 +238,10 @@ export default function MetodosPagoPage() {
               { key: "status", label: "Estado", render: (row) => <Tag tone={row.enabled ? "accent" : "soft"}>{row.enabled ? "Activo" : "Inactivo"}</Tag> },
             ]}
             actions={[
-              { label: "Editar", permission: "settings.payment_methods.update", icon: <PencilIcon />, onClick: openMethodEditor },
-              { label: "Activar", permission: "settings.payment_methods.activate", tone: "accent", icon: <PlusIcon />, visible: (row) => !row.enabled, onClick: toggleMethodStatus },
-              { label: "Desactivar", permission: "settings.payment_methods.update", tone: "warn", icon: <CreditCard className="h-4 w-4" />, visible: (row) => row.enabled, onClick: toggleMethodStatus },
-              { label: "Eliminar", permission: "settings.payment_methods.delete", tone: "warn", icon: <TrashIcon />, onClick: removeMethod },
+              { label: "Editar", permission: "cash.payment_methods.update", icon: <PencilIcon />, onClick: openMethodEditor },
+              { label: "Activar", permission: "cash.payment_methods.activate", tone: "accent", icon: <PlusIcon />, visible: (row) => !row.enabled, onClick: toggleMethodStatus },
+              { label: "Desactivar", permission: "cash.payment_methods.update", tone: "warn", icon: <CreditCard className="h-4 w-4" />, visible: (row) => row.enabled, onClick: toggleMethodStatus },
+              { label: "Eliminar", permission: "cash.payment_methods.delete", tone: "warn", icon: <TrashIcon />, onClick: removeMethod },
             ]}
           />
         </PanelCard>

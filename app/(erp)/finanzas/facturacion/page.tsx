@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ExternalLink, FileCheck2, Printer, ReceiptText } from "lucide-react";
+import { ExternalLink, FileCheck2, Printer, ReceiptText, Settings } from "lucide-react";
 import { AdminActionButton, SparkIcon } from "../../../components/admin/AdminActionButton";
 import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
@@ -133,7 +133,11 @@ export default function FacturacionPage() {
         eyebrow="Finanzas"
         title="Facturación"
         description="Bandeja operativa de comprobantes: emisión, reintentos, errores y documentos generados."
-        action={<ReceiptText className="h-6 w-6 text-[#00C70D]" />}
+        action={
+          <Link href="/finanzas/facturacion/configuracion">
+            <AdminActionButton icon={<Settings className="h-4 w-4" />}>Configuración</AdminActionButton>
+          </Link>
+        }
         stats={[
           { label: "Comprobantes", value: String(documentTotal), hint: "Resultados según el filtro actual.", tone: "dark" },
           { label: "Pendientes", value: "Filtro", hint: "Usa el selector para revisar por estado.", tone: "accent" },

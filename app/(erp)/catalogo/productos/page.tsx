@@ -300,7 +300,7 @@ export default function CatalogoProductosPage() {
       <AdminModuleHeader
         eyebrow="Catalogo"
         title="Productos"
-        description="Productos, insumos, servicios y combos que luego consumira el POS."
+        description="Productos, insumos, servicios y combos que luego consumiran los pedidos."
         action={
           <div className="flex gap-3">
             {viewMode === "create" ? (
@@ -325,7 +325,7 @@ export default function CatalogoProductosPage() {
         stats={[
           { label: "Productos", value: String(products.length), hint: "Pagina actual.", tone: "dark" },
           { label: "Categorias", value: String(categories.length), hint: "Clasificacion disponible.", tone: "accent" },
-          { label: "Para POS", value: String(products.filter((product) => product.availableForPos).length), hint: "Visibles para vender." },
+          { label: "Para pedidos", value: String(products.filter((product) => product.availableForPos).length), hint: "Visibles para vender." },
         ]}
       />
       {viewMode === "create" ? (
@@ -338,7 +338,7 @@ export default function CatalogoProductosPage() {
               label="Imagen del producto"
               value={form.imageUrl}
               previewSrc={resolveApiAssetUrl(form.imageUrl)}
-              description="Se usara para catalogo, POS y pantallas donde el equipo necesite reconocer el producto rapido."
+              description="Se usara para catalogo, pedidos y pantallas donde el equipo necesite reconocer el producto rapido."
               maxBytes={5 * 1024 * 1024}
               maxWidth={1600}
               maxHeight={1600}
@@ -371,7 +371,7 @@ export default function CatalogoProductosPage() {
                 Recalcular con {defaultTaxRate}%
               </AdminActionButton>
             </div>
-            <label className="flex items-center gap-3 rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm font-semibold text-[#0D0D0D]"><input type="checkbox" checked={form.availableForPos} onChange={(event) => setForm((current) => ({ ...current, availableForPos: event.target.checked }))} />Disponible para POS</label>
+            <label className="flex items-center gap-3 rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm font-semibold text-[#0D0D0D]"><input type="checkbox" checked={form.availableForPos} onChange={(event) => setForm((current) => ({ ...current, availableForPos: event.target.checked }))} />Disponible para pedidos</label>
             <label className="flex items-center gap-3 rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm font-semibold text-[#0D0D0D]"><input type="checkbox" checked={form.trackStock} onChange={(event) => setForm((current) => ({ ...current, trackStock: event.target.checked }))} />Controla stock</label>
             <div className="flex justify-end"><AdminActionButton type="submit" tone="primary" icon={<PlusIcon />}>Crear producto</AdminActionButton></div>
           </form>
@@ -385,7 +385,7 @@ export default function CatalogoProductosPage() {
             permissionKeys={effectivePermissionKeys}
             searchPlaceholder="Buscar producto, SKU o categoria..."
             emptyTitle="Aun no hay productos"
-            emptyDescription="Crea productos para empezar a preparar POS e inventario."
+            emptyDescription="Crea productos para empezar a preparar pedidos e inventario."
             columns={[
               { key: "name", label: "Producto", render: (row) => <div className="flex items-center gap-3"><div className="grid size-12 shrink-0 place-items-center overflow-hidden rounded-[16px] border border-[#E4E4E4] bg-[#F8F8F8]">{row.imageUrl ? <img src={resolveApiAssetUrl(row.imageUrl)} alt="" className="h-full w-full object-cover" /> : <span className="text-xs font-black text-[#A1A1A1]">{row.name.slice(0, 2).toUpperCase()}</span>}</div><div><p className="font-semibold text-[#0D0D0D]">{row.name}</p><p className="text-xs text-[#A1A1A1]">{row.sku ?? "sin sku"}</p></div></div> },
               { key: "category", label: "Categoria", render: (row) => row.category?.name ?? "Sin categoria" },
@@ -424,7 +424,7 @@ export default function CatalogoProductosPage() {
               label="Imagen del producto"
               value={editForm.imageUrl}
               previewSrc={resolveApiAssetUrl(editForm.imageUrl)}
-              description="Se usara para catalogo, POS y pantallas donde el equipo necesite reconocer el producto rapido."
+              description="Se usara para catalogo, pedidos y pantallas donde el equipo necesite reconocer el producto rapido."
               maxBytes={5 * 1024 * 1024}
               maxWidth={1600}
               maxHeight={1600}
@@ -459,7 +459,7 @@ export default function CatalogoProductosPage() {
               Recalcular con {defaultTaxRate}%
             </AdminActionButton>
           </div>
-          <label className="flex items-center gap-3 rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm font-semibold text-[#0D0D0D]"><input type="checkbox" checked={editForm.availableForPos} onChange={(event) => setEditForm((current) => ({ ...current, availableForPos: event.target.checked }))} />Disponible para POS</label>
+          <label className="flex items-center gap-3 rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm font-semibold text-[#0D0D0D]"><input type="checkbox" checked={editForm.availableForPos} onChange={(event) => setEditForm((current) => ({ ...current, availableForPos: event.target.checked }))} />Disponible para pedidos</label>
           <label className="flex items-center gap-3 rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm font-semibold text-[#0D0D0D]"><input type="checkbox" checked={editForm.trackStock} onChange={(event) => setEditForm((current) => ({ ...current, trackStock: event.target.checked }))} />Controla stock</label>
         </form>
       </AdminOverlayPanel>

@@ -152,7 +152,7 @@ export default function ConfigEmpresaPage() {
 
       {error ? <AdminMessage title="No pudimos guardar" description={error} tone="warn" /> : null}
 
-      <PanelCard title="Perfil operativo" description={isLoading ? "Cargando datos reales..." : "Estos datos alimentaran tickets, facturacion, POS y reportes."}>
+      <PanelCard title="Perfil operativo" description={isLoading ? "Cargando datos reales..." : "Estos datos alimentaran tickets, facturacion, pedidos y reportes."}>
         <form className="grid gap-4 md:grid-cols-2" onSubmit={handleSubmit}>
           {[
             ["legalName", "Razon social", "BASTI FOODS S.A.C."],

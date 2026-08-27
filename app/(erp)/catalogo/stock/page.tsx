@@ -101,7 +101,7 @@ export default function CatalogoStockPage() {
         ]}
       />
       {viewMode === "create" ? (
-        <PanelCard title="Actualizar stock" description="Stock inicial manual para dejar listo el POS.">
+        <PanelCard title="Actualizar stock" description="Stock inicial manual para dejar lista la venta.">
           <form className="space-y-4" onSubmit={handleSubmit}>
             <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Producto</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.productId} onChange={(event) => setForm((current) => ({ ...current, productId: event.target.value }))} required><option value="">Selecciona producto</option>{products.map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}</select></label>
             <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Sucursal</span><select className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={form.branchId} onChange={(event) => setForm((current) => ({ ...current, branchId: event.target.value }))} required><option value="">Selecciona sucursal</option>{branches.map((branch) => <option key={branch.id} value={branch.id}>{branch.name}</option>)}</select></label>

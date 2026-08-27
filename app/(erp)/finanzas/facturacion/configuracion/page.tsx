@@ -2,12 +2,12 @@
 
 import { useEffect, useState, type FormEvent } from "react";
 import { Pencil, ReceiptText, Trash2 } from "lucide-react";
-import { AdminActionButton } from "../../../components/admin/AdminActionButton";
-import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
-import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
-import { useAuth } from "../../../context/auth-context";
-import { deleteBillingSeries, getBillingSeries, getBranches, updateBillingSeries, upsertBillingSeries } from "../../../lib/erp-api";
-import type { BillingSeriesSummary, BranchSummary } from "../../../types/erp";
+import { AdminActionButton } from "../../../../components/admin/AdminActionButton";
+import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../../components/admin/AdminBlocks";
+import { AdminOverlayPanel } from "../../../../components/admin/AdminOverlayPanel";
+import { useAuth } from "../../../../context/auth-context";
+import { deleteBillingSeries, getBillingSeries, getBranches, updateBillingSeries, upsertBillingSeries } from "../../../../lib/erp-api";
+import type { BillingSeriesSummary, BranchSummary } from "../../../../types/erp";
 
 const inputClass =
   "w-full rounded-[18px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#00C70D]";
@@ -165,8 +165,8 @@ export default function SeriesFiscalesPage() {
   return (
     <section className="space-y-8">
       <AdminModuleHeader
-        eyebrow="Finanzas"
-        title="Series fiscales"
+        eyebrow="Facturación"
+        title="Configuración de facturación"
         description="Controla series y correlativos por sucursal sin mezclar credenciales ni comprobantes."
         action={canCreateSeries ? <AdminActionButton tone="primary" icon={<ReceiptText className="h-4 w-4" />} onClick={openCreateSeries}>Crear serie</AdminActionButton> : <ReceiptText className="h-6 w-6 text-[#00C70D]" />}
         stats={[

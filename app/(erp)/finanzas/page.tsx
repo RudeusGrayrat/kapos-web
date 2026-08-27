@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Banknote, FileText, Landmark, PlugZap, ReceiptText, WalletCards } from "lucide-react";
+import { ArrowRight, Banknote, FileText, Landmark, PlugZap, WalletCards } from "lucide-react";
 import { AdminModuleHeader, PanelCard, Tag } from "../../components/admin/AdminBlocks";
 
 const financeSections = [
@@ -9,13 +9,6 @@ const financeSections = [
     href: "/finanzas/facturacion",
     status: "Operativo",
     icon: FileText,
-  },
-  {
-    title: "Series fiscales",
-    description: "Series y correlativos por sucursal para boletas y facturas.",
-    href: "/finanzas/series-fiscales",
-    status: "Operativo",
-    icon: ReceiptText,
   },
   {
     title: "Proveedores fiscales",
@@ -53,7 +46,7 @@ export default function FinanzasPage() {
       <AdminModuleHeader
         eyebrow="Finanzas"
         title="Control financiero"
-        description="Finanzas agrupa facturacion electronica y, luego, las piezas contables que creceran alrededor del POS."
+        description="Finanzas agrupa facturacion electronica y, luego, las piezas contables que creceran alrededor de pedidos, caja y rentabilidad."
       />
 
       <div className="grid gap-4 lg:grid-cols-2">

@@ -33,7 +33,7 @@ const PUBLIC_NAV = [
 
 const FEATURES = [
   {
-    title: "POS inteligente",
+    title: "Pedidos inteligentes",
     description: "Ventas rapidas y sin errores. Funciona online y offline.",
     icon: ShoppingBag,
   },
@@ -62,7 +62,7 @@ const BENEFITS = [
 ];
 
 const MODULES = [
-  ["Ventas (POS)", "Cobros agiles, multiples medios de pago y propinas.", ShoppingBag],
+  ["Ventas y pedidos", "Cobros agiles, multiples medios de pago y propinas.", ShoppingBag],
   ["Inventario", "Lotes, fechas de vencimiento, recetas y alertas.", Package],
   ["Clientes", "Historial de compras y segmentacion.", UsersRound],
   ["Fidelizacion", "Puntos, niveles y promociones personalizadas.", BadgePercent],
@@ -214,7 +214,7 @@ export default function LandingPage() {
               El ERP que impulsa negocios <span className="text-[#00C70D]">saludables</span>
             </h1>
             <p className="mt-7 max-w-[560px] text-lg leading-9 text-[#535353]">
-              Kapos centraliza POS, inventario, delivery, clientes y reportes en una sola plataforma simple y poderosa para tu negocio.
+              Kapos centraliza pedidos, inventario, delivery, clientes y reportes en una sola plataforma simple y poderosa para tu negocio.
             </p>
 
             <div className="mt-8 flex flex-wrap gap-4">

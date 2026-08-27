@@ -452,7 +452,7 @@ export default function PlatformRolesPage() {
               <span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span>
               <input
                 className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]"
-                placeholder="Puede operar POS y aplicar descuentos autorizados."
+                placeholder="Puede operar pedidos y aplicar descuentos autorizados."
                 value={organizationRoleForm.description}
                 onChange={(event) =>
                   setOrganizationRoleForm((current) => ({

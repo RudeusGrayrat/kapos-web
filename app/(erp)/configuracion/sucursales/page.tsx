@@ -107,7 +107,7 @@ export default function ConfigSucursalesPage() {
       <AdminModuleHeader
         eyebrow="Configuracion"
         title="Sucursales"
-        description="Sedes donde operaran caja, stock, POS y reportes."
+        description="Sedes donde operaran caja, stock, pedidos y reportes."
         action={
           <div className="flex gap-3">
             {viewMode === "create" ? (

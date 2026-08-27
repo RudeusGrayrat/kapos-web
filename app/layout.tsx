@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Kapos ERP",
-  description: "ERP POS para restaurantes, tiendas y operaciones comerciales.",
+  description: "ERP para restaurantes, tiendas y operaciones comerciales.",
   icons: {
     icon: [
       { url: "/favicon.svg", type: "image/svg+xml" },
