@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useMemo, useState, type FormEvent } from "react";
 import {
   BadgeCheck,
   Building2,
@@ -22,12 +22,18 @@ import {
   Tag,
 } from "../../components/admin/AdminBlocks";
 import {
+  AdminPermissionMatrix,
+  buildPermissionMatrixRowsForKeys,
+} from "../../components/admin/AdminPermissionMatrix";
+import {
   getProfileStatus,
   getUserDisplayName,
   getUserSummaryName,
   useAuth,
 } from "../../context/auth-context";
+import { getAssignableOrganizationPermissions } from "../../lib/erp-api";
 import type { DocumentType, UpdateCurrentUserInput } from "../../types/auth";
+import type { OrganizationPermissionSummary } from "../../types/erp";
 
 const inputClass =
   "w-full rounded-[18px] border border-[var(--kapos-border)] bg-white px-4 py-3 text-sm text-[var(--kapos-text)] outline-none transition focus:border-[var(--kapos-green)]";
@@ -44,11 +50,14 @@ function formatDate(value: string | null) {
 
 export default function PerfilPage() {
   const {
+    accessToken,
+    activeOrganizationId,
     activeOrganization,
     effectivePermissionKeys,
     memberships,
     platformContext,
     reloadCurrentUser,
+    refreshSession,
     setActiveOrganizationId,
     updateProfile,
     user,
@@ -61,8 +70,52 @@ export default function PerfilPage() {
     documentNumber: user?.documentNumber ?? "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [permissions, setPermissions] = useState<OrganizationPermissionSummary[]>([]);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function run() {
+      if (!activeOrganizationId) {
+        setPermissions([]);
+        return;
+      }
+
+      const token = accessToken ?? (await refreshSession({ silent: true }))?.accessToken ?? null;
+
+      if (!token) {
+        return;
+      }
+
+      try {
+        const response = await getAssignableOrganizationPermissions({
+          accessToken: token,
+          organizationId: activeOrganizationId,
+        });
+
+        if (!cancelled) {
+          setPermissions(response);
+        }
+      } catch {
+        if (!cancelled) {
+          setPermissions([]);
+        }
+      }
+    }
+
+    void run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, activeOrganizationId, refreshSession]);
+
+  const permissionRows = useMemo(
+    () => buildPermissionMatrixRowsForKeys([], permissions, effectivePermissionKeys),
+    [effectivePermissionKeys, permissions],
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -337,18 +390,13 @@ export default function PerfilPage() {
               <p className="text-sm text-[var(--kapos-text-soft)]">Sucursales</p>
             </div>
           </div>
-          <div className="max-h-80 overflow-y-auto rounded-[18px] border border-[var(--kapos-border)] bg-white p-3">
-            {effectivePermissionKeys.length === 0 ? (
-              <p className="p-3 text-sm text-[var(--kapos-text-soft)]">
-                No hay permisos cargados para esta sesion.
-              </p>
-            ) : null}
-            <div className="flex flex-wrap gap-2">
-              {effectivePermissionKeys.map((permission) => (
-                <Tag key={permission}>{permission}</Tag>
-              ))}
-            </div>
-          </div>
+          <AdminPermissionMatrix
+            rows={permissionRows}
+            selectedPermissionKeys={effectivePermissionKeys}
+            emptyTitle="Sin permisos cargados"
+            emptyDescription="No hay permisos cargados para esta sesion."
+            minHeightClassName="max-h-80"
+          />
         </PanelCard>
       </div>
     </section>

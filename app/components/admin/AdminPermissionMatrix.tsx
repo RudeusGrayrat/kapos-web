@@ -110,6 +110,34 @@ export function buildPermissionMatrixRows(
     });
 }
 
+export function buildPermissionMatrixRowsForKeys(
+  modules: PermissionMatrixModule[],
+  permissions: PermissionMatrixPermission[],
+  permissionKeys: string[],
+) {
+  const permissionsByKey = new Map(
+    permissions.map((permission) => [permission.key, permission]),
+  );
+  const selectedPermissions = permissionKeys.map((permissionKey) => {
+    const knownPermission = permissionsByKey.get(permissionKey);
+
+    if (knownPermission) {
+      return knownPermission;
+    }
+
+    const [moduleKey, submoduleKey] = permissionKey.split(".");
+
+    return {
+      key: permissionKey,
+      name: permissionKey,
+      moduleKey: moduleKey || "system",
+      submoduleKey: submoduleKey || "general",
+    };
+  });
+
+  return buildPermissionMatrixRows(modules, selectedPermissions);
+}
+
 export function AdminPermissionMatrix({
   rows,
   selectedPermissionKeys,

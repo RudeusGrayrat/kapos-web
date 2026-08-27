@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   AdminActionButton,
   ArrowLeftIcon,
@@ -17,6 +17,10 @@ import {
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
+import {
+  AdminPermissionMatrix,
+  buildPermissionMatrixRowsForKeys,
+} from "../../../components/admin/AdminPermissionMatrix";
 import { useAuth } from "../../../context/auth-context";
 import {
   createInternalUser,
@@ -75,6 +79,27 @@ export default function ConfigUsuariosPage() {
   const [selectedMember, setSelectedMember] = useState<InternalUserSummary | null>(null);
   const [editForm, setEditForm] = useState<UserForm>(emptyUserForm());
   const [error, setError] = useState<string | null>(null);
+  const availablePermissions = useMemo(() => {
+    const permissionsByKey = new Map<string, InternalRoleSummary["permissions"][number]>();
+
+    for (const role of roles) {
+      for (const permission of role.permissions) {
+        permissionsByKey.set(permission.key, permission);
+      }
+    }
+
+    return Array.from(permissionsByKey.values());
+  }, [roles]);
+
+  const selectedMemberPermissionRows = useMemo(
+    () =>
+      buildPermissionMatrixRowsForKeys(
+        [],
+        availablePermissions,
+        selectedMember?.effectivePermissionKeys ?? [],
+      ),
+    [availablePermissions, selectedMember?.effectivePermissionKeys],
+  );
 
   async function resolveToken() {
     return accessToken ?? (await refreshSession({ silent: true }))?.accessToken ?? null;
@@ -350,12 +375,15 @@ export default function ConfigUsuariosPage() {
             <p className="text-sm font-semibold text-[#0D0D0D]">Roles</p>
             {renderRoleSelector("edit", editForm.roleScopeKeys)}
           </div>
-          <div className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
+          <div className="space-y-3">
             <p className="text-sm font-semibold text-[#0D0D0D]">Permisos efectivos</p>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {(selectedMember?.effectivePermissionKeys ?? []).slice(0, 24).map((key) => <Tag key={key}>{key}</Tag>)}
-              {(selectedMember?.effectivePermissionKeys.length ?? 0) > 24 ? <Tag tone="dark">+{(selectedMember?.effectivePermissionKeys.length ?? 0) - 24}</Tag> : null}
-            </div>
+            <AdminPermissionMatrix
+              rows={selectedMemberPermissionRows}
+              selectedPermissionKeys={selectedMember?.effectivePermissionKeys ?? []}
+              emptyTitle="Sin permisos efectivos"
+              emptyDescription="Este usuario no tiene permisos cargados para esta organizacion."
+              minHeightClassName="max-h-80"
+            />
           </div>
         </form>
       </AdminOverlayPanel>

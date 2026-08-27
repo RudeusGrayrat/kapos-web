@@ -19,6 +19,7 @@ import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import {
   AdminPermissionMatrix,
   buildPermissionMatrixRows,
+  buildPermissionMatrixRowsForKeys,
 } from "../../../components/admin/AdminPermissionMatrix";
 import { useAuth } from "../../../context/auth-context";
 import {
@@ -173,6 +174,11 @@ export default function ConfigRolesPage() {
   }
 
   const permissionRows = buildPermissionMatrixRows([], permissions);
+  const selectedRolePermissionRows = buildPermissionMatrixRowsForKeys(
+    [],
+    permissions,
+    editForm.permissionKeys,
+  );
 
   function renderPermissionSelector(target: "create" | "edit", values: string[]) {
     return (
@@ -272,9 +278,13 @@ export default function ConfigRolesPage() {
           </div>
           <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Descripcion</span><textarea className="min-h-24 w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.description} onChange={(event) => setEditForm((current) => ({ ...current, description: event.target.value }))} disabled={selectedRole?.isSystem} /></label>
           {selectedRole?.isSystem ? (
-            <div className="flex flex-wrap gap-2">
-              {editForm.permissionKeys.map((key) => <Tag key={key}>{key}</Tag>)}
-            </div>
+            <AdminPermissionMatrix
+              rows={selectedRolePermissionRows}
+              selectedPermissionKeys={editForm.permissionKeys}
+              emptyTitle="Sin permisos ligados"
+              emptyDescription="Este rol no tiene permisos ligados todavia."
+              minHeightClassName="max-h-80"
+            />
           ) : renderPermissionSelector("edit", editForm.permissionKeys)}
         </form>
       </AdminOverlayPanel>

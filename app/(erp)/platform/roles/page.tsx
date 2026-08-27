@@ -18,21 +18,25 @@ import {
   Tag,
 } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
+import {
+  AdminPermissionMatrix,
+  buildPermissionMatrixRows,
+  buildPermissionMatrixRowsForKeys,
+} from "../../../components/admin/AdminPermissionMatrix";
 import { useAuth } from "../../../context/auth-context";
 import { isApiError } from "../../../lib/api";
 import {
   createOrganizationRole,
   getOrganizationRoles,
+  getPlatformModules,
   getPlatformOrganizations,
   getPlatformPermissions,
   getPlatformRoles,
   updatePlatformRole,
 } from "../../../lib/platform-admin-api";
-import {
-  formatRoleContext,
-  humanizeCatalogKey,
-} from "../../../lib/platform-admin-formatters";
+import { formatRoleContext } from "../../../lib/platform-admin-formatters";
 import type {
+  PlatformModuleSummary,
   PlatformPermissionSummary,
   PlatformOrganizationSummary,
   PlatformRoleTemplate,
@@ -45,6 +49,7 @@ export default function PlatformRolesPage() {
   const [organizations, setOrganizations] = useState<PlatformOrganizationSummary[]>([]);
   const [organizationRoles, setOrganizationRoles] = useState<PlatformRoleTemplate[]>([]);
   const [permissions, setPermissions] = useState<PlatformPermissionSummary[]>([]);
+  const [modules, setModules] = useState<PlatformModuleSummary[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,15 +80,22 @@ export default function PlatformRolesPage() {
       throw new Error("No se pudo restaurar la sesion del superadmin.");
     }
 
-    const [rolesResponse, permissionsResponse, organizationsResponse] = await Promise.all([
+    const [
+      rolesResponse,
+      permissionsResponse,
+      organizationsResponse,
+      modulesResponse,
+    ] = await Promise.all([
       getPlatformRoles(token),
       getPlatformPermissions(token),
       getPlatformOrganizations(token),
+      getPlatformModules(token),
     ]);
 
     setRoles(rolesResponse);
     setPermissions(permissionsResponse);
     setOrganizations(organizationsResponse);
+    setModules(modulesResponse);
   }
 
   async function fetchRolesTable(input: {
@@ -268,16 +280,49 @@ export default function PlatformRolesPage() {
     }
   }
 
-  const groupedPermissions = useMemo(
-    () =>
-      permissions.reduce<Record<string, PlatformPermissionSummary[]>>((acc, permission) => {
-        const groupKey = permission.moduleKey ?? "sin-modulo";
-        acc[groupKey] = acc[groupKey] ?? [];
-        acc[groupKey].push(permission);
-        return acc;
-      }, {}),
-    [permissions],
+  const permissionRows = useMemo(
+    () => buildPermissionMatrixRows(modules, permissions),
+    [modules, permissions],
   );
+  const organizationPermissionRows = useMemo(
+    () =>
+      buildPermissionMatrixRows(
+        modules,
+        permissions.filter((permission) => permission.audience !== "PLATFORM"),
+      ),
+    [modules, permissions],
+  );
+  const selectedRolePermissionRows = useMemo(
+    () =>
+      buildPermissionMatrixRowsForKeys(
+        modules,
+        permissions,
+        selectedRole?.permissionKeys ?? [],
+      ),
+    [modules, permissions, selectedRole?.permissionKeys],
+  );
+
+  function toggleEditPermission(permissionKey: string) {
+    setEditForm((current) =>
+      current
+        ? {
+            ...current,
+            permissionKeys: current.permissionKeys.includes(permissionKey)
+              ? current.permissionKeys.filter((key) => key !== permissionKey)
+              : [...current.permissionKeys, permissionKey],
+          }
+        : current,
+    );
+  }
+
+  function toggleOrganizationRolePermission(permissionKey: string) {
+    setOrganizationRoleForm((current) => ({
+      ...current,
+      permissionKeys: current.permissionKeys.includes(permissionKey)
+        ? current.permissionKeys.filter((key) => key !== permissionKey)
+        : [...current.permissionKeys, permissionKey],
+    }));
+  }
 
   return (
     <section className="space-y-8">
@@ -417,46 +462,14 @@ export default function PlatformRolesPage() {
                 }
               />
             </label>
-            <div className="max-h-64 space-y-3 overflow-y-auto pr-1">
-              {Object.entries(groupedPermissions)
-                .filter(([, modulePermissions]) =>
-                  modulePermissions.some((permission) => permission.audience !== "PLATFORM"),
-                )
-                .map(([moduleKey, modulePermissions]) => (
-                  <article key={moduleKey} className="rounded-[22px] border border-[#E4E4E4] bg-[#F8F8F8] p-3">
-                    <p className="font-semibold text-[#0D0D0D]">
-                      {humanizeCatalogKey(moduleKey)}
-                    </p>
-                    <div className="mt-3 flex flex-wrap gap-2">
-                      {modulePermissions
-                        .filter((permission) => permission.audience !== "PLATFORM")
-                        .map((permission) => {
-                          const active = organizationRoleForm.permissionKeys.includes(permission.key);
-
-                          return (
-                            <AdminActionButton
-                              key={permission.id}
-                              type="button"
-                              tone="secondary"
-                              active={active}
-                              size="sm"
-                              onClick={() =>
-                                setOrganizationRoleForm((current) => ({
-                                  ...current,
-                                  permissionKeys: active
-                                    ? current.permissionKeys.filter((key) => key !== permission.key)
-                                    : [...current.permissionKeys, permission.key],
-                                }))
-                              }
-                            >
-                              {permission.name}
-                            </AdminActionButton>
-                          );
-                        })}
-                    </div>
-                  </article>
-                ))}
-            </div>
+            <AdminPermissionMatrix
+              rows={organizationPermissionRows}
+              selectedPermissionKeys={organizationRoleForm.permissionKeys}
+              onToggle={toggleOrganizationRolePermission}
+              emptyTitle="Sin permisos de organizacion"
+              emptyDescription="No hay permisos disponibles para roles de organizacion."
+              minHeightClassName="max-h-72"
+            />
             <div className="flex justify-end">
               <AdminActionButton
                 type="submit"
@@ -552,46 +565,12 @@ export default function PlatformRolesPage() {
 
               <div className="space-y-3">
                 <p className="text-sm font-semibold text-[#0D0D0D]">Permisos activos</p>
-                <div className="space-y-4">
-                  {Object.entries(groupedPermissions).map(([moduleKey, modulePermissions]) => (
-                    <article key={moduleKey} className="rounded-[24px] border border-[#E4E4E4] bg-[#F8F8F8] p-4">
-                      <div className="flex items-center gap-2">
-                        <p className="font-semibold text-[#0D0D0D]">
-                          {humanizeCatalogKey(moduleKey)}
-                        </p>
-                        <Tag tone="soft">{modulePermissions.length} permisos</Tag>
-                      </div>
-                      <div className="mt-4 flex flex-wrap gap-2">
-                        {modulePermissions.map((permission) => {
-                          const active = editForm.permissionKeys.includes(permission.key);
-
-                          return (
-                            <AdminActionButton
-                              key={permission.id}
-                              onClick={() =>
-                                setEditForm((current) =>
-                                  current
-                                    ? {
-                                        ...current,
-                                        permissionKeys: current.permissionKeys.includes(permission.key)
-                                          ? current.permissionKeys.filter((key) => key !== permission.key)
-                                          : [...current.permissionKeys, permission.key],
-                                      }
-                                    : current,
-                                )
-                              }
-                              tone="secondary"
-                              active={active}
-                              size="sm"
-                            >
-                              {permission.name}
-                            </AdminActionButton>
-                          );
-                        })}
-                      </div>
-                    </article>
-                  ))}
-                </div>
+                <AdminPermissionMatrix
+                  rows={permissionRows}
+                  selectedPermissionKeys={editForm.permissionKeys}
+                  onToggle={toggleEditPermission}
+                  minHeightClassName="max-h-[520px]"
+                />
               </div>
             </form>
           ) : (
@@ -623,22 +602,18 @@ export default function PlatformRolesPage() {
                 </article>
               </div>
 
-              <article className="rounded-[26px] border border-[#E4E4E4] bg-[#F8F8F8] p-5">
+              <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#8a9668]">
                   Permisos ligados
                 </p>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {selectedRole.permissionKeys.length > 0 ? (
-                    selectedRole.permissionKeys.map((permissionKey) => (
-                      <Tag key={permissionKey} tone="soft">
-                        {permissionKey}
-                      </Tag>
-                    ))
-                  ) : (
-                    <p className="text-sm text-[#535353]">Este rol no tiene permisos ligados todavia.</p>
-                  )}
-                </div>
-              </article>
+                <AdminPermissionMatrix
+                  rows={selectedRolePermissionRows}
+                  selectedPermissionKeys={selectedRole.permissionKeys}
+                  emptyTitle="Sin permisos ligados"
+                  emptyDescription="Este rol no tiene permisos ligados todavia."
+                  minHeightClassName="max-h-[520px]"
+                />
+              </div>
             </div>
           )
         ) : null}

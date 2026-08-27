@@ -18,6 +18,7 @@ import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import {
   AdminPermissionMatrix,
   buildPermissionMatrixRows,
+  buildPermissionMatrixRowsForKeys,
 } from "../../../components/admin/AdminPermissionMatrix";
 import { useAuth } from "../../../context/auth-context";
 import { isApiError } from "../../../lib/api";
@@ -542,6 +543,10 @@ export default function PlatformUsersPage() {
     modules,
     organizationPermissions,
   );
+  const platformPermissionRows = buildPermissionMatrixRows(
+    modules,
+    platformPermissions,
+  );
   const owners = users.filter((user) => user.scope === "OWNER").length;
 
   function renderMembershipPermissionMatrix(
@@ -772,40 +777,30 @@ export default function PlatformUsersPage() {
                 <p className="text-xs leading-6 text-[#667053]">
                   Estos botones ajustan permisos especificos encima del rol de plataforma. Activo significa permitido; al apagarlo queda denegado para este usuario.
                 </p>
-                <div className="flex max-h-52 flex-wrap gap-2 overflow-y-auto pr-1">
-                  {platformPermissions.map((permission) => {
-                    const active = getEffectivePermissionKeys(
-                      selectedUser.platformRolePermissionKeys,
-                      editForm.platformOverrides,
-                    ).includes(permission.key);
-
-                    return (
-                      <AdminActionButton
-                        key={permission.id}
-                        type="button"
-                        tone="secondary"
-                        active={active}
-                        size="sm"
-                        onClick={() =>
-                          setEditForm((current) =>
-                            current
-                              ? {
-                                  ...current,
-                                  platformOverrides: toggleOverride(
-                                    selectedUser.platformRolePermissionKeys,
-                                    current.platformOverrides,
-                                    permission.key,
-                                  ),
-                                }
-                              : current,
-                          )
-                        }
-                      >
-                        {permission.name}
-                      </AdminActionButton>
-                    );
-                  })}
-                </div>
+                <AdminPermissionMatrix
+                  rows={platformPermissionRows}
+                  selectedPermissionKeys={getEffectivePermissionKeys(
+                    selectedUser.platformRolePermissionKeys,
+                    editForm.platformOverrides,
+                  )}
+                  onToggle={(permissionKey) =>
+                    setEditForm((current) =>
+                      current
+                        ? {
+                            ...current,
+                            platformOverrides: toggleOverride(
+                              selectedUser.platformRolePermissionKeys,
+                              current.platformOverrides,
+                              permissionKey,
+                            ),
+                          }
+                        : current,
+                    )
+                  }
+                  emptyTitle="Sin permisos de plataforma"
+                  emptyDescription="No hay permisos de plataforma disponibles."
+                  minHeightClassName="max-h-72"
+                />
               </div>
               <div className="space-y-4 md:col-span-2">
                 <p className="text-sm font-semibold text-[#0D0D0D]">Accesos por organizacion</p>
@@ -918,7 +913,14 @@ export default function PlatformUsersPage() {
                 </p>
                 <div className="mt-4 space-y-3">
                   {selectedUser.memberships.length > 0 ? (
-                    selectedUser.memberships.map((membership) => (
+                    selectedUser.memberships.map((membership) => {
+                      const membershipPermissionRows = buildPermissionMatrixRowsForKeys(
+                        modules,
+                        organizationPermissions,
+                        membership.permissionKeys,
+                      );
+
+                      return (
                       <div key={membership.id} className="rounded-[22px] border border-[#e7edd5] bg-white p-4">
                         <div className="flex flex-wrap items-center justify-between gap-2">
                           <div>
@@ -946,15 +948,16 @@ export default function PlatformUsersPage() {
                         <p className="mt-3 text-sm text-[#535353]">
                           {membership.permissionKeys.length} permisos efectivos en esta organizacion.
                         </p>
-                        <div className="mt-3 flex max-h-28 flex-wrap gap-2 overflow-y-auto pr-1">
-                          {membership.permissionKeys.slice(0, 24).map((permissionKey) => (
-                            <span key={permissionKey} className="rounded-full bg-[#f2f7df] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-[#65783a]">
-                              {permissionKey}
-                            </span>
-                          ))}
-                        </div>
+                        <AdminPermissionMatrix
+                          rows={membershipPermissionRows}
+                          selectedPermissionKeys={membership.permissionKeys}
+                          emptyTitle="Sin permisos efectivos"
+                          emptyDescription="Este usuario no tiene permisos en esta organizacion."
+                          minHeightClassName="max-h-64"
+                        />
                       </div>
-                    ))
+                      );
+                    })
                   ) : (
                     <p className="text-sm text-[#535353]">
                       Sin relaciones activas por ahora.
@@ -986,13 +989,17 @@ export default function PlatformUsersPage() {
                   {selectedUser.platformPermissionKeys.length} permisos de plataforma.{" "}
                   {selectedUser.effectivePermissionKeys.length} permisos efectivos en total.
                 </p>
-                <div className="mt-3 flex max-h-28 flex-wrap gap-2 overflow-y-auto pr-1">
-                  {selectedUser.platformPermissionKeys.slice(0, 24).map((permissionKey) => (
-                    <span key={permissionKey} className="rounded-full bg-[#111] px-3 py-1 text-[0.7rem] font-semibold uppercase tracking-[0.12em] text-white">
-                      {permissionKey}
-                    </span>
-                  ))}
-                </div>
+                <AdminPermissionMatrix
+                  rows={buildPermissionMatrixRowsForKeys(
+                    modules,
+                    platformPermissions,
+                    selectedUser.platformPermissionKeys,
+                  )}
+                  selectedPermissionKeys={selectedUser.platformPermissionKeys}
+                  emptyTitle="Sin permisos de plataforma"
+                  emptyDescription="Este usuario no tiene acceso de plataforma."
+                  minHeightClassName="max-h-64"
+                />
               </article>
             </div>
           )
