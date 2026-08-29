@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Banknote, FileText, Landmark, PlugZap, WalletCards } from "lucide-react";
+import { ArrowRight, Banknote, FileText, PlugZap, TrendingUp } from "lucide-react";
 import { AdminModuleHeader, PanelCard, Tag } from "../../components/admin/AdminBlocks";
 
 const financeSections = [
@@ -18,25 +18,18 @@ const financeSections = [
     icon: PlugZap,
   },
   {
-    title: "Cuentas por cobrar",
-    description: "Saldos pendientes, credito a clientes y seguimiento de pagos.",
-    href: "/finanzas/cuentas-por-cobrar",
-    status: "Por construir",
-    icon: WalletCards,
-  },
-  {
     title: "Gastos",
-    description: "Registro y clasificacion de gastos operativos del negocio.",
+    description: "Registro de salidas reales de caja para servicios, compras y operacion diaria.",
     href: "/finanzas/gastos",
-    status: "Por construir",
+    status: "Operativo",
     icon: Banknote,
   },
   {
-    title: "Bancos y conciliacion",
-    description: "Movimientos bancarios, conciliaciones y control de cuentas.",
-    href: "/finanzas/bancos-conciliacion",
-    status: "Por construir",
-    icon: Landmark,
+    title: "Rentabilidad",
+    description: "Ventas menos costo de productos y gastos para estimar utilidad.",
+    href: "/finanzas/rentabilidad",
+    status: "Operativo",
+    icon: TrendingUp,
   },
 ];
 

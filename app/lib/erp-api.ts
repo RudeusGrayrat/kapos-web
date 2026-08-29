@@ -13,7 +13,10 @@ import type {
   PaymentMethodSummary,
   ProductCategorySummary,
   ProductStockSummary,
+  ProfitabilitySummary,
   ProductSummary,
+  ExpenseSummary,
+  StockMovementSummary,
   UploadedAssetSummary,
   CustomerSummary,
   DiningAreaSummary,
@@ -308,7 +311,7 @@ export function getStock(input: OrganizationRequestInput) {
 
 export function upsertStock(
   input: OrganizationRequestInput & {
-    body: { productId: string; branchId: string; quantity: number; minQuantity?: number };
+    body: { productId: string; branchId: string; quantity: number; minQuantity?: number; note?: string };
   },
 ) {
   return apiRequest<ProductStockSummary>("/erp/catalog/stock", {
@@ -317,6 +320,23 @@ export function upsertStock(
     headers: organizationHeaders(input.organizationId),
     body: input.body,
   });
+}
+
+export function getStockMovements(
+  input: OrganizationRequestInput & { page?: number; limit?: number; search?: string },
+) {
+  const params = new URLSearchParams();
+  if (input.page) params.set("page", String(input.page));
+  if (input.limit) params.set("limit", String(input.limit));
+  if (input.search?.trim()) params.set("search", input.search.trim());
+  const query = params.toString();
+  return apiRequest<PaginatedErpResponse<StockMovementSummary>>(
+    `/erp/catalog/stock/movements${query ? `?${query}` : ""}`,
+    {
+      accessToken: input.accessToken,
+      headers: organizationHeaders(input.organizationId),
+    },
+  );
 }
 
 export function getCashRegisters(input: OrganizationRequestInput) {
@@ -1226,6 +1246,90 @@ export function issueSaleBillingDocument(
       accessToken: input.accessToken,
       headers: organizationHeaders(input.organizationId),
       body: { documentType: input.documentType },
+    },
+  );
+}
+
+export function issueCreditNote(
+  input: OrganizationRequestInput & {
+    documentId: string;
+    reasonCode?: "01" | "04" | "06" | "07";
+    reason: string;
+    reverseSale: boolean;
+  },
+) {
+  return apiRequest<BillingDocumentSummary>(
+    `/erp/billing/documents/${input.documentId}/credit-note`,
+    {
+      method: "POST",
+      accessToken: input.accessToken,
+      headers: organizationHeaders(input.organizationId),
+      body: {
+        reasonCode: input.reasonCode,
+        reason: input.reason,
+        reverseSale: input.reverseSale,
+      },
+    },
+  );
+}
+
+export function getExpenses(
+  input: OrganizationRequestInput & {
+    page?: number;
+    limit?: number;
+    search?: string;
+    from?: string;
+    to?: string;
+  },
+) {
+  const params = new URLSearchParams();
+  if (input.page) params.set("page", String(input.page));
+  if (input.limit) params.set("limit", String(input.limit));
+  if (input.search?.trim()) params.set("search", input.search.trim());
+  if (input.from) params.set("from", input.from);
+  if (input.to) params.set("to", input.to);
+  const query = params.toString();
+  return apiRequest<PaginatedErpResponse<ExpenseSummary>>(
+    `/erp/finance/expenses${query ? `?${query}` : ""}`,
+    {
+      accessToken: input.accessToken,
+      headers: organizationHeaders(input.organizationId),
+    },
+  );
+}
+
+export function createExpense(
+  input: OrganizationRequestInput & {
+    body: {
+      cashSessionId: string;
+      paymentMethodId?: string;
+      amount: number;
+      concept: string;
+      note?: string;
+    };
+  },
+) {
+  return apiRequest<ExpenseSummary>("/erp/finance/expenses", {
+    method: "POST",
+    accessToken: input.accessToken,
+    headers: organizationHeaders(input.organizationId),
+    body: input.body,
+  });
+}
+
+export function getProfitability(
+  input: OrganizationRequestInput & { range?: DashboardRange; from?: string; to?: string },
+) {
+  const params = new URLSearchParams();
+  if (input.range) params.set("range", input.range);
+  if (input.from) params.set("from", input.from);
+  if (input.to) params.set("to", input.to);
+  const query = params.toString();
+  return apiRequest<ProfitabilitySummary>(
+    `/erp/finance/profitability${query ? `?${query}` : ""}`,
+    {
+      accessToken: input.accessToken,
+      headers: organizationHeaders(input.organizationId),
     },
   );
 }

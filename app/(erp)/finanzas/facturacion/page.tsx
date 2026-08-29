@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { ExternalLink, FileCheck2, Printer, ReceiptText, Settings } from "lucide-react";
+import { ExternalLink, FileCheck2, FileMinus2, Printer, Settings } from "lucide-react";
 import { AdminActionButton, SparkIcon } from "../../../components/admin/AdminActionButton";
 import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { AdminDataTable } from "../../../components/admin/AdminDataTable";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import { useAuth } from "../../../context/auth-context";
 import { useToast } from "../../../context/toast-context";
-import { getBillingDocuments, issueBillingDocument } from "../../../lib/erp-api";
+import { getBillingDocuments, issueBillingDocument, issueCreditNote } from "../../../lib/erp-api";
 import { printBillingDocumentTicket } from "../../../lib/receipt-printing";
 import type { BillingDocumentStatus, BillingDocumentSummary } from "../../../types/erp";
 
@@ -40,8 +40,12 @@ export default function FacturacionPage() {
   const [documentTotal, setDocumentTotal] = useState(0);
   const [reloadKey, setReloadKey] = useState(0);
   const [selectedDocument, setSelectedDocument] = useState<BillingDocumentSummary | null>(null);
+  const [creditNoteDocument, setCreditNoteDocument] = useState<BillingDocumentSummary | null>(null);
   const [detailDocument, setDetailDocument] = useState<BillingDocumentSummary | null>(null);
   const [issueType, setIssueType] = useState<"BOLETA" | "FACTURA">("BOLETA");
+  const [creditNoteReasonCode, setCreditNoteReasonCode] = useState<"01" | "04" | "06" | "07">("01");
+  const [creditNoteReason, setCreditNoteReason] = useState("");
+  const [reverseSale, setReverseSale] = useState(true);
   const [busy, setBusy] = useState(false);
 
   async function resolveToken() {
@@ -90,6 +94,38 @@ export default function FacturacionPage() {
     }
   }
 
+  function openCreditNote(document: BillingDocumentSummary) {
+    setCreditNoteDocument(document);
+    setCreditNoteReasonCode("01");
+    setCreditNoteReason("");
+    setReverseSale(true);
+  }
+
+  async function confirmCreditNote() {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId || !creditNoteDocument || !creditNoteReason.trim()) return;
+    setBusy(true);
+    try {
+      const note = await issueCreditNote({
+        accessToken: token,
+        organizationId: activeOrganizationId,
+        documentId: creditNoteDocument.id,
+        reasonCode: creditNoteReasonCode,
+        reason: creditNoteReason.trim(),
+        reverseSale,
+      });
+      setCreditNoteDocument(null);
+      setReloadKey((current) => current + 1);
+      toast.showSuccess(`Nota de crédito ${note.series}-${note.number} emitida correctamente.`, "Nota emitida");
+      if (note.pdfUrl) window.open(note.pdfUrl, "_blank", "noopener,noreferrer");
+    } catch (noteError) {
+      toast.showError(noteError, "No se pudo emitir la nota");
+      setReloadKey((current) => current + 1);
+    } finally {
+      setBusy(false);
+    }
+  }
+
   function documentName(document: BillingDocumentSummary | null) {
     if (!document) return "Comprobante";
     if (document.series && document.number) return `${document.series}-${document.number}`;
@@ -105,6 +141,12 @@ export default function FacturacionPage() {
   function providerResponseText(document: BillingDocumentSummary | null) {
     if (!document?.rawResponse) return "Sin respuesta registrada del proveedor.";
     return JSON.stringify(document.rawResponse, null, 2);
+  }
+
+  function canIssueCreditNote(document: BillingDocumentSummary) {
+    if (document.status !== "BILLED") return false;
+    if (document.type !== "BOLETA" && document.type !== "FACTURA") return false;
+    return !document.adjustmentDocuments?.some((note) => note.type === "NOTA_CREDITO" && note.status !== "CANCELLED");
   }
 
   function printBillingPdf(document: BillingDocumentSummary) {
@@ -178,6 +220,7 @@ export default function FacturacionPage() {
           actions={[
             { label: "Ver detalle", permission: "billing.documents.read", onClick: setDetailDocument },
             { label: "Emitir o reintentar", permission: "billing.documents.issue", icon: <SparkIcon />, tone: "accent", visible: (row) => row.status === "PENDING" || row.status === "FAILED", onClick: openIssue },
+            { label: "Nota de crédito", permission: "billing.documents.adjust", icon: <FileMinus2 className="h-4 w-4" />, tone: "warn", visible: canIssueCreditNote, onClick: openCreditNote },
             { label: "Abrir PDF", icon: <ExternalLink className="h-4 w-4" />, visible: (row) => Boolean(row.pdfUrl), onClick: (row) => { if (row.pdfUrl) window.open(row.pdfUrl, "_blank", "noopener,noreferrer"); } },
             { label: "Imprimir PDF", permission: "billing.documents.print", icon: <Printer className="h-4 w-4" />, visible: (row) => Boolean(row.pdfUrl), onClick: printBillingPdf },
             { label: "Imprimir ticket", permission: "billing.documents.print", icon: <Printer className="h-4 w-4" />, visible: (row) => row.type === "TICKET", onClick: printBillingDocumentTicket },
@@ -196,6 +239,43 @@ export default function FacturacionPage() {
         <div className="grid gap-5 md:grid-cols-2">
           <div className="rounded-[26px] border border-[#e7edd9] bg-[#F8F8F8] p-5"><p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#849252]">Venta</p><p className="mt-3 text-2xl font-semibold text-[#19210f]">{selectedDocument?.sale.saleNumber}</p><p className="mt-2 text-sm text-[#657052]">S/ {selectedDocument?.sale.total.toFixed(2)}</p></div>
           <label className="space-y-2"><span className="text-sm font-semibold">Tipo de comprobante</span><select className={inputClass} value={issueType} onChange={(event) => setIssueType(event.target.value as "BOLETA" | "FACTURA")} disabled={Boolean(selectedDocument?.series)}><option value="BOLETA">Boleta</option><option value="FACTURA">Factura</option></select><small className="block leading-5 text-[#6b7558]">La factura requiere un cliente registrado con RUC de 11 dígitos.</small></label>
+        </div>
+      </AdminOverlayPanel>
+
+      <AdminOverlayPanel
+        open={Boolean(creditNoteDocument)}
+        onClose={() => !busy && setCreditNoteDocument(null)}
+        eyebrow="Nota de crédito"
+        title="Anular o corregir comprobante"
+        description="La nota se emitirá sobre el comprobante original. Solo si reversas la operación se moverán stock, caja, puntos y estado de venta."
+        footer={<div className="flex justify-end gap-3"><AdminActionButton onClick={() => setCreditNoteDocument(null)} disabled={busy}>Cancelar</AdminActionButton><AdminActionButton tone="danger" icon={<FileMinus2 className="h-4 w-4" />} onClick={() => void confirmCreditNote()} disabled={busy || !creditNoteReason.trim()}>Emitir nota</AdminActionButton></div>}
+      >
+        <div className="grid gap-5 md:grid-cols-2">
+          <div className="rounded-[26px] border border-[#e7edd9] bg-[#F8F8F8] p-5">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#849252]">Comprobante original</p>
+            <p className="mt-3 text-2xl font-semibold text-[#19210f]">{documentName(creditNoteDocument)}</p>
+            <p className="mt-2 text-sm text-[#657052]">Venta {creditNoteDocument?.sale.saleNumber} · S/ {creditNoteDocument?.sale.total.toFixed(2)}</p>
+          </div>
+          <label className="space-y-2">
+            <span className="text-sm font-semibold">Motivo SUNAT</span>
+            <select className={inputClass} value={creditNoteReasonCode} onChange={(event) => setCreditNoteReasonCode(event.target.value as "01" | "04" | "06" | "07")}>
+              <option value="01">Anulación de la operación</option>
+              <option value="04">Descuento global</option>
+              <option value="06">Devolución total</option>
+              <option value="07">Devolución por ítem</option>
+            </select>
+          </label>
+          <label className="space-y-2 md:col-span-2">
+            <span className="text-sm font-semibold">Sustento</span>
+            <textarea className={`${inputClass} min-h-28 resize-none`} value={creditNoteReason} onChange={(event) => setCreditNoteReason(event.target.value)} placeholder="Ej. Cliente solicitó anulación total de la operación." maxLength={500} />
+          </label>
+          <label className="flex items-start gap-3 rounded-[24px] border border-[#E4E4E4] bg-white p-4 md:col-span-2">
+            <input type="checkbox" className="mt-1 h-5 w-5 accent-[#00C70D]" checked={reverseSale} onChange={(event) => setReverseSale(event.target.checked)} />
+            <span>
+              <span className="block font-semibold text-[#0D0D0D]">Reversar operación completa</span>
+              <span className="mt-1 block text-sm leading-6 text-[#535353]">Devuelve stock, registra salida en caja, revierte puntos y marca la venta como anulada. Si solo necesitas corregir fiscalmente sin tocar operación, desmárcalo.</span>
+            </span>
+          </label>
         </div>
       </AdminOverlayPanel>
 
@@ -234,6 +314,10 @@ export default function FacturacionPage() {
 
         {detailDocument?.errorMessage ? (
           <AdminMessage title="Motivo registrado" description={detailDocument.errorMessage} tone="warn" />
+        ) : null}
+
+        {detailDocument?.affectedDocument ? (
+          <AdminMessage title="Documento relacionado" description={`Modifica ${detailDocument.affectedDocument.series}-${detailDocument.affectedDocument.number}. ${detailDocument.noteReason ?? ""}`} />
         ) : null}
 
         <div className="flex flex-wrap gap-3">

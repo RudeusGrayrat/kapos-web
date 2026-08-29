@@ -87,6 +87,28 @@ export type ProductStockSummary = {
   branch?: { id: string; name: string; code: string | null };
 };
 
+export type StockMovementSummary = {
+  id: string;
+  organizationId: string;
+  branchId: string;
+  productId: string;
+  saleId: string | null;
+  createdByUserId: string;
+  type: "SALE" | "SALE_CANCEL" | "ADJUSTMENT";
+  quantity: number;
+  balanceAfter: number;
+  note: string | null;
+  occurredAt: string;
+  product?: { id: string; name: string; sku: string | null };
+  branch?: { id: string; name: string; code: string | null };
+  createdBy?: {
+    id: string;
+    email: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  };
+};
+
 export type CashRegisterSummary = {
   id: string;
   branchId: string;
@@ -430,6 +452,13 @@ export type BillingSeriesSummary = {
   branch: { id: string; name: string; code: string | null };
 };
 
+export type BillingDocumentType =
+  | "TICKET"
+  | "BOLETA"
+  | "FACTURA"
+  | "NOTA_CREDITO"
+  | "NOTA_DEBITO";
+
 export type BillingDocumentStatus =
   | "PENDING"
   | "ISSUING"
@@ -439,7 +468,8 @@ export type BillingDocumentStatus =
 
 export type BillingDocumentSummary = {
   id: string;
-  type: "TICKET" | "BOLETA" | "FACTURA";
+  type: BillingDocumentType;
+  affectedDocumentId: string | null;
   status: BillingDocumentStatus;
   recipientDocumentType: "DNI" | "RUC" | "CE" | "PASSPORT" | null;
   recipientDocumentNumber: string | null;
@@ -455,8 +485,13 @@ export type BillingDocumentSummary = {
   cdrUrl: string | null;
   errorMessage: string | null;
   rawResponse?: unknown;
+  noteCode: string | null;
+  noteReason: string | null;
+  reversesSale: boolean;
   issuedAt: string | null;
   createdAt: string;
+  affectedDocument?: Pick<BillingDocumentSummary, "id" | "type" | "series" | "number" | "status"> | null;
+  adjustmentDocuments?: Array<Pick<BillingDocumentSummary, "id" | "type" | "series" | "number" | "status" | "issuedAt">>;
   sale: {
     id: string;
     saleNumber: string;
@@ -480,6 +515,42 @@ export type BillingDocumentSummary = {
       };
     } | null;
   };
+};
+
+export type ExpenseSummary = CashMovementSummary & {
+  cashSession?: {
+    id: string;
+    branch: { id: string; name: string; code: string | null };
+    cashRegister: { id: string; name: string; code: string };
+  };
+};
+
+export type ProfitabilitySummary = {
+  range: { from: string; to: string };
+  summary: {
+    salesTotal: number;
+    productCostTotal: number;
+    expenseTotal: number;
+    grossProfit: number;
+    netProfit: number;
+    marginPercent: number;
+    saleCount: number;
+    expenseCount: number;
+  };
+  daily: Array<{
+    date: string;
+    sales: number;
+    costs: number;
+    expenses: number;
+    profit: number;
+  }>;
+  topProducts: Array<{
+    name: string;
+    quantity: number;
+    sales: number;
+    cost: number;
+    profit: number;
+  }>;
 };
 
 export type DashboardRange = "today" | "last_7_days" | "last_30_days";
