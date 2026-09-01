@@ -74,92 +74,15 @@ const MODULES = [
 
 function ErpPreview() {
   return (
-    <div className="relative mx-auto w-full max-w-[650px]">
-      <div className="rounded-t-[26px] border-[10px] border-[#0D0D0D] bg-white shadow-[0_38px_80px_rgba(13,13,13,0.22)]">
-        <div className="flex min-h-[360px] overflow-hidden rounded-t-[14px] bg-[#F8F8F8]">
-          <aside className="hidden w-24 border-r border-[#E4E4E4] bg-white p-4 sm:block">
-            <Image
-              src="/brand/kapos-k.svg"
-              alt="Kapos"
-              width={32}
-              height={36}
-              className="h-8 w-8 object-contain"
-            />
-            <div className="mt-7 space-y-3">
-              {["Resumen", "Ventas", "Inventario", "Clientes", "Delivery"].map((item, index) => (
-                <div
-                  key={item}
-                  className={`h-8 rounded-full ${index === 0 ? "bg-[#E8FCEB]" : "bg-[#F1F1F1]"}`}
-                />
-              ))}
-            </div>
-          </aside>
-
-          <div className="min-w-0 flex-1 p-5 sm:p-7">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-black text-[#00C70D]">Kapos</p>
-                <h2 className="mt-4 text-xl font-black text-[#0D0D0D]">Resumen general</h2>
-              </div>
-              <div className="h-9 w-32 rounded-full border border-[#E4E4E4] bg-white" />
-            </div>
-
-            <div className="mt-5 grid gap-3 sm:grid-cols-4">
-              {[
-                ["Ventas del dia", "S/ 780.00", "+12.5%"],
-                ["Pedidos", "356", "+5.1%"],
-                ["Ticket promedio", "S/ 50.00", "+6.2%"],
-                ["Clientes nuevos", "42", "+15.1%"],
-              ].map(([label, value, trend]) => (
-                <article key={label} className="rounded-[8px] bg-white p-4 shadow-[0_12px_28px_rgba(13,13,13,0.06)]">
-                  <p className="text-[0.65rem] font-semibold text-[#535353]">{label}</p>
-                  <strong className="mt-2 block text-sm font-black text-[#0D0D0D]">{value}</strong>
-                  <span className="mt-1 block text-[0.65rem] font-bold text-[#00C70D]">{trend} vs ayer</span>
-                </article>
-              ))}
-            </div>
-
-            <div className="mt-5 grid gap-4 lg:grid-cols-[1.4fr_0.8fr]">
-              <div className="rounded-[8px] bg-white p-5 shadow-[0_12px_28px_rgba(13,13,13,0.06)]">
-                <div className="mb-4 flex items-center justify-between">
-                  <p className="text-xs font-black text-[#0D0D0D]">Ventas ultimos 7 dias</p>
-                  <span className="h-2 w-2 rounded-full bg-[#00C70D]" />
-                </div>
-                <div className="relative h-36">
-                  <div className="absolute inset-0 rounded-xl bg-[linear-gradient(180deg,rgba(0,199,13,0.12)_0%,rgba(0,199,13,0)_100%)]" />
-                  <svg className="absolute inset-0 h-full w-full" viewBox="0 0 320 140" role="img" aria-label="Grafico de ventas">
-                    <polyline
-                      fill="none"
-                      points="12,102 58,76 102,94 146,50 194,72 246,22 306,44"
-                      stroke="#00C70D"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth="5"
-                    />
-                    {[12, 58, 102, 146, 194, 246, 306].map((cx, index) => (
-                      <circle key={cx} cx={cx} cy={[102, 76, 94, 50, 72, 22, 44][index]} fill="#00C70D" r="4" />
-                    ))}
-                  </svg>
-                </div>
-              </div>
-              <div className="rounded-[8px] bg-white p-5 shadow-[0_12px_28px_rgba(13,13,13,0.06)]">
-                <p className="text-xs font-black text-[#0D0D0D]">Ventas por canal</p>
-                <div className="mt-5 grid place-items-center">
-                  <div className="h-24 w-24 rounded-full bg-[conic-gradient(#00C70D_0_48%,#A1A1A1_48%_76%,#E4E4E4_76%_100%)] p-5">
-                    <div className="h-full w-full rounded-full bg-white" />
-                  </div>
-                </div>
-                <div className="mt-4 space-y-2 text-xs text-[#535353]">
-                  <p><span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#00C70D]" />Tienda 60%</p>
-                  <p><span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#A1A1A1]" />Delivery 25%</p>
-                  <p><span className="mr-2 inline-block h-2 w-2 rounded-full bg-[#E4E4E4]" />Pickup 15%</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="mx-auto h-5 w-[92%] rounded-b-[28px] bg-[linear-gradient(180deg,#535353_0%,#0D0D0D_100%)] shadow-[0_18px_30px_rgba(13,13,13,0.22)]" />
+    <div className="relative  w-full max-w-[880px]">
+      <Image
+        src="/promo/kapos-dashboard-promo-v3.png"
+        alt="Dashboard de Kapos con ventas, inventario y accesos operativos"
+        width={1680}
+        height={940}
+        priority
+        className="h-auto w-full rounded-[24px] border border-[#E4E4E4] bg-white shadow-[0_38px_80px_rgba(13,13,13,0.18)]"
+      />
     </div>
   );
 }
@@ -208,7 +131,7 @@ export default function LandingPage() {
           ))}
         </div>
 
-        <div className="relative mx-auto grid min-h-[620px] w-full max-w-[1320px] items-center gap-10 px-5 py-14 md:px-8 lg:grid-cols-[0.92fr_1.08fr] lg:py-20">
+        <div className="relative mx-auto flex flex-wrap justify-center items-center min-h-[620px] w-full max-w-[1820px] items-center gap-1 px-5 py-14 md:px-8 lg:py-20">
           <div>
             <h1 className="max-w-[620px] text-5xl font-black leading-[1.08] text-[#0D0D0D] sm:text-6xl lg:text-7xl">
               El ERP que impulsa negocios <span className="text-[#00C70D]">saludables</span>
