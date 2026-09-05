@@ -55,11 +55,11 @@ export default function RentabilidadPage() {
       <AdminModuleHeader
         eyebrow="Finanzas"
         title="Rentabilidad"
-        description="Margen estimado con ventas cobradas, costo actual de productos y gastos registrados en caja."
+        description="Margen con costos congelados al vender y gastos reales registrados en caja."
         action={<select className="rounded-full border border-[#E4E4E4] bg-white px-5 py-3 text-sm font-semibold" value={range} onChange={(event) => setRange(event.target.value as DashboardRange)}>{Object.entries(rangeLabels).map(([key, label]) => <option key={key} value={key}>{label}</option>)}</select>}
         stats={[
           { label: "Venta", value: money(summary?.summary.salesTotal ?? 0), hint: `${summary?.summary.saleCount ?? 0} ventas`, tone: "dark" },
-          { label: "Costo productos", value: money(summary?.summary.productCostTotal ?? 0), hint: "Estimado por costo actual.", tone: "accent" },
+          { label: "Costo productos", value: money(summary?.summary.productCostTotal ?? 0), hint: "Costo histórico de cada venta.", tone: "accent" },
           { label: "Utilidad neta", value: money(summary?.summary.netProfit ?? 0), hint: `${(summary?.summary.marginPercent ?? 0).toFixed(1)}% margen.` },
         ]}
       />

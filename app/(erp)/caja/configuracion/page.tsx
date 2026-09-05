@@ -1,14 +1,14 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useState, type FormEvent } from "react";
 import { CreditCard, WalletCards } from "lucide-react";
 import { AdminActionButton, ArrowLeftIcon, PencilIcon, PlusIcon, TrashIcon } from "../../../components/admin/AdminActionButton";
 import { AdminDataTable, createLocalAdminTableFetch } from "../../../components/admin/AdminDataTable";
 import { AdminMessage, AdminModuleHeader, PanelCard, Tag } from "../../../components/admin/AdminBlocks";
 import { AdminOverlayPanel } from "../../../components/admin/AdminOverlayPanel";
 import { useAuth } from "../../../context/auth-context";
-import { createPaymentMethod, deletePaymentMethod, getPaymentMethods, updatePaymentMethod } from "../../../lib/erp-api";
-import type { PaymentMethodSummary } from "../../../types/erp";
+import { createPaymentMethod, deletePaymentMethod, getPaymentMethods, getPaymentProviderConfig, updatePaymentMethod, updatePaymentProviderConfig } from "../../../lib/erp-api";
+import type { PaymentMethodSummary, PaymentProviderConfigSummary } from "../../../types/erp";
 
 const inputClass =
   "w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]";
@@ -54,11 +54,46 @@ export default function MetodosPagoPage() {
     sortOrder: "0",
     enabled: true,
   });
+  const [izipay, setIzipay] = useState<PaymentProviderConfigSummary | null>(null);
+  const [izipayForm, setIzipayForm] = useState({ environment: "TEST" as "TEST" | "PRODUCTION", merchantCode: "", facilitatorCode: "", apiKey: "", enabled: false });
+  const [izipayBusy, setIzipayBusy] = useState(false);
 
   const canCreate = effectivePermissionKeys.includes("cash.payment_methods.create");
 
   async function resolveToken() {
     return accessToken ?? (await refreshSession({ silent: true }))?.accessToken ?? null;
+  }
+
+  async function loadIzipayConfig() {
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId) return;
+    try {
+      const config = await getPaymentProviderConfig({ accessToken: token, organizationId: activeOrganizationId });
+      setIzipay(config);
+      setIzipayForm({ environment: config.environment, merchantCode: config.merchantCode, facilitatorCode: config.facilitatorCode ?? "", apiKey: "", enabled: config.enabled });
+    } catch (loadError) {
+      setError(loadError instanceof Error ? loadError.message : "No se pudo cargar Izipay.");
+    }
+  }
+
+  useEffect(() => { void loadIzipayConfig(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [activeOrganizationId]);
+
+  async function saveIzipay(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const token = await resolveToken();
+    if (!token || !activeOrganizationId) return;
+    setIzipayBusy(true); setError(null); setSuccess(null);
+    try {
+      const config = await updatePaymentProviderConfig({
+        accessToken: token, organizationId: activeOrganizationId,
+        body: { environment: izipayForm.environment, merchantCode: izipayForm.merchantCode, facilitatorCode: izipayForm.facilitatorCode || undefined, apiKey: izipayForm.apiKey || undefined, enabled: izipayForm.enabled },
+      });
+      setIzipay(config);
+      setIzipayForm((current) => ({ ...current, apiKey: "" }));
+      setSuccess("Configuración Izipay guardada. La clave queda cifrada y no vuelve al navegador.");
+    } catch (saveError) {
+      setError(saveError instanceof Error ? saveError.message : "No se pudo guardar Izipay.");
+    } finally { setIzipayBusy(false); }
   }
 
   async function fetchPaymentMethods(input: { page: number; limit: number; search: string }) {
@@ -246,6 +281,18 @@ export default function MetodosPagoPage() {
           />
         </PanelCard>
       )}
+
+      <PanelCard title="Integraciones de pago" description="Izipay procesa cobros; Nubefact se configura por separado en Facturación. La API key se cifra en el servidor y jamás se expone al móvil.">
+        <form className="grid gap-4 md:grid-cols-2" onSubmit={saveIzipay}>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Proveedor</span><input className={inputClass} value="Izipay" disabled /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Ambiente</span><select className={inputClass} value={izipayForm.environment} onChange={(event) => setIzipayForm((current) => ({ ...current, environment: event.target.value as "TEST" | "PRODUCTION" }))} disabled={!effectivePermissionKeys.includes("cash.payment_methods.update") || izipayBusy}><option value="TEST">Prueba</option><option value="PRODUCTION">Producción</option></select></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Código de comercio</span><input className={inputClass} value={izipayForm.merchantCode} onChange={(event) => setIzipayForm((current) => ({ ...current, merchantCode: event.target.value }))} placeholder="Entregado por Izipay" required disabled={!effectivePermissionKeys.includes("cash.payment_methods.update") || izipayBusy} /></label>
+          <label className="space-y-2"><span className="text-sm font-semibold text-[#0D0D0D]">Código facilitador</span><input className={inputClass} value={izipayForm.facilitatorCode} onChange={(event) => setIzipayForm((current) => ({ ...current, facilitatorCode: event.target.value }))} placeholder="Opcional" disabled={!effectivePermissionKeys.includes("cash.payment_methods.update") || izipayBusy} /></label>
+          <label className="space-y-2 md:col-span-2"><span className="text-sm font-semibold text-[#0D0D0D]">API key {izipay?.hasApiKey ? "(ya guardada)" : ""}</span><input className={inputClass} type="password" autoComplete="new-password" value={izipayForm.apiKey} onChange={(event) => setIzipayForm((current) => ({ ...current, apiKey: event.target.value }))} placeholder={izipay?.hasApiKey ? "Déjala vacía para conservarla" : "Clave de desarrollador Izipay"} disabled={!effectivePermissionKeys.includes("cash.payment_methods.update") || izipayBusy} /></label>
+          <label className="flex items-center gap-3 rounded-[20px] border border-[#e6ebd9] bg-[#fafcf5] px-4 py-3 text-sm font-semibold md:col-span-2"><input type="checkbox" checked={izipayForm.enabled} onChange={(event) => setIzipayForm((current) => ({ ...current, enabled: event.target.checked }))} disabled={!effectivePermissionKeys.includes("cash.payment_methods.update") || izipayBusy} /> Activar Izipay cuando el bridge móvil esté instalado y validado</label>
+          <div className="flex items-center justify-between gap-3 md:col-span-2"><p className="text-xs leading-5 text-[#535353]">Estado: {izipay?.enabled ? "activo" : "pendiente"}. Guardar estas credenciales no habilita aún el lector físico ni la impresora del SmartPOS.</p>{effectivePermissionKeys.includes("cash.payment_methods.update") ? <AdminActionButton type="submit" tone="primary" disabled={izipayBusy}>Guardar Izipay</AdminActionButton> : null}</div>
+        </form>
+      </PanelCard>
 
       <AdminOverlayPanel
         open={Boolean(selectedMethod)}

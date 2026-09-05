@@ -13,6 +13,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   Banknote,
   BarChart3,
+  Bell,
   CircleUserRound,
   FileText,
   Grid2x2,
@@ -29,6 +30,7 @@ import {
   Wallet,
 } from "lucide-react";
 import { useAuth } from "../context/auth-context";
+import { useNotifications } from "../context/notifications-context";
 import { HoverTooltip } from "./ui/HoverTooltip";
 import type {
   MembershipAccessSummary,
@@ -222,6 +224,7 @@ function getActiveCategory(pathname: string, categories: Category[]) {
 export default function SideBar() {
   const { activeOrganization, logout, navigationCatalog, platformContext } =
     useAuth();
+  const { unreadCount, refreshNotifications } = useNotifications();
   const pathname = usePathname();
   const router = useRouter();
   const shellRef = useRef<HTMLDivElement | null>(null);
@@ -374,6 +377,22 @@ export default function SideBar() {
         </nav>
 
         <div className="mt-auto w-full flex-col space-y-4">
+          <button
+            type="button"
+            onClick={() => void refreshNotifications()}
+            className="group relative flex h-16 w-full items-center overflow-visible pl-4"
+          >
+            <HoverTooltip label="Notificaciones" side="right" />
+            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--kapos-border)] bg-[var(--kapos-card)] text-[var(--kapos-black)] shadow-md transition group-hover:border-[var(--kapos-success)] group-hover:bg-[var(--kapos-green-wash)]">
+              <Bell className="h-5 w-5" />
+              {unreadCount > 0 ? (
+                <span className="absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--kapos-danger)] px-1 text-[0.65rem] font-black leading-none text-white shadow-md">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              ) : null}
+            </div>
+          </button>
+
           <Link
             href="/perfil"
             className="group relative flex h-16 w-full items-center overflow-visible pl-4"

@@ -11,11 +11,13 @@ import type {
   OrganizationPermissionSummary,
   PaginatedErpResponse,
   PaymentMethodSummary,
+  PaymentProviderConfigSummary,
   ProductCategorySummary,
   ProductStockSummary,
   ProfitabilitySummary,
   ProductSummary,
   ExpenseSummary,
+  FinancialPlanningSummary,
   StockMovementSummary,
   UploadedAssetSummary,
   CustomerSummary,
@@ -32,6 +34,7 @@ import type {
   BillingSeriesSummary,
   DashboardRange,
   DashboardSummary,
+  ErpNotificationsResponse,
 } from "../types/erp";
 
 type OrganizationRequestInput = {
@@ -85,6 +88,51 @@ export function updateDashboardPreferences(input: {
       ? organizationHeaders(input.organizationId)
       : undefined,
     body: input.body,
+  });
+}
+
+export function getErpNotifications(input: OrganizationRequestInput & {
+  page?: number;
+  limit?: number;
+  search?: string;
+  unreadOnly?: boolean;
+}) {
+  const params = new URLSearchParams();
+  if (input.page) params.set("page", String(input.page));
+  if (input.limit) params.set("limit", String(input.limit));
+  if (input.search) params.set("search", input.search);
+  if (input.unreadOnly) params.set("unreadOnly", "true");
+  const query = params.toString();
+
+  return apiRequest<ErpNotificationsResponse>(
+    `/erp/notifications${query ? `?${query}` : ""}`,
+    {
+      accessToken: input.accessToken,
+      headers: organizationHeaders(input.organizationId),
+    },
+  );
+}
+
+export function getErpUnreadNotifications(input: OrganizationRequestInput) {
+  return apiRequest<{ unread: number }>("/erp/notifications/unread-count", {
+    accessToken: input.accessToken,
+    headers: organizationHeaders(input.organizationId),
+  });
+}
+
+export function markErpNotificationAsRead(input: OrganizationRequestInput & { notificationId: string }) {
+  return apiRequest(`/erp/notifications/${input.notificationId}/read`, {
+    method: "PATCH",
+    accessToken: input.accessToken,
+    headers: organizationHeaders(input.organizationId),
+  });
+}
+
+export function markAllErpNotificationsAsRead(input: OrganizationRequestInput) {
+  return apiRequest<{ updated: number }>("/erp/notifications/read-all", {
+    method: "PATCH",
+    accessToken: input.accessToken,
+    headers: organizationHeaders(input.organizationId),
   });
 }
 
@@ -1332,4 +1380,57 @@ export function getProfitability(
       headers: organizationHeaders(input.organizationId),
     },
   );
+}
+
+export function getPaymentProviderConfig(input: OrganizationRequestInput) {
+  return apiRequest<PaymentProviderConfigSummary>("/erp/cash/payment-provider", {
+    accessToken: input.accessToken, headers: organizationHeaders(input.organizationId),
+  });
+}
+
+export function updatePaymentProviderConfig(
+  input: OrganizationRequestInput & {
+    body: { environment: "TEST" | "PRODUCTION"; merchantCode: string; facilitatorCode?: string; apiKey?: string; enabled: boolean };
+  },
+) {
+  return apiRequest<PaymentProviderConfigSummary>("/erp/cash/payment-provider", {
+    method: "PATCH", accessToken: input.accessToken, headers: organizationHeaders(input.organizationId), body: input.body,
+  });
+}
+
+export function getFinancialPlanning(
+  input: OrganizationRequestInput & { branchId: string },
+) {
+  return apiRequest<FinancialPlanningSummary>(
+    `/erp/finance/planning?branchId=${encodeURIComponent(input.branchId)}`,
+    { accessToken: input.accessToken, headers: organizationHeaders(input.organizationId) },
+  );
+}
+
+export function upsertFinancialPlan(
+  input: OrganizationRequestInput & {
+    body: { branchId: string; monthlySalesTarget: number; dailyConsumptionTarget?: number; alertThresholdPercent?: number };
+  },
+) {
+  return apiRequest<FinancialPlanningSummary["plan"]>("/erp/finance/planning", {
+    method: "POST", accessToken: input.accessToken, headers: organizationHeaders(input.organizationId), body: input.body,
+  });
+}
+
+export function createRecurringExpense(
+  input: OrganizationRequestInput & {
+    body: { branchId: string; name: string; amount: number; startsOn: string; endsOn?: string; enabled?: boolean };
+  },
+) {
+  return apiRequest<FinancialPlanningSummary["recurringExpenses"][number]>("/erp/finance/planning/recurring-expenses", {
+    method: "POST", accessToken: input.accessToken, headers: organizationHeaders(input.organizationId), body: input.body,
+  });
+}
+
+export function deleteRecurringExpense(
+  input: OrganizationRequestInput & { expenseId: string },
+) {
+  return apiRequest<{ deleted: boolean }>(`/erp/finance/planning/recurring-expenses/${input.expenseId}`, {
+    method: "DELETE", accessToken: input.accessToken, headers: organizationHeaders(input.organizationId),
+  });
 }

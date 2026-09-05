@@ -633,6 +633,85 @@ export type DashboardNotification = {
   route?: string;
 };
 
+export type PaymentProviderConfigSummary = {
+  provider: string;
+  environment: "TEST" | "PRODUCTION";
+  merchantCode: string;
+  facilitatorCode: string | null;
+  enabled: boolean;
+  hasApiKey: boolean;
+  configured: boolean;
+  updatedAt: string | null;
+};
+
+export type FinancialPlanningSummary = {
+  branchId: string;
+  plan: {
+    id: string;
+    monthlySalesTarget: number;
+    dailyConsumptionTarget: number | null;
+    alertThresholdPercent: number;
+  } | null;
+  recurringExpenses: Array<{
+    id: string;
+    name: string;
+    amount: number;
+    frequency: "MONTHLY";
+    startsOn: string;
+    endsOn: string | null;
+    enabled: boolean;
+  }>;
+  summary: {
+    recurringExpenseTotal: number;
+    salesTotal: number;
+    productCostTotal: number;
+    contributionMarginPercent: number;
+    consumptionCount: number;
+    recommendedMonthlySalesTarget: number;
+    effectiveMonthlySalesTarget: number;
+    expectedSalesToDate: number;
+    targetProgressPercent: number;
+    isBelowExpectedPace: boolean;
+  };
+};
+
+export type ErpNotificationSeverity = "INFO" | "SUCCESS" | "WARNING" | "CRITICAL";
+
+export type ErpNotificationSummary = {
+  id: string;
+  recipientId: string;
+  title: string;
+  message: string;
+  eventKey: string;
+  audience: "ORGANIZATION" | "BRANCH" | "PERMISSION" | "INDIVIDUAL" | "SYSTEM";
+  severity: ErpNotificationSeverity;
+  moduleKey: string | null;
+  submoduleKey: string | null;
+  permissionKey: string | null;
+  entityType: string | null;
+  entityId: string | null;
+  route: string | null;
+  metadata: unknown;
+  branch: { id: string; name: string; code: string | null } | null;
+  actor: {
+    id: string;
+    email: string | null;
+    firstName: string | null;
+    lastName: string | null;
+  } | null;
+  readAt: string | null;
+  deliveredAt: string | null;
+  createdAt: string;
+};
+
+export type ErpNotificationsResponse = {
+  data: ErpNotificationSummary[];
+  total: number;
+  unread: number;
+  page: number;
+  limit: number;
+};
+
 export type DashboardSummary = {
   context: {
     scope: DashboardScope;

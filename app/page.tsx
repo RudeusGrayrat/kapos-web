@@ -23,6 +23,7 @@ import {
   Zap,
 } from "lucide-react";
 import { useAuth } from "./context/auth-context";
+import { publicSite } from "./config/public-site";
 
 const PUBLIC_NAV = [
   { label: "Funciones", href: "#funciones" },
@@ -71,6 +72,40 @@ const MODULES = [
   ["Configuracion", "Catalogos, usuarios y permisos.", Settings],
   ["Nube segura", "Accede desde cualquier lugar y dispositivo.", Cloud],
 ] as const;
+
+function InstagramIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" className={className} aria-hidden="true">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function FacebookIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M13.7 21v-8h2.7l.4-3.1h-3.1V7.92c0-.9.25-1.52 1.56-1.52H16.9V3.62A22.6 22.6 0 0 0 14.5 3.5c-2.37 0-4 1.45-4 4.1v2.3H7.8V13h2.7v8h3.2Z" />
+    </svg>
+  );
+}
+
+function TikTokIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M15.2 3c.36 2.47 1.75 3.94 4.1 4.1v3.1a8.2 8.2 0 0 1-4.04-1.18v6.24a5.77 5.77 0 1 1-5-5.72v3.18a2.68 2.68 0 1 0 1.88 2.56V3h3.06Z" />
+    </svg>
+  );
+}
+
+function LinkedInIcon({ className }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className={className} aria-hidden="true">
+      <path d="M6.1 8.4H3V21h3.1V8.4ZM4.55 3A1.8 1.8 0 1 0 4.6 6.6 1.8 1.8 0 0 0 4.55 3ZM21 13.8c0-3.8-2-5.6-4.7-5.6-2.17 0-3.15 1.2-3.7 2.04V8.4H9.5V21h3.1v-6.24c0-1.64.3-3.22 2.34-3.22 2 0 2.03 1.88 2.03 3.33V21H20v-7.2Z" />
+    </svg>
+  );
+}
 
 function ErpPreview() {
   return (
@@ -212,12 +247,15 @@ export default function LandingPage() {
       </section>
 
       <section className="mx-auto w-full max-w-[1320px] px-5 py-8 md:px-8">
-        <div className="grid items-center gap-7 overflow-hidden rounded-[8px] border border-[#B8F5BC] bg-[linear-gradient(90deg,#E8FCEB_0%,#FFFFFF_62%,#E8FCEB_100%)] px-7 py-8 md:grid-cols-[0.8fr_1.3fr_0.8fr]">
-          <div className="flex items-end justify-center gap-4 md:justify-start">
-            <div className="h-24 w-28 rotate-[-12deg] rounded-[8px] border border-[#E4E4E4] bg-[linear-gradient(135deg,#8A5A2A_0%,#D7A947_48%,#5B371A_100%)] shadow-[0_18px_30px_rgba(13,13,13,0.14)]" />
-            <div className="grid h-28 w-20 place-items-center rounded-b-[18px] rounded-t-[10px] bg-[#0D0D0D] text-5xl font-black text-[#40D653] shadow-[0_18px_30px_rgba(13,13,13,0.16)]">
-              K
-            </div>
+        <div className="grid items-center gap-8 overflow-hidden rounded-[20px] border border-[#B8F5BC] bg-[linear-gradient(90deg,#E8FCEB_0%,#FFFFFF_62%,#E8FCEB_100%)] p-5 sm:p-7 md:grid-cols-[1fr_1.1fr]">
+          <div className="overflow-hidden rounded-[16px] border border-[#E4E4E4] bg-white shadow-[0_18px_36px_rgba(13,13,13,0.12)]">
+            <Image
+              src="/promo/kapos-dashboard-promo-v3.png"
+              alt="Dashboard de Kapos con ventas, inventario y accesos operativos"
+              width={1680}
+              height={940}
+              className="h-auto w-full"
+            />
           </div>
           <div className="text-center md:text-left">
             <h2 className="text-2xl font-black text-[#0D0D0D] md:text-3xl">
@@ -226,6 +264,10 @@ export default function LandingPage() {
             <p className="mt-3 text-sm leading-7 text-[#535353]">
               Solicita una demo personalizada y descubre como podemos ayudarte a crecer.
             </p>
+            <div className="mt-5 grid gap-3 text-left sm:grid-cols-2">
+              <p className="flex items-center gap-3 text-sm font-semibold text-[#0D0D0D]"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00C70D]" />Recorre el ERP con tu operación.</p>
+              <p className="flex items-center gap-3 text-sm font-semibold text-[#0D0D0D]"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00C70D]" />Resuelve tus dudas antes de empezar.</p>
+            </div>
             <a
               href="#contacto"
               className="mt-5 inline-flex min-h-12 items-center gap-4 rounded-[8px] bg-[#00C70D] px-8 text-sm font-black text-white shadow-[0_16px_30px_rgba(0,199,13,0.22)] transition hover:bg-[#00920A]"
@@ -233,20 +275,6 @@ export default function LandingPage() {
               Solicitar demo
               <ArrowRight className="h-4 w-4" />
             </a>
-          </div>
-          <div className="text-center md:text-left">
-            <div className="mx-auto flex justify-center -space-x-3 md:justify-start">
-              {["AM", "LC", "JR", "KV"].map((initials, index) => (
-                <span
-                  key={initials}
-                  className="grid h-11 w-11 place-items-center rounded-full border-2 border-white bg-[#F1F1F1] text-xs font-black text-[#0D0D0D]"
-                  style={{ transform: `translateY(${index % 2 ? 4 : 0}px)` }}
-                >
-                  {initials}
-                </span>
-              ))}
-            </div>
-            <p className="mt-4 text-sm leading-6 text-[#535353]">Mas de 500 negocios ya confian en Kapos.</p>
           </div>
         </div>
       </section>
@@ -258,11 +286,27 @@ export default function LandingPage() {
             <p className="mt-4 max-w-xs text-sm leading-7 text-[#535353]">
               El ERP en la nube disenado para negocios saludables que buscan crecer con control y simplicidad.
             </p>
-            <div className="mt-5 flex gap-3 text-sm font-black text-[#535353]">
-              <span>IG</span>
-              <span>FB</span>
-              <span>TT</span>
-              <span>IN</span>
+            <div className="mt-5 flex gap-3">
+              {publicSite.social.instagramUrl ? (
+                <a href={publicSite.social.instagramUrl} target="_blank" rel="noreferrer" aria-label="Instagram de Kapos" className="grid h-10 w-10 place-items-center rounded-full border border-[#E4E4E4] text-[#0D0D0D] transition hover:border-[#00C70D] hover:bg-[#E8FCEB] hover:text-[#00920A]">
+                  <InstagramIcon className="h-5 w-5" />
+                </a>
+              ) : null}
+              {publicSite.social.facebookUrl ? (
+                <a href={publicSite.social.facebookUrl} target="_blank" rel="noreferrer" aria-label="Facebook de Kapos" className="grid h-10 w-10 place-items-center rounded-full border border-[#E4E4E4] text-[#0D0D0D] transition hover:border-[#00C70D] hover:bg-[#E8FCEB] hover:text-[#00920A]">
+                  <FacebookIcon className="h-5 w-5" />
+                </a>
+              ) : null}
+              {publicSite.social.tiktokUrl ? (
+                <a href={publicSite.social.tiktokUrl} target="_blank" rel="noreferrer" aria-label="TikTok de Kapos" className="grid h-10 w-10 place-items-center rounded-full border border-[#E4E4E4] text-[#0D0D0D] transition hover:border-[#00C70D] hover:bg-[#E8FCEB] hover:text-[#00920A]">
+                  <TikTokIcon className="h-5 w-5" />
+                </a>
+              ) : null}
+              {publicSite.social.linkedinUrl ? (
+                <a href={publicSite.social.linkedinUrl} target="_blank" rel="noreferrer" aria-label="LinkedIn de Kapos" className="grid h-10 w-10 place-items-center rounded-full border border-[#E4E4E4] text-[#0D0D0D] transition hover:border-[#00C70D] hover:bg-[#E8FCEB] hover:text-[#00920A]">
+                  <LinkedInIcon className="h-5 w-5" />
+                </a>
+              ) : null}
             </div>
           </div>
           <div>
@@ -292,9 +336,34 @@ export default function LandingPage() {
           <div>
             <h3 className="font-black text-[#0D0D0D]">Contacto</h3>
             <div className="mt-4 space-y-3 text-sm text-[#535353]">
-              <p className="flex items-center gap-3"><Mail className="h-4 w-4 text-[#00C70D]" />hola@kapos.app</p>
-              <p className="flex items-center gap-3"><Phone className="h-4 w-4 text-[#00C70D]" />+57 300 123 4567</p>
-              <p className="flex items-center gap-3"><MapPin className="h-4 w-4 text-[#00C70D]" />Medellin, Colombia</p>
+              {publicSite.contact.email ? (
+                <a href={`mailto:${publicSite.contact.email}`} className="flex items-center gap-3 hover:text-[#00920A]">
+                  <Mail className="h-4 w-4 shrink-0 text-[#00C70D]" />
+                  {publicSite.contact.email}
+                </a>
+              ) : null}
+              {publicSite.contact.phone ? (
+                <a href={`tel:${publicSite.contact.phone.replace(/[^+\d]/g, "")}`} className="flex items-center gap-3 hover:text-[#00920A]">
+                  <Phone className="h-4 w-4 shrink-0 text-[#00C70D]" />
+                  {publicSite.contact.phone}
+                </a>
+              ) : null}
+              {publicSite.contact.whatsappUrl ? (
+                <a href={publicSite.contact.whatsappUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-[#00920A]">
+                  <Phone className="h-4 w-4 shrink-0 text-[#00C70D]" />
+                  WhatsApp
+                </a>
+              ) : null}
+              {publicSite.contact.address ? (
+                publicSite.contact.mapsUrl ? (
+                  <a href={publicSite.contact.mapsUrl} target="_blank" rel="noreferrer" className="flex items-center gap-3 hover:text-[#00920A]">
+                    <MapPin className="h-4 w-4 shrink-0 text-[#00C70D]" />
+                    {publicSite.contact.address}
+                  </a>
+                ) : (
+                  <p className="flex items-center gap-3"><MapPin className="h-4 w-4 shrink-0 text-[#00C70D]" />{publicSite.contact.address}</p>
+                )
+              ) : null}
             </div>
           </div>
         </div>
