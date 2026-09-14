@@ -69,6 +69,11 @@ function customerOptionLabel(customer: CustomerSummary) {
   return [customer.user.firstName, customer.user.lastName].filter(Boolean).join(" ") || customer.user.documentNumber || customer.user.phone || customer.user.email || "Cliente";
 }
 
+function isExternalIzipayMethod(method: PaymentMethodSummary | undefined) {
+  if (!method) return false;
+  return `${method.code} ${method.name}`.toLowerCase().includes("izipay");
+}
+
 function escapeHtml(value: string) {
   return value.replace(/[&<>"]/g, (character) => ({
     "&": "&amp;",
@@ -126,7 +131,7 @@ export default function PosPage() {
     note: "",
   });
   const [itemForm, setItemForm] = useState({ productId: "", quantity: "1", note: "" });
-  const [paymentForm, setPaymentForm] = useState({ paymentMethodId: "", amount: "" });
+  const [paymentForm, setPaymentForm] = useState({ paymentMethodId: "", amount: "", providerRef: "" });
   const [paymentCustomerProfileId, setPaymentCustomerProfileId] = useState("");
   const [billingDocumentType, setBillingDocumentType] = useState<PosBillingDocumentType>("TICKET");
   const [billingRecipient, setBillingRecipient] = useState({
@@ -453,6 +458,11 @@ export default function PosPage() {
       setError("Para emitir factura ingresa RUC de 11 digitos y razon social.");
       return;
     }
+    const paymentMethod = paymentMethods.find((method) => method.id === paymentForm.paymentMethodId);
+    if (isExternalIzipayMethod(paymentMethod) && !paymentForm.providerRef.trim()) {
+      setError("Ingresa el numero de operacion o autorizacion mostrado por Izipay/Somos Ari.");
+      return;
+    }
     setBusy(true);
     setError(null);
     try {
@@ -478,6 +488,8 @@ export default function PosPage() {
           cashSessionId,
           paymentMethodId: paymentForm.paymentMethodId || undefined,
           amount: Number(paymentForm.amount),
+          provider: isExternalIzipayMethod(paymentMethod) ? "IZIPAY_EXTERNAL" : undefined,
+          providerRef: isExternalIzipayMethod(paymentMethod) ? paymentForm.providerRef.trim() : undefined,
           billingDocumentType,
           billingRecipient: billingDocumentType === "FACTURA"
             ? {
@@ -516,6 +528,8 @@ export default function PosPage() {
   const canMoveTables = effectivePermissionKeys.includes("sales.orders.move_table");
   const canGeneratePrebill = effectivePermissionKeys.includes("sales.orders.prebill");
   const canCancelItems = effectivePermissionKeys.includes("sales.orders.cancel_item");
+  const selectedPaymentMethod = paymentMethods.find((method) => method.id === paymentForm.paymentMethodId);
+  const requiresExternalIzipayReference = isExternalIzipayMethod(selectedPaymentMethod);
 
   async function handlePrintInternalTicket() {
     if (!lastClosedAccount) return;
@@ -742,7 +756,12 @@ export default function PosPage() {
                   ))}
                 </div>
               ) : null}
-              <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_auto]" onSubmit={handlePayment}><select className={inputClass} value={paymentForm.paymentMethodId} onChange={(event) => setPaymentForm((current) => ({ ...current, paymentMethodId: event.target.value }))}>{paymentMethods.map((method) => <option key={method.id} value={method.id}>{method.name}</option>)}</select><input className={inputClass} type="number" min="0.01" max={selectedAccount.balance} step="0.01" value={paymentForm.amount} readOnly={splitByItems} onChange={(event) => setPaymentForm((current) => ({ ...current, amount: event.target.value }))} required /><AdminActionButton type="submit" tone="primary" icon={<CreditCard className="h-4 w-4" />} disabled={busy || !cashSessionId || Number(paymentForm.amount) <= 0}>Registrar pago</AdminActionButton></form>
+              <form className="grid gap-3 md:grid-cols-[minmax(0,1fr)_180px_auto]" onSubmit={handlePayment}>
+                <select className={inputClass} value={paymentForm.paymentMethodId} onChange={(event) => setPaymentForm((current) => ({ ...current, paymentMethodId: event.target.value, providerRef: "" }))}>{paymentMethods.map((method) => <option key={method.id} value={method.id}>{method.name}</option>)}</select>
+                <input className={inputClass} type="number" min="0.01" max={selectedAccount.balance} step="0.01" value={paymentForm.amount} readOnly={splitByItems} onChange={(event) => setPaymentForm((current) => ({ ...current, amount: event.target.value }))} required />
+                <AdminActionButton type="submit" tone="primary" icon={<CreditCard className="h-4 w-4" />} disabled={busy || !cashSessionId || Number(paymentForm.amount) <= 0}>{requiresExternalIzipayReference ? "Confirmar cobro Izipay" : "Registrar pago"}</AdminActionButton>
+                {requiresExternalIzipayReference ? <label className="space-y-2 md:col-span-3"><span className="text-sm font-semibold">N. de operacion o autorizacion Izipay</span><input className={inputClass} value={paymentForm.providerRef} onChange={(event) => setPaymentForm((current) => ({ ...current, providerRef: event.target.value }))} placeholder="Ej. 123456 o el codigo mostrado en Somos Ari" required /><small className="block leading-5 text-[#6b7558]">Primero confirma que el cobro fue aprobado en el terminal externo. Kapos registrara esta referencia para auditoria y conciliacion.</small></label> : null}
+              </form>
             </PanelCard>
           </div>
         ) : (

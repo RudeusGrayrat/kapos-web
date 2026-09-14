@@ -306,10 +306,11 @@ export function createProduct(
 }
 
 export function uploadProductCreateImage(
-  input: OrganizationRequestInput & { file: File },
+  input: OrganizationRequestInput & { file: File; productName?: string },
 ) {
   const body = new FormData();
   body.set("file", input.file);
+  if (input.productName?.trim()) body.set("productName", input.productName.trim());
 
   return apiRequest<UploadedAssetSummary>(
     "/erp/uploads/products/create-image",
@@ -334,10 +335,11 @@ export function updateProduct(
 }
 
 export function uploadProductUpdateImage(
-  input: OrganizationRequestInput & { file: File },
+  input: OrganizationRequestInput & { file: File; productName?: string },
 ) {
   const body = new FormData();
   body.set("file", input.file);
+  if (input.productName?.trim()) body.set("productName", input.productName.trim());
 
   return apiRequest<UploadedAssetSummary>(
     "/erp/uploads/products/update-image",

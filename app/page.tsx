@@ -29,7 +29,7 @@ const PUBLIC_NAV = [
   { label: "Funciones", href: "#funciones" },
   { label: "Beneficios", href: "#beneficios" },
   { label: "Planes", href: "#planes" },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Contacto", href: "#contactos" },
 ];
 
 const FEATURES = [
@@ -177,7 +177,7 @@ export default function LandingPage() {
 
             <div className="mt-8 flex flex-wrap gap-4">
               <a
-                href="#contacto"
+                href="#contactos"
                 className="inline-flex min-h-14 items-center gap-4 rounded-[10px] bg-[#00C70D] px-8 text-base font-black text-white shadow-[0_18px_34px_rgba(0,199,13,0.24)] transition hover:bg-[#00920A]"
               >
                 Solicitar demo
@@ -269,7 +269,7 @@ export default function LandingPage() {
               <p className="flex items-center gap-3 text-sm font-semibold text-[#0D0D0D]"><CheckCircle2 className="h-5 w-5 shrink-0 text-[#00C70D]" />Resuelve tus dudas antes de empezar.</p>
             </div>
             <a
-              href="#contacto"
+              href="#contactos"
               className="mt-5 inline-flex min-h-12 items-center gap-4 rounded-[8px] bg-[#00C70D] px-8 text-sm font-black text-white shadow-[0_16px_30px_rgba(0,199,13,0.22)] transition hover:bg-[#00920A]"
             >
               Solicitar demo
@@ -279,7 +279,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      <footer id="contacto" className="border-t border-[#E4E4E4] bg-white">
+      <footer id="contactos" className="border-t border-[#E4E4E4] bg-white">
         <div className="mx-auto grid w-full max-w-[1320px] gap-10 px-5 py-10 md:grid-cols-[1.4fr_0.7fr_0.7fr_0.7fr_1fr] md:px-8">
           <div>
             <Image src="/brand/kapos-logo.svg" alt="Kapos" width={158} height={57} className="h-auto w-32" />
@@ -322,15 +322,15 @@ export default function LandingPage() {
             <h3 className="font-black text-[#0D0D0D]">Empresa</h3>
             <div className="mt-4 space-y-3 text-sm text-[#535353]">
               <a href="#funciones" className="block hover:text-[#00C70D]">Sobre nosotros</a>
-              <a href="#contacto" className="block hover:text-[#00C70D]">Blog</a>
-              <a href="#contacto" className="block hover:text-[#00C70D]">Soporte</a>
+              <a href="#contactos" className="block hover:text-[#00C70D]">Blog</a>
+              <a href="#contactos" className="block hover:text-[#00C70D]">Soporte</a>
             </div>
           </div>
           <div>
             <h3 className="font-black text-[#0D0D0D]">Legal</h3>
             <div className="mt-4 space-y-3 text-sm text-[#535353]">
-              <a href="#contacto" className="block hover:text-[#00C70D]">Terminos y condiciones</a>
-              <a href="#contacto" className="block hover:text-[#00C70D]">Politica de privacidad</a>
+              <a href="#contactos" className="block hover:text-[#00C70D]">Terminos y condiciones</a>
+              <a href="#contactos" className="block hover:text-[#00C70D]">Politica de privacidad</a>
             </div>
           </div>
           <div>

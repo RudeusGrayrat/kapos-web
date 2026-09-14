@@ -216,6 +216,7 @@ export default function CatalogoProductosPage() {
       accessToken: token,
       organizationId: activeOrganizationId,
       file,
+      productName: form.name,
     });
 
     toast.showSuccess("Imagen subida al catalogo.", "Imagen lista");
@@ -235,6 +236,7 @@ export default function CatalogoProductosPage() {
       accessToken: token,
       organizationId: activeOrganizationId,
       file,
+      productName: editForm.name,
     });
 
     toast.showSuccess("Imagen subida al catalogo.", "Imagen lista");
@@ -265,7 +267,7 @@ export default function CatalogoProductosPage() {
           status: editForm.status,
           trackStock: editForm.trackStock,
           availableForPos: editForm.availableForPos,
-          imageUrl: editForm.imageUrl || undefined,
+          imageUrl: editForm.imageUrl || null,
         },
       });
       setSelectedProduct(null);

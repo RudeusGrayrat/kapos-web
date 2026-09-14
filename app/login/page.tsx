@@ -54,28 +54,13 @@ function LoginPageContent() {
           >
             Volver al landing
           </Link>
-          <h1 className="mt-8 text-4xl font-semibold leading-tight">
-            Ingresa al ERP protegido de Kapos.
-          </h1>
+          <h1 className="mt-8 text-4xl font-semibold leading-tight">Kapos ERP</h1>
           <p className="mt-5 max-w-md text-sm leading-7 text-white/75">
-            Despues del login el usuario entra al dashboard y desde ese punto
-            el sidebar siempre se mantiene como estructura fija del sistema.
+            Gestiona las operaciones de tu negocio desde un solo lugar.
           </p>
-
-          <div className="mt-10 space-y-4">
-            {[
-              "Landing publico separado del shell privado.",
-              "Rutas ERP bloqueadas si no existe sesion.",
-              "Sidebar por modulos con submodulos laterales.",
-            ].map((item) => (
-              <div
-                key={item}
-                className="rounded-[24px] border border-white/10 bg-white/10 px-4 py-4 text-sm text-white/85 backdrop-blur"
-              >
-                {item}
-              </div>
-            ))}
-          </div>
+          <Link href="/#contactos" className="mt-10 inline-flex text-sm font-semibold text-[#8DF593] transition hover:text-white">
+            ¿Necesitas ayuda? Contáctanos
+          </Link>
         </section>
 
         <section className="p-8 md:p-10">
@@ -86,17 +71,8 @@ function LoginPageContent() {
             Accede a tu espacio de trabajo
           </h2>
           <p className="mt-4 max-w-lg text-sm leading-7 text-[#535353]">
-            Ingresa con tu acceso ERP de Kapos. En local tendras un usuario
-            maestro para administrar organizaciones, cuentas, permisos y
-            modulos desde la base del sistema.
+            Ingresa con tus credenciales para continuar.
           </p>
-          <div className="mt-4 rounded-[20px] border border-[#B8F5BC] bg-[#E8FCEB] px-4 py-3 text-sm text-[#0D0D0D]">
-            Acceso local inicial: usuario <strong>ADMIN</strong> o correo{" "}
-            <strong>admin@kapos.local</strong> con contrasena{" "}
-            <strong>admin</strong>. Ese usuario solo existe como superadmin de
-            Kapos; desde ahi tu crearas empresas como Basti y asignaras sus
-            owners, permisos y modulos.
-          </div>
 
           <form onSubmit={handleSubmit} className="mt-8 space-y-5">
             <label className="block">
@@ -107,7 +83,7 @@ function LoginPageContent() {
                 value={identifier}
                 onChange={(event) => setIdentifier(event.target.value)}
                 className="w-full rounded-[20px] border border-[#E4E4E4] bg-[#ffffff] px-4 py-3 text-sm text-[#0D0D0D] outline-none transition focus:border-[#0D0D0D]"
-                placeholder="admin, correo@empresa.com o identificador"
+                placeholder="Ingresa tu usuario o correo"
                 autoComplete="username"
                 required
               />
@@ -139,7 +115,7 @@ function LoginPageContent() {
               disabled={isSubmitting}
               className="inline-flex w-full items-center justify-center rounded-full bg-[#0D0D0D] px-6 py-3.5 text-sm font-semibold text-white shadow-[0_18px_35px_rgba(47,60,29,0.2)] transition hover:bg-[#1A1A1A] disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {isSubmitting ? "Ingresando..." : "Entrar al dashboard"}
+              {isSubmitting ? "Ingresando..." : "Iniciar sesión"}
             </button>
           </form>
         </section>
