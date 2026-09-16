@@ -19,6 +19,8 @@ import {
   Grid2x2,
   LayoutDashboard,
   LogOut,
+  Menu,
+  MoreHorizontal,
   Package,
   Receipt,
   Settings,
@@ -28,6 +30,7 @@ import {
   Truck,
   Users,
   Wallet,
+  X,
 } from "lucide-react";
 import { useAuth } from "../context/auth-context";
 import { useNotifications } from "../context/notifications-context";
@@ -224,7 +227,7 @@ function getActiveCategory(pathname: string, categories: Category[]) {
 export default function SideBar() {
   const { activeOrganization, logout, navigationCatalog, platformContext } =
     useAuth();
-  const { unreadCount, refreshNotifications } = useNotifications();
+  const { unreadCount } = useNotifications();
   const pathname = usePathname();
   const router = useRouter();
   const shellRef = useRef<HTMLDivElement | null>(null);
@@ -246,6 +249,8 @@ export default function SideBar() {
   const [openedCategoryKey, setOpenedCategoryKey] = useState<string | null>(
     null,
   );
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isQuickMenuOpen, setIsQuickMenuOpen] = useState(false);
 
   const visibleCategory =
     visibleCategories.find((category) => category.key === openedCategoryKey) ??
@@ -267,6 +272,8 @@ export default function SideBar() {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape") {
         setOpenedCategoryKey(null);
+        setIsMobileMenuOpen(false);
+        setIsQuickMenuOpen(false);
       }
     };
 
@@ -277,6 +284,7 @@ export default function SideBar() {
 
       if (!shellRef.current.contains(event.target as Node)) {
         setOpenedCategoryKey(null);
+        setIsQuickMenuOpen(false);
       }
     };
 
@@ -290,6 +298,53 @@ export default function SideBar() {
   }, []);
 
   return (
+    <>
+      <button
+        type="button"
+        onClick={() => setIsMobileMenuOpen(true)}
+        className="fixed left-4 top-4 z-[90] grid h-12 w-12 place-items-center rounded-2xl border border-white/10 bg-[var(--kapos-black)] text-white shadow-lg lg:hidden"
+        aria-label="Abrir menu del ERP"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
+      {isMobileMenuOpen ? (
+        <div className="fixed inset-0 z-[100] lg:hidden">
+          <button
+            type="button"
+            aria-label="Cerrar menu"
+            className="absolute inset-0 bg-black/45 backdrop-blur-sm"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
+          <aside className="relative flex h-full w-[min(22rem,calc(100%-2.5rem))] flex-col bg-[linear-gradient(180deg,#050505_0%,var(--kapos-black)_100%)] px-5 py-6 text-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-white/10 pb-5">
+              <Link href="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-3 text-lg font-black">
+                {ICONS.logo}<span>Kapos</span>
+              </Link>
+              <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="grid h-10 w-10 place-items-center rounded-xl bg-white/10" aria-label="Cerrar menu"><X className="h-5 w-5" /></button>
+            </div>
+            <nav className="min-h-0 flex-1 space-y-6 overflow-y-auto py-6 pr-1">
+              {visibleCategories.map((category) => (
+                <section key={category.key}>
+                  <div className="flex items-center gap-3 px-2 text-sm font-black text-[#c8ff5e]">{category.icon}<span>{category.label}</span></div>
+                  <div className="mt-3 space-y-1">
+                    {category.items.map((item) => {
+                      const isActive = isActivePath(pathname, item.path);
+                      return <Link key={item.path} href={item.path} onClick={() => setIsMobileMenuOpen(false)} className={`block rounded-xl px-4 py-3 text-sm transition ${isActive ? "bg-white text-[var(--kapos-black)] font-bold" : "text-white/72 hover:bg-white/10 hover:text-white"}`}>{item.label}</Link>;
+                    })}
+                  </div>
+                </section>
+              ))}
+            </nav>
+            <div className="flex gap-2 border-t border-white/10 pt-5">
+              <Link href="/notificaciones" onClick={() => setIsMobileMenuOpen(false)} className="relative grid h-11 w-11 place-items-center rounded-xl bg-[#c8ff5e] text-[var(--kapos-black)]" aria-label="Ver notificaciones"><Bell className="h-5 w-5" />{unreadCount > 0 ? <span className="absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--kapos-danger)] px-1 text-[0.65rem] font-black leading-none text-white">{unreadCount > 99 ? "99+" : unreadCount}</span> : null}</Link>
+              <Link href="/perfil" onClick={() => setIsMobileMenuOpen(false)} className="flex-1 rounded-xl bg-white/10 px-4 py-3 text-center text-sm font-bold">Perfil</Link>
+              <button type="button" onClick={() => void handleLogout()} className="rounded-xl px-4 py-3 text-sm font-bold text-white/70 hover:bg-red-500 hover:text-white">Salir</button>
+            </div>
+          </aside>
+        </div>
+      ) : null}
+
     <div
       ref={shellRef}
       className="relative my-6 ml-6 hidden w-20 shrink-0 select-none overflow-visible lg:block"
@@ -376,42 +431,23 @@ export default function SideBar() {
           })}
         </nav>
 
-        <div className="mt-auto w-full flex-col space-y-4">
+        <div className="relative mt-auto w-full flex-col space-y-4">
+          {isQuickMenuOpen ? (
+            <div className="absolute bottom-0 left-24 z-40 flex items-center gap-3 rounded-full border border-[var(--kapos-border)] bg-[var(--kapos-card)] p-2 shadow-[0_18px_42px_rgba(12,13,15,.18)]">
+              <Link href="/notificaciones" onClick={() => setIsQuickMenuOpen(false)} className="group relative grid h-12 w-12 place-items-center rounded-full bg-[var(--kapos-green-wash)] text-[var(--kapos-green-dark)] transition hover:bg-[var(--kapos-green)] hover:text-white" aria-label="Ver notificaciones"><Bell className="h-5 w-5" />{unreadCount > 0 ? <span className="absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--kapos-danger)] px-1 text-[0.65rem] font-black leading-none text-white">{unreadCount > 99 ? "99+" : unreadCount}</span> : null}</Link>
+              <Link href="/perfil" onClick={() => setIsQuickMenuOpen(false)} className="grid h-12 w-12 place-items-center rounded-full bg-[var(--kapos-black)] text-white transition hover:bg-[var(--kapos-charcoal)]" aria-label="Ir a mi perfil">{ICONS.profile}</Link>
+              <button type="button" onClick={() => void handleLogout()} className="grid h-12 w-12 place-items-center rounded-full text-[var(--kapos-text-muted)] transition hover:bg-[var(--kapos-danger)] hover:text-white" aria-label="Cerrar sesion">{ICONS.logout}</button>
+            </div>
+          ) : null}
           <button
             type="button"
-            onClick={() => void refreshNotifications()}
-            className="group relative flex h-16 w-full items-center overflow-visible pl-4"
+            onClick={() => setIsQuickMenuOpen((current) => !current)}
+            className="group relative flex h-16 w-full items-center overflow-visible pl-4 text-[var(--kapos-text-muted)] transition-colors hover:text-white"
+            aria-label={isQuickMenuOpen ? "Cerrar menu rapido" : "Abrir menu rapido"}
           >
-            <HoverTooltip label="Notificaciones" side="right" />
-            <div className="relative flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--kapos-border)] bg-[var(--kapos-card)] text-[var(--kapos-black)] shadow-md transition group-hover:border-[var(--kapos-success)] group-hover:bg-[var(--kapos-green-wash)]">
-              <Bell className="h-5 w-5" />
-              {unreadCount > 0 ? (
-                <span className="absolute -right-1 -top-1 grid min-h-5 min-w-5 place-items-center rounded-full bg-[var(--kapos-danger)] px-1 text-[0.65rem] font-black leading-none text-white shadow-md">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              ) : null}
-            </div>
-          </button>
-
-          <Link
-            href="/perfil"
-            className="group relative flex h-16 w-full items-center overflow-visible pl-4"
-            onClick={() => setOpenedCategoryKey(null)}
-          >
-            <HoverTooltip label="Perfil" side="right" />
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-[var(--kapos-border)] bg-[var(--kapos-card)] text-[var(--kapos-black)] shadow-md">
-              {ICONS.profile}
-            </div>
-          </Link>
-
-          <button
-            type="button"
-            onClick={() => void handleLogout()}
-            className="group relative flex h-14 w-full items-center pl-4 text-[var(--kapos-text-muted)] transition-colors hover:text-white"
-          >
-            <HoverTooltip label="Salir" side="right" />
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full group-hover:bg-[var(--kapos-danger)]">
-              {ICONS.logout}
+            <HoverTooltip label="Mas opciones" side="right" />
+            <div className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-full transition ${isQuickMenuOpen ? "bg-[var(--kapos-card)] text-[var(--kapos-black)]" : "group-hover:bg-[var(--kapos-charcoal)]"}`}>
+              <MoreHorizontal className="h-5 w-5" />
             </div>
           </button>
         </div>
@@ -495,5 +531,6 @@ export default function SideBar() {
         </div>
       ) : null}
     </div>
+    </>
   );
 }

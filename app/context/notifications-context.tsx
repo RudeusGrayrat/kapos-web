@@ -78,6 +78,10 @@ export function NotificationsProvider({ children }: { children: React.ReactNode 
         show(newestUnread.message, newestUnread.title);
       }
       hasHydratedRef.current = true;
+    } catch {
+      // Notifications are auxiliary: a temporary API failure must not disrupt ERP navigation.
+      setNotifications([]);
+      setUnreadCount(0);
     } finally {
       setIsLoading(false);
     }

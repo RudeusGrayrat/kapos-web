@@ -238,6 +238,7 @@ export default function PlatformOrganizationsPage() {
       await createPlatformOrganization(token, {
         legalName: form.legalName,
         tradeName: form.tradeName || undefined,
+        slug: form.slug || undefined,
         documentNumber: form.documentNumber || undefined,
         email: form.email || undefined,
         phone: form.phone || undefined,
@@ -295,6 +296,7 @@ export default function PlatformOrganizationsPage() {
       await updatePlatformOrganization(token, selectedOrganization.id, {
         legalName: editForm.legalName,
         tradeName: editForm.tradeName || undefined,
+        slug: editForm.slug,
         documentNumber: editForm.documentNumber || undefined,
         email: editForm.email || undefined,
         phone: editForm.phone || undefined,
@@ -446,6 +448,11 @@ export default function PlatformOrganizationsPage() {
                 <label className="space-y-2">
                   <span className="text-sm font-semibold text-[#0D0D0D]">Nombre comercial</span>
                   <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" placeholder="Basti" value={form.tradeName} onChange={(event) => setForm((current) => ({ ...current, tradeName: event.target.value }))} />
+                </label>
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Slug de tienda online</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#00C70D]" placeholder="basti" value={form.slug} onChange={(event) => setForm((current) => ({ ...current, slug: event.target.value.toLowerCase() }))} pattern="[a-z0-9-]+" minLength={3} maxLength={50} />
+                  <p className="text-xs leading-5 text-[#A1A1A1]">Identificador público usado por Basti web y mobile. Solo letras minúsculas, números y guiones. Si lo dejas vacío, Kapos lo genera.</p>
                 </label>
                 <label className="space-y-2">
                   <span className="text-sm font-semibold text-[#0D0D0D]">RUC o documento</span>
@@ -695,6 +702,11 @@ export default function PlatformOrganizationsPage() {
                 <label className="space-y-2">
                   <span className="text-sm font-semibold text-[#0D0D0D]">Nombre comercial</span>
                   <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm outline-none transition focus:border-[#00C70D]" value={editForm.tradeName} onChange={(event) => setEditForm((current) => current ? { ...current, tradeName: event.target.value } : current)} />
+                </label>
+                <label className="space-y-2">
+                  <span className="text-sm font-semibold text-[#0D0D0D]">Slug de tienda online</span>
+                  <input className="w-full rounded-[20px] border border-[#E4E4E4] bg-white px-4 py-3 text-sm lowercase outline-none transition focus:border-[#00C70D]" value={editForm.slug} onChange={(event) => setEditForm((current) => current ? { ...current, slug: event.target.value.toLowerCase() } : current)} pattern="[a-z0-9-]+" minLength={3} maxLength={50} required />
+                  <p className="text-xs leading-5 text-[#A1A1A1]">Este valor forma la URL pública de la tienda. Cambiarlo requiere actualizar el slug configurado en cada frontend conectado.</p>
                 </label>
                 <label className="space-y-2">
                   <span className="text-sm font-semibold text-[#0D0D0D]">Documento</span>

@@ -35,7 +35,7 @@ export default function ErpLayout({ children }: ErpLayoutProps) {
       <div className="mx-auto flex max-h-screen w-full overflow-y-hidden">
         <SideBar />
 
-        <main className="min-w-0 overflow-y-hidden flex-1 px-4 py-6 lg:pr-6">
+        <main className="min-w-0 overflow-y-hidden flex-1 px-4 pb-6 pt-20 lg:py-6 lg:pr-6">
           <div className="min-h-[calc(100vh-3rem)] overflow-y-hidden rounded-[34px] border border-[var(--kapos-border)] bg-white/82 p-4   md:p-6">
             <div className="min-w-0 max-h-[calc(100vh-6rem)] overflow-y-auto rounded-[28px] p-3 md:p-5">
               <ErpRouteGuard>{children}</ErpRouteGuard>
